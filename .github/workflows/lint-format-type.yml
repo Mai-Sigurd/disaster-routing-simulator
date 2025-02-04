@@ -1,4 +1,4 @@
-name: Ruff Formatting & Linting
+name: Lint, Format & Type Check
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   lint-and-format:
-    name: Check Formatting & Linting
+    name: Run Formatting, Linting, & Type Checking
     runs-on: ubuntu-latest
 
     steps:
@@ -23,10 +23,13 @@ jobs:
           python-version: 3.13
 
       - name: Install Ruff
-        run: pip install ruff
+        run: pip install ruff mypy
 
-      - name: Run Ruff Formatter
-        run: ruff format --check .
+      - name: Run Ruff Formatter (Check Formatting)
+        run: ruff format --check src/
 
-      - name: Run Ruff Linter
-        run: ruff check .
+      - name: Run Ruff Linter (Check Code Quality)
+        run: ruff check src/
+
+      - name: Run Mypy (Type Checking)
+        run: mypy src/
