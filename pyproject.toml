@@ -19,6 +19,7 @@ scikit-learn = "^1.6.1"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
 mypy = "^1.14.1"
+ruff = "^0.9.4"
 
 [tool.mypy]
 python_version = "3.11"
