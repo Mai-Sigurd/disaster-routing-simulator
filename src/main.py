@@ -10,7 +10,7 @@ logging.basicConfig(
 )
 
 
-def download_osm_graph(queries: list[str]) -> nx.MultiDiGraph:
+def download_osm_graph(queries) -> nx.MultiDiGraph:
     def download_query(query: str) -> nx.MultiDiGraph:
         logging.info(f"Downloading graph for {query}")
         city_graph = ox.graph_from_place(
