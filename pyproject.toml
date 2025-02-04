@@ -16,6 +16,16 @@ osmnx = "^2.0.1"
 matplotlib = "^3.10.0"
 scikit-learn = "^1.6.1"
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--verbose --strict-markers"
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
