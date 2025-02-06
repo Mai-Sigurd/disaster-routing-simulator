@@ -1,27 +1,15 @@
 import logging
 
-import networkx as nx
 import osmnx as ox
 
 from data_loader.danger_zones import load_danger_zone
+from data_loader.osm import download_osm_graph
 
 logging.basicConfig(
     level=logging.INFO,
     format="{asctime} [{levelname}] {message}",
     style="{",
 )
-
-
-def download_osm_graph(queries: list[str]) -> nx.MultiDiGraph:
-    def download_query(query: str) -> nx.MultiDiGraph:
-        logging.info(f"Downloading graph for {query}")
-        city_graph = ox.graph_from_place(
-            query, network_type="drive_service", simplify=True
-        )
-        logging.info(f"Downloaded graph for {query}")
-        return city_graph
-
-    return nx.compose_all([download_query(city) for city in queries])
 
 
 if __name__ == "__main__":
