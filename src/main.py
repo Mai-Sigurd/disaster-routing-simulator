@@ -3,6 +3,8 @@ import logging
 import networkx as nx
 import osmnx as ox
 
+from data_loader.danger_zones import load_danger_zone
+
 logging.basicConfig(
     level=logging.INFO,
     format="{asctime} [{levelname}] {message}",
@@ -37,3 +39,5 @@ if __name__ == "__main__":
         ]
     )
     fig, ax = ox.plot.plot_graph(G, node_size=0, edge_linewidth=0.5, figsize=(10, 10))
+
+    danger_zones = load_danger_zone("dangerzone_amager.geojson")
