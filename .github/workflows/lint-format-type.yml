@@ -1,0 +1,35 @@
+name: Lint, Format & Type Check
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint-and-format:
+    name: Run Formatting, Linting, & Type Checking
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.13
+
+      - name: Install Ruff
+        run: pip install ruff mypy
+
+      - name: Run Ruff Formatter (Check Formatting)
+        run: ruff format --check src/
+
+      - name: Run Ruff Linter (Check Code Quality)
+        run: ruff check src/
+
+      - name: Run Mypy (Type Checking)
+        run: mypy src/

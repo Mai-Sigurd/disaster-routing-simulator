@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "disaster-routing-simulator"
+version = "0.1.0"
+description = ""
+authors = [
+    "Amalie Bøgild <malleboegild@gmail.com>",
+    "Joachim Borup <joachim@borup.com>",
+    "Mai Odgaard <odgaardmai@gmail.com>",
+]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.13"
+matplotlib = "^3.10.0"
+osmnx = "^2.0.1"
+scikit-learn = "^1.6.1"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.14.1"
+pytest = "^8.3.4"
+ruff = "^0.9.4"
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+warn_return_any = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--verbose --strict-markers"
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
