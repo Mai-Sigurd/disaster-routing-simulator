@@ -37,6 +37,9 @@ python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
 
+[tool.ruff.lint]
+extend-select = ["I"]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
