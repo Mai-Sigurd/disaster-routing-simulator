@@ -21,7 +21,9 @@ def load_danger_zone(file_name: str) -> gpd.GeoDataFrame:
     raise NotImplementedError
 
 
-def distribute_population(danger_zone: gpd.GeoDataFrame) -> list[tuple[shapely.geometry.Point, int]]:
+def distribute_population(
+    danger_zone: gpd.GeoDataFrame,
+) -> list[tuple[shapely.geometry.Point, int]]:
     """
     Distributes the population of a danger zone across the surrounding areas.
     :return: A list of tuples where each tuple contains a coordinate and the number of people at that coordinate.
