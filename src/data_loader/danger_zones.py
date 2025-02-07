@@ -5,7 +5,7 @@ from shapely.geometry import shape
 
 from data_loader import DATA_DIR, load_json
 
-DANGER_ZONE_DIR = DATA_DIR / "danger_zones"
+DANGER_ZONES_DIR = DATA_DIR / "danger_zones"
 
 
 def load_danger_zone(file_name: str) -> gpd.GeoDataFrame:
@@ -19,7 +19,7 @@ def load_danger_zone(file_name: str) -> gpd.GeoDataFrame:
         raise ValueError(f"Invalid file name: {file_name}")
 
     logging.info(f"Loading danger zone: {file_name}")
-    filepath = DANGER_ZONE_DIR / file_name
+    filepath = DANGER_ZONES_DIR / file_name
     data = load_json(filepath)
 
     logging.info(f"Loaded danger zone: {file_name}")
