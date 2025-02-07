@@ -17,6 +17,7 @@ matplotlib = "^3.10.0"
 osmnx = "^2.0.1"
 pandas = "^2.2.3"
 scikit-learn = "^1.6.1"
+shapely = "^2.0.7"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.15.0"
@@ -36,6 +37,9 @@ addopts = "--verbose --strict-markers"
 python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
+
+[tool.ruff.lint]
+extend-select = ["I"]
 
 [build-system]
 requires = ["poetry-core"]
