@@ -37,6 +37,7 @@ addopts = "--verbose --strict-markers"
 python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
+pythonpath = ["src"]
 
 [tool.ruff.lint]
 extend-select = ["I"]
