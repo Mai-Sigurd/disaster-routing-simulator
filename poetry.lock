@@ -1319,7 +1319,18 @@ h2 = ["h2 (>=4,<5)"]
 socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["zstandard (>=0.18.0)"]
 
+[[package]]
+name = "wget"
+version = "3.2"
+description = "pure python download utility"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "wget-3.2.zip", hash = "sha256:35e630eca2aa50ce998b9b1a127bb26b30dfee573702782aa982f875e3f16061"},
+]
+
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "94d199b1beb991ef80aba89c9d102fc3567a2fe2d7890fde7b40cefe0442e67f"
+content-hash = "1540d4d0c2acb5f64cfab7180040e0b3b289275a8c48b8ef46f1feebaba94182"
