@@ -1,9 +1,9 @@
 import geopandas as gpd
 import networkx as nx
 import pandas as pd
-import shapely
+from shapely.geometry.point import Point
 
-route = list[shapely.geometry.Point]
+route = list[Point]
 """A list of coordinates representing a route"""
 
 
@@ -23,7 +23,7 @@ def load_danger_zone(file_name: str) -> gpd.GeoDataFrame:
 
 def distribute_population(
     danger_zone: gpd.GeoDataFrame,
-) -> list[tuple[shapely.geometry.Point, int]]:
+) -> list[tuple[Point, int]]:
     """
     Distributes the population of a danger zone across the surrounding areas.
     :return: A list of tuples where each tuple contains a coordinate and the number of people at that coordinate.
@@ -32,7 +32,7 @@ def distribute_population(
 
 
 def route_to_safety(
-    origin_points: list[shapely.geometry.Point], danger_zone: gpd.GeoDataFrame
+    origin_points: list[Point], danger_zone: gpd.GeoDataFrame
 ) -> list[route]:
     """
     Routes a list of origin points to the nearest safe location.
