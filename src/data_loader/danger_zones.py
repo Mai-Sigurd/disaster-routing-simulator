@@ -1,0 +1,27 @@
+import logging
+
+import geopandas as gpd
+from shapely.geometry import shape
+
+from data_loader import DATA_DIR, load_json
+
+DANGER_ZONES_DIR = DATA_DIR / "danger_zones"
+
+
+def load_danger_zone(file_name: str) -> gpd.GeoDataFrame:
+    """
+    Loads a danger zone GeoJSON file and returns a GeoDataFrame.
+
+    :param file_name: Name of the GeoJSON file (e.g., "dangerzone_1.geojson")
+    :return: GeoDataFrame containing the danger zone polygon(s)
+    """
+    if not file_name.endswith(".geojson"):
+        raise ValueError(f"Invalid file name: {file_name}")
+
+    logging.info(f"Loading danger zone: {file_name}")
+    filepath = DANGER_ZONES_DIR / file_name
+    data = load_json(filepath)
+
+    logging.info(f"Loaded danger zone: {file_name}")
+    polygons = [shape(feature["geometry"]) for feature in data["features"]]
+    return gpd.GeoDataFrame(geometry=polygons)
