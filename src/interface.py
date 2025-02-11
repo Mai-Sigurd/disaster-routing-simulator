@@ -1,9 +1,5 @@
-import heapq as hq
-from typing import Dict, List, Tuple
-
 import geopandas as gpd
 import networkx as nx
-import osmnx as ox
 import pandas as pd
 from shapely.geometry import Point
 
