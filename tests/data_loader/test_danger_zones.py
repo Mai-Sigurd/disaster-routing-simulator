@@ -39,7 +39,7 @@ def test_load_danger_zone(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> No
     file_path.write_text(json.dumps(data))
 
     monkeypatch.setattr(
-        "data_loader.danger_zones.DANGER_ZONE_DIR", tmp_path / "danger_zones"
+        "data_loader.danger_zones.DANGER_ZONES_DIR", tmp_path / "danger_zones"
     )
 
     danger_zone = load_danger_zone("test.geojson")
