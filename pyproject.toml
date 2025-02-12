@@ -14,6 +14,7 @@ package-mode = false
 python = "^3.12"
 geopandas = "^1.0.1"
 matplotlib = "^3.10.0"
+matsim-tools = "^0.0.19"
 osmnx = "^2.0.1"
 pandas = "^2.2.3"
 scikit-learn = "^1.6.1"
