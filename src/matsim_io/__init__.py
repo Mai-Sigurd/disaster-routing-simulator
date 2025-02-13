@@ -32,16 +32,6 @@ def write_network(
 
     logging.info(f"Writing MATSim network to {network_file}")
 
-    def parse_min_int(value: str | list[str] | None) -> int | None:
-        """
-        Helper function to extract the minimum integer from a string or list of strings.
-        In some cases, when a road has different speed limits, the max_speed of the simplified edge is a list.
-        In those cases, we choose the minimum speed limit of the road.
-        """
-        if value is None:
-            return None
-        return min(map(int, value)) if isinstance(value, list) else int(value)
-
     open_func = gzip.open if gzip_compress else open
     with open_func(MATSIM_DATA_DIR / network_file, "wb+") as f_write:
         writer = NetworkWriter(f_write)  # type: ignore[arg-type]
@@ -61,8 +51,8 @@ def write_network(
                 from_node,
                 to_node,
                 length=link_data["length"],
-                speed_limit=parse_min_int(link_data.get("maxspeed")),
-                perm_lanes=parse_min_int(link_data.get("lanes")),
+                speed_limit=_parse_min_int(link_data.get("maxspeed")),
+                perm_lanes=_parse_min_int(link_data.get("lanes")),
             )
         writer.end_links()
 
@@ -89,3 +79,14 @@ def write_plan() -> None:
         writer.end_person()
 
         writer.end_population()
+
+
+def _parse_min_int(value: str | list[str] | None) -> int | None:
+    """
+    Helper function to extract the minimum integer from a string or list of strings.
+    In some cases, when a road has different speed limits, the max_speed of the simplified edge is a list.
+    In those cases, we choose the minimum speed limit of the road.
+    """
+    if value is None:
+        return None
+    return min(map(int, value)) if isinstance(value, list) else int(value)
