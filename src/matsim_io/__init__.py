@@ -1,10 +1,24 @@
 import matsim
 import networkx as nx
 
+from data_loader import DATA_DIR
 from matsim_io.writers import NetworkWriter
 
+MATSIM_DATA_DIR = DATA_DIR / "matsim"
 
-def write_network(graph: nx.MultiDiGraph, name: str | None = None) -> None:
+
+def write_network(
+    graph: nx.MultiDiGraph,
+    network_name: str | None = None,
+    network_file: str = "network.xml",
+) -> None:
+    """
+    Write a network to a MATSim network file.
+    :param graph: NetworkX graph representing the network.
+    :param network_name: Name of the network.
+    :param network_file: Name of the output file.
+    """
+
     def parse_min_int(value: str | list[str] | None) -> int | None:
         """
         Helper function to extract the minimum integer from a string or list of strings.
@@ -15,9 +29,9 @@ def write_network(graph: nx.MultiDiGraph, name: str | None = None) -> None:
             return None
         return min(map(int, value)) if isinstance(value, list) else int(value)
 
-    with open("network.xml", "wb+") as f_write:
+    with open(MATSIM_DATA_DIR / network_file, "wb+") as f_write:
         writer = NetworkWriter(f_write)
-        writer.start_network(name)
+        writer.start_network(network_name)
 
         writer.start_nodes()
         for node_id, node_data in graph.nodes(data=True):
