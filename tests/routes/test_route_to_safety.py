@@ -34,6 +34,11 @@ def test_route_to_safety() -> None:
     assert routes == [["A", "B", "C", "D"]]
 
 
+def test_route_to_safety_more_than_one() -> None:
+    routes = route_to_safety(["A", "B"], danger_zone, G)
+    assert routes == [["A", "B", "C", "D"], ["B", "C", "D"]]
+
+
 # Create a directed graph
 G1 = nx.MultiDiGraph()
 
