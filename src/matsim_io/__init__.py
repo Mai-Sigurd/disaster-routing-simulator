@@ -1,3 +1,5 @@
+import gzip
+
 import matsim
 import networkx as nx
 
@@ -11,13 +13,21 @@ def write_network(
     graph: nx.MultiDiGraph,
     network_name: str | None = None,
     network_file: str = "network.xml",
+    gzip_compress: bool = True,
 ) -> None:
     """
     Write a network to a MATSim network file.
     :param graph: NetworkX graph representing the network.
     :param network_name: Name of the network.
     :param network_file: Name of the output file.
+    :param gzip_compress: Whether to save the file as a .gz compressed file.
     """
+    if not network_file.endswith(".xml") or network_file.endswith(".xml.gz"):
+        raise ValueError(
+            f"Invalid file name: {network_file}. Expected .xml or .xml.gz file."
+        )
+    if gzip_compress and not network_file.endswith(".gz"):
+        network_file += ".gz"
 
     def parse_min_int(value: str | list[str] | None) -> int | None:
         """
@@ -29,8 +39,9 @@ def write_network(
             return None
         return min(map(int, value)) if isinstance(value, list) else int(value)
 
-    with open(MATSIM_DATA_DIR / network_file, "wb+") as f_write:
-        writer = NetworkWriter(f_write)
+    open_func = gzip.open if gzip_compress else open
+    with open_func(MATSIM_DATA_DIR / network_file, "wb+") as f_write:
+        writer = NetworkWriter(f_write)  # type: ignore[arg-type]
         writer.start_network(network_name)
 
         writer.start_nodes()
