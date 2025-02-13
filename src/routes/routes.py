@@ -1,5 +1,4 @@
 import heapq as hq
-from typing import Dict, List, Tuple
 
 import geopandas as gpd
 import networkx as nx
@@ -19,9 +18,10 @@ def route_to_safety(
     """
     Routes a list of origin points to the nearest safe location.
 
-    :param origin_points: A list of buckets, where each bucket contains road segments with a number of cars.
+    :param origin_points: A list of vertices given as str IDs
     :param danger_zone: A GeoDataFrame containing the danger zone polygon(s).
-    :return: A list of routes where each route corresponds to the origin points at the same index.
+    :param G: A graph corresponding to the road network
+    :return: A list of routes where each route corresponds to the origin point at the same index.
     """
     routes = []
 
@@ -73,7 +73,7 @@ def route_to_safety(
     return routes
 
 
-def reconstruct_route(predecessor: Dict[str, str | None], end: str) -> List[str]:
+def reconstruct_route(predecessor: dict[str, str | None], end: str) -> list[str]:
     path = []
     while end is not None:
         path.append(end)
@@ -94,8 +94,8 @@ def is_in_dangerzone(
 
 
 def update_priority(
-    heap: List[Tuple[float, str]],
-    node_priority: Dict[str, float],
+    heap: list[tuple[float, str]],
+    node_priority: dict[str, float],
     node: str,
     new_priority: float,
 ) -> None:
