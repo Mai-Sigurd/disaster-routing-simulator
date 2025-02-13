@@ -21,7 +21,7 @@ def distribute_population(
 ) -> gpd.GeoDataFrame:
     """
     Returns the nodes in the danger zone and the number of people at each node.
-    :return: A list of tuples where each tuple contains an id of a node and the number of people at that node.
+    :return: A geopandas dataframe with id corresponding to OSM IDS and population.
     """
     # List to store nodes in the danger zone and their population
 
