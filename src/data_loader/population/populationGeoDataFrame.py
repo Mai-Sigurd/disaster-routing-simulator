@@ -102,5 +102,5 @@ def snap_population_to_nodes(df: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
 
 
 snap_population_to_nodes(filter_world_pop_to_cph(read_world_pop_data())).to_file(
-    "PopulationGeoDataframe", driver="GeoJSON"
+    "PopulationGeoDataframe.geojson", driver="GeoJSON"
 )
