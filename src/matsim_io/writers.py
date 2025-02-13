@@ -72,6 +72,7 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
         to_node: int,
         length: float,
         speed_limit: int | None = None,
+        capacity: int | None = None,
         perm_lanes: int | None = None,
     ) -> None:
         """
@@ -81,10 +82,13 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
         :param to_node: ID of the node where the link ends.
         :param length: Length of the link in meters.
         :param speed_limit: Maximum allowed speed of the link in meters per second.
+        :param capacity: Maximum number of vehicles that can pass the link per hour.
         :param perm_lanes: Number of lanes on the link.
         """
         if speed_limit is None:
             speed_limit = DANISH_SPEED_LIMIT
+        if capacity is None:
+            capacity = 1000
         if perm_lanes is None:
             perm_lanes = 1
 
@@ -103,6 +107,9 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
         assert isinstance(speed_limit, int) and speed_limit > 0, (
             "speed_limit must be a positive integer"
         )
+        assert isinstance(capacity, int) and capacity > 0, (
+            "capacity must be a positive integer"
+        )
         assert isinstance(perm_lanes, int) and perm_lanes > 0, (
             "perm_lanes must be a positive integer"
         )
@@ -114,6 +121,7 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
             f' to="{to_node}"'
             f' length="{length}"'
             f' freespeed="{kmh_to_ms(speed_limit):.2f}"'
+            f' capacity="{capacity}"'
             f' permlanes="{perm_lanes}"/>'
         )
 
