@@ -34,38 +34,41 @@ def route_to_safety(
             node: None for node in G.nodes
         }  # To track shortest path
 
-        nearestNode = nx.distance.nearest_nodes(G, origin[0], origin[1])
-        update_priority(dist, node_priority, nearestNode, 0)
+        update_priority(dist, node_priority, origin, 0)
 
         while not all(
             sptSet.values()
-        ):  # while there are still elements in sptSet that are false
-            priority, smallest_node = dist[0]
+        ):  # there are still elements in sptSet that are false
+            if dist:
+                priority, smallest_node = hq.heappop(dist)
+            else:  # the heap is empty
+                raise Exception("There are no more nodes to explore")
             if (
                 priority == node_priority[smallest_node]
             ):  # Only use values that are not outdated
                 if not sptSet[smallest_node]:
                     sptSet[smallest_node] = True
-                    for neighbour in G.successors[smallest_node]:
-                        for _, _, edge_data in G.edges(
-                            smallest_node, neighbour, data=True
-                        ):  # Multiple edges between two nodes possible
-                            weight = edge_data.get(
-                                "weight", float("inf")
-                            )  # Default weight to inf, weight of edge between popped_node and neighbour
-                            new_distance = priority + weight
+                    for _, neighbour, edge_data in G.edges(
+                        smallest_node, data=True
+                    ):  # Multiple edges between two nodes possible
+                        weight = edge_data.get(
+                            "weight", float("inf")
+                        )  # Default weight to inf, weight of edge between popped_node and neighbour
+                        new_distance = priority + weight
 
-                            if new_distance < node_priority[neighbour]:
-                                update_priority(
-                                    dist, node_priority, neighbour, new_distance
-                                )
-                                predecessor[neighbour] = smallest_node
+                        if new_distance < node_priority[neighbour]:
+                            update_priority(
+                                dist, node_priority, neighbour, new_distance
+                            )
+                            predecessor[neighbour] = smallest_node
 
             if not is_in_dangerzone(
-                smallest_node, danger_zone
+                smallest_node, danger_zone, G
             ):  # We have found shortest route to node outside dangerzone
                 routes.append(reconstruct_route(predecessor, smallest_node))
                 break  # there is no need to find other routes
+        else:  # if there are no more elements to explore in sptSet
+            raise Exception("There are no reachable nodes outside the dangerzone")
 
     return routes
 
@@ -78,10 +81,13 @@ def reconstruct_route(predecessor: Dict[str, str | None], end: str) -> List[str]
     return path[::-1]
 
 
-def is_in_dangerzone(v: vertex, danger_zone: gpd.GeoDataFrame) -> bool:
+def is_in_dangerzone(
+    v: vertex, danger_zone: gpd.GeoDataFrame, G: nx.MultiDiGraph
+) -> bool:
+    x, y = G.nodes[v]["pos"]
     p = gpd.GeoSeries(
         [
-            Point(v[0], v[1]),
+            Point(x, y),
         ],
     )
     return danger_zone.intersects(p)[0]  # type: ignore
