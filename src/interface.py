@@ -1,9 +1,12 @@
 import geopandas as gpd
 import networkx as nx
 import pandas as pd
-from shapely.geometry.point import Point
+from shapely.geometry import Point
 
-route = list[Point]
+vertex = str
+"""A tuple containing the latitude and longitude of a point"""
+
+route = list[vertex]
 """A list of coordinates representing a route"""
 
 
@@ -31,8 +34,9 @@ def distribute_population(
     raise NotImplementedError
 
 
+# based on: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/
 def route_to_safety(
-    origin_points: list[Point], danger_zone: gpd.GeoDataFrame
+    origin_points: list[vertex], danger_zone: gpd.GeoDataFrame, G: nx.MultiDiGraph
 ) -> list[route]:
     """
     Routes a list of origin points to the nearest safe location.
