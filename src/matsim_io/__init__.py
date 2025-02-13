@@ -5,6 +5,16 @@ from matsim_io.writers import NetworkWriter
 
 
 def write_network(graph: nx.MultiDiGraph, name: str | None = None) -> None:
+    def parse_min_int(value: str | list[str] | None) -> int | None:
+        """
+        Helper function to extract the minimum integer from a string or list of strings.
+        In some cases, when a road has different speed limits, the max_speed of the simplified edge is a list.
+        In those cases, we choose the minimum speed limit of the road.
+        """
+        if value is None:
+            return None
+        return min(map(int, value)) if isinstance(value, list) else int(value)
+
     with open("network.xml", "wb+") as f_write:
         writer = NetworkWriter(f_write)
         writer.start_network(name)
@@ -23,10 +33,8 @@ def write_network(graph: nx.MultiDiGraph, name: str | None = None) -> None:
                 from_node,
                 to_node,
                 length=link_data["length"],
-                free_speed=kmh_to_ms(int(link_data["maxspeed"]))
-                if "maxspeed" in link_data
-                else None,
-                perm_lanes=link_data.get("lanes"),
+                speed_limit=parse_min_int(link_data.get("maxspeed")),
+                perm_lanes=parse_min_int(link_data.get("lanes")),
             )
         writer.end_links()
 
@@ -51,8 +59,3 @@ def write_plan() -> None:
         writer.end_person()
 
         writer.end_population()
-
-
-def kmh_to_ms(kmh: float) -> float:
-    """Convert km/h to m/s."""
-    return kmh * 1000 / 3600

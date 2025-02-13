@@ -2,9 +2,7 @@ from typing import BinaryIO
 
 from matsim.writers import XmlWriter
 
-from matsim_io import kmh_to_ms
-
-DANISH_SPEED_LIMIT = kmh_to_ms(130)
+DANISH_SPEED_LIMIT = 130  # km/h
 
 
 class NetworkWriter(XmlWriter):  # type: ignore[misc]
@@ -73,7 +71,7 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
         from_node: int,
         to_node: int,
         length: float,
-        free_speed: float = DANISH_SPEED_LIMIT,
+        speed_limit: int | None = None,
         perm_lanes: int | None = None,
     ) -> None:
         """
@@ -82,20 +80,44 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
         :param from_node: ID of the node where the link starts.
         :param to_node: ID of the node where the link ends.
         :param length: Length of the link in meters.
-        :param free_speed: Maximum allowed speed of the link in meters per second.
+        :param speed_limit: Maximum allowed speed of the link in meters per second.
         :param perm_lanes: Number of lanes on the link.
         """
+        if speed_limit is None:
+            speed_limit = DANISH_SPEED_LIMIT
         if perm_lanes is None:
             perm_lanes = 1
-        assert 0 < link_id
-        assert 0 < from_node
-        assert 0 < to_node
+
+        assert isinstance(link_id, int) and link_id > 0, (
+            "link_id must be a positive integer"
+        )
+        assert isinstance(from_node, int) and from_node > 0, (
+            "from_node must be a positive integer"
+        )
+        assert isinstance(to_node, int) and to_node > 0, (
+            "to_node must be a positive integer"
+        )
+        assert isinstance(length, (int, float)) and length > 0, (
+            "length must be a positive number"
+        )
+        assert isinstance(speed_limit, int) and speed_limit > 0, (
+            "speed_limit must be a positive integer"
+        )
+        assert isinstance(perm_lanes, int) and perm_lanes > 0, (
+            "perm_lanes must be a positive integer"
+        )
+
         self._require_scope(self.LINKS_SCOPE)
         self._write_line(
             f'<link id="{link_id}"'
             f' from="{from_node}"'
             f' to="{to_node}"'
             f' length="{length}"'
-            f' freespeed="{free_speed:.2f}"'
+            f' freespeed="{kmh_to_ms(speed_limit):.2f}"'
             f' permlanes="{perm_lanes}"/>'
         )
+
+
+def kmh_to_ms(kmh: float) -> float:
+    """Convert km/h to m/s."""
+    return kmh * 1000 / 3600
