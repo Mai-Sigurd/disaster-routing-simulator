@@ -11,8 +11,10 @@ from tqdm import tqdm
 
 tif_path = "../../../data/population/"
 tif_filename = "dnk_ppp_2020_constrained.tif"
-tif_filenamePath = f'{tif_path}{tif_filename}'
+tif_filenamePath = f"{tif_path}{tif_filename}"
 logging.getLogger().setLevel(logging.INFO)
+
+
 def download_osm_graph(queries: list[str]) -> nx.MultiDiGraph:
     def download_query(query: str) -> nx.MultiDiGraph:
         logging.info(f"Downloading graph for {query}")
@@ -23,6 +25,7 @@ def download_osm_graph(queries: list[str]) -> nx.MultiDiGraph:
         return city_graph
 
     return nx.compose_all([download_query(city) for city in queries])
+
 
 G = download_osm_graph(
     [
@@ -39,22 +42,33 @@ G = download_osm_graph(
 logging.info("Graph downloaded")
 maximum_distance_to_node = 100
 
+
 def read_world_pop_data() -> gpd.GeoDataFrame:
     with rasterio.open(tif_filenamePath) as dataset:
         val = dataset.read(1)  # band 5
         no_data = dataset.nodata
-        geometry = [Point(dataset.xy(x, y)[0], dataset.xy(x, y)[1]) for x, y in np.ndindex(val.shape) if
-                    val[x, y] != no_data]
+        geometry = [
+            Point(dataset.xy(x, y)[0], dataset.xy(x, y)[1])
+            for x, y in np.ndindex(val.shape)
+            if val[x, y] != no_data
+        ]
         v = [val[x, y] for x, y in np.ndindex(val.shape) if val[x, y] != no_data]
-        df = gpd.GeoDataFrame({'geometry': geometry, 'data': v})
+        df = gpd.GeoDataFrame({"geometry": geometry, "data": v})
         df.crs = dataset.crs
     return df
+
 
 def filter_world_pop_to_cph(df: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     nodes, edges = ox.graph_to_gdfs(G)
     x_min, y_min, x_max, y_max = nodes.total_bounds
-    gdf_filtered = df[(df.geometry.x > x_min) & (df.geometry.x < x_max) & (df.geometry.y > y_min) & (df.geometry.y < y_max)]
+    gdf_filtered = df[
+        (df.geometry.x > x_min)
+        & (df.geometry.x < x_max)
+        & (df.geometry.y > y_min)
+        & (df.geometry.y < y_max)
+    ]
     return gdf_filtered
+
 
 def snap_population_to_nodes(df: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     nearest_nodes_to_pop = {}
@@ -62,7 +76,9 @@ def snap_population_to_nodes(df: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     for i in tqdm(df.index):
         point = df.loc[i].geometry
         pop = df.loc[i].data
-        (nearest_node, dist) = ox.distance.nearest_nodes(G, point.x, point.y, return_dist=True)
+        (nearest_node, dist) = ox.distance.nearest_nodes(
+            G, point.x, point.y, return_dist=True
+        )
         if dist < maximum_distance_to_node:
             if nearest_node not in nearest_nodes_to_pop:
                 nearest_nodes_to_pop[nearest_node] = pop
@@ -72,14 +88,19 @@ def snap_population_to_nodes(df: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         {
             "id": list(nearest_nodes_to_pop.keys()),
             "pop": list(nearest_nodes_to_pop.values()),
-            "geometry": [nodes.loc[k].geometry for k in nearest_nodes_to_pop.keys()]
+            "geometry": [nodes.loc[k].geometry for k in nearest_nodes_to_pop.keys()],
         },
-        geometry="geometry"
+        geometry="geometry",
     )
     if nodes.crs:
-        result.set_crs(nodes.crs, inplace=True)  # Set Coordinate Reference System from nodes
+        result.set_crs(
+            nodes.crs, inplace=True
+        )  # Set Coordinate Reference System from nodes
     else:
         raise ValueError("Nodes GeoDataFrame has no CRS defined!")
     return result
 
-snap_population_to_nodes(filter_world_pop_to_cph(read_world_pop_data())).to_file("PopulationGeoDataframe", driver="GeoJSON")
+
+snap_population_to_nodes(filter_world_pop_to_cph(read_world_pop_data())).to_file(
+    "PopulationGeoDataframe", driver="GeoJSON"
+)
