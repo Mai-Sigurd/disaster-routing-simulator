@@ -1,4 +1,5 @@
 import gzip
+import logging
 
 import matsim
 import networkx as nx
@@ -28,6 +29,8 @@ def write_network(
         )
     if gzip_compress and not network_file.endswith(".gz"):
         network_file += ".gz"
+
+    logging.info(f"Writing MATSim network to {network_file}")
 
     def parse_min_int(value: str | list[str] | None) -> int | None:
         """
@@ -64,6 +67,8 @@ def write_network(
         writer.end_links()
 
         writer.end_network()
+
+    logging.info(f"Finished writing MATSim network to {network_file}")
 
 
 def write_plan() -> None:
