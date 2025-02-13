@@ -25,4 +25,4 @@ def distribute_population(
     """
     # List to store nodes in the danger zone and their population
 
-    return gpd.sjoin(population, danger_zone, how='inner', predicate='within')
+    return gpd.sjoin(population, danger_zone, how="inner", predicate="within")
