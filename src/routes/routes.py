@@ -36,13 +36,9 @@ def route_to_safety(
 
         update_priority(dist, node_priority, origin, 0)
 
-        while not all(
-            sptSet.values()
-        ):  # there are still elements in sptSet that are false
-            if dist:
-                priority, smallest_node = hq.heappop(dist)
-            else:  # the heap is empty
-                raise Exception("There are no more nodes to explore")
+        while dist:
+            priority, smallest_node = hq.heappop(dist)
+
             if (
                 priority == node_priority[smallest_node]
             ):  # Only use values that are not outdated
