@@ -1,0 +1,75 @@
+import geopandas as gpd
+import networkx as nx
+import pytest
+from shapely.geometry import Point, Polygon
+
+from routes.routes import route_to_safety
+
+# Create a directed graph
+G = nx.MultiDiGraph()
+
+# Add nodes (coordinates as strings for simplicity)
+G.add_node("A", pos=(2, 2))
+G.add_node("B", pos=(3, 2))
+G.add_node("C", pos=(3, 3))
+G.add_node("D", pos=(5, 5))
+G.add_node("E", pos=(4, 4))
+
+# Add edges with weights
+G.add_edge("A", "B", weight=1)
+G.add_edge("B", "C", weight=1)
+G.add_edge("C", "D", weight=2)
+G.add_edge("C", "E", weight=1)
+G.add_edge("E", "D", weight=2)
+
+# Define a danger zone polygon
+danger_zone = gpd.GeoDataFrame(geometry=[Polygon([(1, 4), (1, 1), (4, 1), (4, 4)])])
+
+# List of origin points
+origin_points = ["A"]
+
+
+def test_route_to_safety() -> None:
+    routes = route_to_safety(["A"], danger_zone, G)
+    assert routes == [["A", "B", "C", "D"]]
+
+
+def test_route_to_safety_more_than_one() -> None:
+    routes = route_to_safety(["A", "B"], danger_zone, G)
+    assert routes == [["A", "B", "C", "D"], ["B", "C", "D"]]
+
+
+# Create a directed graph
+G1 = nx.MultiDiGraph()
+
+# Add nodes (coordinates as strings for simplicity)
+G1.add_node("A", pos=(2, 2))
+G1.add_node("B", pos=(4, 4))
+G1.add_node("C", pos=(5, 5))
+
+# Add edges with weights
+G1.add_edge("A", "B", weight=1)
+G1.add_edge("B", "C", weight=1)
+
+
+def test_route_to_safety_endpoint_is_completely_free_from_danger() -> None:
+    routes = route_to_safety(["A"], danger_zone, G1)
+    assert routes == [["A", "B", "C"]]
+
+
+# Create a directed graph
+G2 = nx.MultiDiGraph()
+
+# Add nodes (coordinates as strings for simplicity)
+G2.add_node("A", pos=(2, 2))
+G2.add_node("B", pos=(3, 2))
+
+# Add edges with weights
+G2.add_edge("A", "B", weight=1)
+
+
+def test_route_to_safety_all_nodes_are_in_dangerzone() -> None:
+    with pytest.raises(
+        Exception, match="There are no reachable nodes outside the dangerzone"
+    ):
+        route_to_safety(["A"], danger_zone, G2)
