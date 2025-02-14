@@ -17,11 +17,16 @@ class Route:
         remaining_people = self.num_people_on_route % chunks
 
         seconds_from_midnight = 0
-        for i in range(chunks):
-            count = people_per_interval + (
-                1 if i < remaining_people else 0
-            )  # Distribute remainder evenly
-            departure_times[seconds_from_midnight] = count
-            seconds_from_midnight += interval
+        if chunks < self.num_people_on_route:
+            for i in range(chunks):
+                count = people_per_interval + (
+                    1 if i < remaining_people else 0
+                )  # Distribute remainder evenly
+                departure_times[seconds_from_midnight] = count
+                seconds_from_midnight += interval
+        else:  # There are more chunks than people, so there will be 1 person in the first chunk(s) and then 0 in the remaining. The remaining will not even be present in the departure_times dict.
+            for i in range(self.num_people_on_route):
+                departure_times[seconds_from_midnight] = 1
+                seconds_from_midnight += interval
 
         self.departure_times = departure_times
