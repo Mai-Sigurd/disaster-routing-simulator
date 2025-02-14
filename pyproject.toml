@@ -18,6 +18,8 @@ osmnx = "^2.0.1"
 pandas = "^2.2.3"
 scikit-learn = "^1.6.1"
 shapely = "^2.0.7"
+rasterio = "^1.4.3"
+tqdm = "^4.67.1"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.15.0"

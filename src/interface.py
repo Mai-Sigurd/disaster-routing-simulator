@@ -28,7 +28,7 @@ def distribute_population(
     danger_zone: gpd.GeoDataFrame,
 ) -> list[tuple[Point, int]]:
     """
-    Distributes the population of a danger zone across the surrounding areas.
+    Distributes the worldpop of a danger zone across the surrounding areas.
     :return: A list of tuples where each tuple contains a coordinate and the number of people at that coordinate.
     """
     raise NotImplementedError
