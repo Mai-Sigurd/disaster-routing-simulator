@@ -1,5 +1,6 @@
 import gzip
 import logging
+import random
 
 import matsim
 import networkx as nx
@@ -61,22 +62,42 @@ def write_network(
     logging.info(f"Finished writing MATSim network to {network_file}")
 
 
-def write_plan() -> None:
-    with open("plans.xml", "wb+") as f_write:
+def write_plan(
+    graph: nx.MultiDiGraph,
+    plan_file: str = "plan.xml",
+    gzip_compress: bool = True,
+) -> None:
+    if not plan_file.endswith(".xml") or plan_file.endswith(".xml.gz"):
+        raise ValueError(
+            f"Invalid file name: {plan_file}. Expected .xml or .xml.gz file."
+        )
+    if gzip_compress and not plan_file.endswith(".gz"):
+        plan_file += ".gz"
+
+    nodes = list(graph.nodes)
+
+    open_func = gzip.open if gzip_compress else open
+    with open_func(MATSIM_DATA_DIR / plan_file, "wb+") as f_write:
         writer = matsim.writers.PopulationWriter(f_write)
 
         writer.start_population()
-        writer.start_person("person_id_123")
-        writer.start_plan(selected=True)
+        count = 0
 
-        writer.add_activity(type="home", x=0.0, y=0.0, end_time=8 * 3600)
-        writer.add_leg(mode="walk")
-        writer.add_activity(type="work", x=10.0, y=0.0, end_time=18 * 3600)
-        writer.add_leg(mode="pt")
-        writer.add_activity(type="home", x=0.0, y=0.0)
-
-        writer.end_plan()
-        writer.end_person()
+        while count < 2500:
+            v, w = random.sample(nodes, 2)
+            if not nx.has_path(graph, v, w):
+                continue
+            v, w = graph.nodes[v], graph.nodes[w]
+            dep_time = 60 * count
+            for _ in range(5):
+                writer.start_person(count)
+                writer.start_plan(selected=True)
+                writer.add_activity("danger", x=v["x"], y=v["y"], end_time=dep_time)
+                writer.add_leg(mode="car", departure_time=dep_time)
+                writer.add_activity("safe", x=w["x"], y=w["y"])
+                writer.end_plan()
+                writer.end_person()
+                count += 1
 
         writer.end_population()
 
