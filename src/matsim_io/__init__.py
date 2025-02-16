@@ -51,8 +51,8 @@ def write_network(
                 from_node,
                 to_node,
                 length=link_data["length"],
-                speed_limit=_parse_min_int(link_data.get("maxspeed")),
-                perm_lanes=_parse_min_int(link_data.get("lanes")),
+                speed_limit=_try_parse_min_int(link_data, "maxspeed"),
+                perm_lanes=_try_parse_min_int(link_data, "lanes"),
             )
         writer.end_links()
 
@@ -81,12 +81,17 @@ def write_plan() -> None:
         writer.end_population()
 
 
-def _parse_min_int(value: str | list[str] | None) -> int | None:
+def _try_parse_min_int(link_data: dict[str, list[str] | str], key: str) -> int | None:
     """
     Helper function to extract the minimum integer from a string or list of strings.
     In some cases, when a road has different speed limits, the max_speed of the simplified edge is a list.
     In those cases, we choose the minimum speed limit of the road.
     """
+    value = link_data.get(key)
     if value is None:
         return None
-    return min(map(int, value)) if isinstance(value, list) else int(value)
+    try:
+        return min(map(int, value)) if isinstance(value, list) else int(value)
+    except ValueError:
+        logging.error(f"Invalid {key} value: {value}")
+        return None
