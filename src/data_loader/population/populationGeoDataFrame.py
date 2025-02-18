@@ -103,7 +103,5 @@ def save_to_geojson() -> None:
     ).to_file(
         # "../../../data/population/PopulationGeoDataframe.geojson",
         POPULATION_DATA_DIR / "PopulationGeoDataframe.geojson",
-        driver="GeoJSON"
+        driver="GeoJSON",
     )
-
-

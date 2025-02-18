@@ -9,11 +9,11 @@ from routes.shortestpath import route_to_safety
 G = nx.MultiDiGraph()
 
 # Add nodes (coordinates as strings for simplicity)
-G.add_node("A", pos=(2, 2))
-G.add_node("B", pos=(3, 2))
-G.add_node("C", pos=(3, 3))
-G.add_node("D", pos=(5, 5))
-G.add_node("E", pos=(4, 4))
+G.add_node("A", x=2, y=2)
+G.add_node("B", x=3, y=2)
+G.add_node("C", x=3, y=3)
+G.add_node("D", x=5, y=5)
+G.add_node("E", x=4, y=4)
 
 # Add edges with weights
 G.add_edge("A", "B", weight=1)
@@ -43,9 +43,9 @@ def test_route_to_safety_more_than_one() -> None:
 G1 = nx.MultiDiGraph()
 
 # Add nodes (coordinates as strings for simplicity)
-G1.add_node("A", pos=(2, 2))
-G1.add_node("B", pos=(4, 4))
-G1.add_node("C", pos=(5, 5))
+G1.add_node("A", x=2, y=2)
+G1.add_node("B", x=4, y=4)
+G1.add_node("C", x=5, y=5)
 
 # Add edges with weights
 G1.add_edge("A", "B", weight=1)
@@ -61,8 +61,8 @@ def test_route_to_safety_endpoint_is_completely_free_from_danger() -> None:
 G2 = nx.MultiDiGraph()
 
 # Add nodes (coordinates as strings for simplicity)
-G2.add_node("A", pos=(2, 2))
-G2.add_node("B", pos=(3, 2))
+G2.add_node("A", x=2, y=2)
+G2.add_node("B", x=3, y=2)
 
 # Add edges with weights
 G2.add_edge("A", "B", weight=1)
