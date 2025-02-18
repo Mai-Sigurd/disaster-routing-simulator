@@ -42,7 +42,7 @@ def test_load_danger_zone(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> No
         "data_loader.danger_zones.DANGER_ZONES_DIR", tmp_path / "danger_zones"
     )
 
-    danger_zone = load_danger_zone("test.geojson")
+    danger_zone = load_danger_zone("test.geojson", "")
     assert isinstance(danger_zone, gpd.GeoDataFrame)
     assert len(danger_zone) == 1
 
