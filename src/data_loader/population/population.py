@@ -37,4 +37,4 @@ def get_origin_points(population: gpd.GeoDataFrame) -> list[str]:
     :param population: A GeoDataFrame containing the population data.
     :return: A list of origin points.
     """
-    return list(population['id'])
+    return list(population["id"])

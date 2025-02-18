@@ -27,6 +27,7 @@ def load_danger_zone(file_name: str, crs: str) -> gpd.GeoDataFrame:
     polygons = [shape(feature["geometry"]) for feature in data["features"]]
     return gpd.GeoDataFrame(geometry=polygons, crs=crs)
 
+
 def set_danger_zone_crs(danger_zone: gpd.GeoDataFrame, crs: str) -> gpd.GeoDataFrame:
     if danger_zone.crs is None:
         danger_zone.set_crs(crs, inplace=True)
