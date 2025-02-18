@@ -1,5 +1,8 @@
+from routes.shortestpath import route
+
+
 class Route:
-    def __init__(self, path: list[str], num_people_on_route: int) -> None:
+    def __init__(self, path: route, num_people_on_route: int) -> None:
         self.path = path
         self.num_people_on_route = num_people_on_route
         self.departure_times: dict[int, int] = {0: num_people_on_route}
