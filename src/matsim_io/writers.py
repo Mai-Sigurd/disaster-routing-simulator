@@ -49,7 +49,6 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
         :param x: Latitude of the node.
         :param y: Longitude of the node.
         """
-        assert 0 < node_id
         self._require_scope(self.NODES_SCOPE)
         self._write_line(f'<node id="{node_id}" x="{x}" y="{y}"/>')
 
@@ -92,15 +91,6 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
         if perm_lanes is None:
             perm_lanes = 1
 
-        assert isinstance(link_id, int) and link_id > 0, (
-            "link_id must be a positive integer"
-        )
-        assert isinstance(from_node, int) and from_node > 0, (
-            "from_node must be a positive integer"
-        )
-        assert isinstance(to_node, int) and to_node > 0, (
-            "to_node must be a positive integer"
-        )
         assert isinstance(length, (int, float)) and length > 0, (
             "length must be a positive number"
         )
@@ -120,7 +110,7 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
             f' from="{from_node}"'
             f' to="{to_node}"'
             f' length="{length}"'
-            f' freespeed="{kmh_to_ms(speed_limit):.2f}"'
+            f' freespeed="{_kmh_to_ms(speed_limit):.2f}"'
             f' capacity="{capacity}"'
             f' permlanes="{perm_lanes}"/>'
         )
@@ -176,6 +166,6 @@ class PlansWriter(PopulationWriter):  # type: ignore[misc]
         self._write_line("</leg>")
 
 
-def kmh_to_ms(kmh: float) -> float:
+def _kmh_to_ms(kmh: float) -> float:
     """Convert km/h to m/s."""
     return kmh * 1000 / 3600
