@@ -3,7 +3,7 @@ import logging
 from geopandas import GeoDataFrame
 
 from data_loader.danger_zones import load_danger_zone
-from data_loader.osm import load_osm
+from data_loader.osm import download_cph, load_osm
 from data_loader.population.population import (
     distribute_population,
     get_origin_points,
@@ -18,23 +18,12 @@ logging.basicConfig(
     style="{",
 )
 
+CPH_LOADED = True
+
 
 if __name__ == "__main__":
-    # G = download_osm_graph(["Capital Region of Denmark"])
-    # save_to_geojson()
-    # G = download_osm_graph(
-    #     [
-    #         "Copenhagen Municipality, Denmark",
-    #         "Frederiksberg Municipality, Denmark",
-    #         "Tårnby Municipality, Denmark",
-    #         "Hvidovre Municipality, Denmark",
-    #         "Rødovre Municipality, Denmark",
-    #         "Gentofte Municipality, Denmark",
-    #         "Gladsaxe Municipality, Denmark",
-    #         "Herlev Municipality, Denmark",
-    #     ]
-    # )
-    # save_osm(G, "copenhagen.graphml")
+    if not CPH_LOADED:
+        download_cph()
     G = load_osm("copenhagen.graphml")
     populationData: GeoDataFrame = load_geojson(
         "../data/population/PopulationGeoDataframe.geojson"
