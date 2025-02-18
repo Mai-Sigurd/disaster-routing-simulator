@@ -4,3 +4,6 @@
 
 # OSM data
 cache
+
+#pycache
+__pycache__
