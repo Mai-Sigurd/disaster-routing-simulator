@@ -167,5 +167,5 @@ def _try_parse_min_int(link_data: dict[str, list[str] | str], key: str) -> int |
     try:
         return min(map(int, value)) if isinstance(value, list) else int(value)
     except ValueError:
-        logging.error(f"Invalid {key} value: {value}")
+        logging.warning(f"Invalid {key} value: {value}")
         return None
