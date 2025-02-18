@@ -62,13 +62,13 @@ def write_network(
 
 def write_plans(
     routes: list[Route],
-    plan_file: str = "plans.xml",
+    plan_filename: str = "plans.xml",
     gzip_compress: bool = True,
 ) -> None:
     """
     Write a MATSim plan file based on a given network and routes.
     :param routes: List of routes to turn into MATSim plans.
-    :param plan_file: Name of the output file.
+    :param plan_filename: Name of the output file.
     :param gzip_compress: Whether to save the file as a .gz compressed file.
     """
     if not LINK_IDS:
@@ -76,11 +76,11 @@ def write_plans(
     if not routes:
         logging.warning("No routes given. Writing empty MATSim plan file.")
 
-    plan_file = _validate_and_format_filename(plan_file, gzip_compress)
-    logging.info(f"Writing MATSim plans to {plan_file}")
+    plan_filename = _validate_and_format_filename(plan_filename, gzip_compress)
+    logging.info(f"Writing MATSim plans to {plan_filename}")
 
     open_func = gzip.open if gzip_compress else open
-    with open_func(MATSIM_DATA_DIR / plan_file, "wb+") as f_write:
+    with open_func(MATSIM_DATA_DIR / plan_filename, "wb+") as f_write:
         writer = PlansWriter(f_write)
         writer.start_population()
 
@@ -106,7 +106,7 @@ def write_plans(
 
         writer.end_population()
 
-    logging.info(f"Finished writing MATSim plans to {plan_file}")
+    logging.info(f"Finished writing MATSim plans to {plan_filename}")
 
 
 def _validate_and_format_filename(network_filename: str, gzip_compress: bool) -> str:
@@ -116,7 +116,7 @@ def _validate_and_format_filename(network_filename: str, gzip_compress: bool) ->
     :param network_filename: Name of the output file.
     :return: Valid network file name.
     """
-    if not network_filename.endswith(".xml") or network_filename.endswith(".xml.gz"):
+    if not (network_filename.endswith(".xml") or network_filename.endswith(".xml.gz")):
         raise ValueError(
             f"Invalid file name: {network_filename}. Expected .xml or .xml.gz file."
         )
