@@ -12,6 +12,7 @@ from tqdm import tqdm
 
 from data_loader import DATA_DIR
 from data_loader.osm import download_osm_graph
+from data_loader.population.population import GEOMETRY, NODE_ID, POPULATION
 
 
 def read_world_pop_data(tif_filename_path: Path) -> gpd.GeoDataFrame:
@@ -59,11 +60,11 @@ def snap_population_to_nodes(
                 nearest_nodes_to_pop[nearest_node] += pop
     result = gpd.GeoDataFrame(
         {
-            "id": list(nearest_nodes_to_pop.keys()),
-            "pop": list(nearest_nodes_to_pop.values()),
-            "geometry": [nodes.loc[k].geometry for k in nearest_nodes_to_pop.keys()],
+            NODE_ID: list(nearest_nodes_to_pop.keys()),
+            POPULATION: list(nearest_nodes_to_pop.values()),
+            GEOMETRY: [nodes.loc[k].geometry for k in nearest_nodes_to_pop.keys()],
         },
-        geometry="geometry",
+        geometry=GEOMETRY,
     )
     if nodes.crs:
         result.set_crs(
@@ -74,10 +75,11 @@ def snap_population_to_nodes(
     return result
 
 
-def main() -> None:
+def save_to_geojson() -> None:
     logging.getLogger().setLevel(logging.INFO)
 
     POPULATION_DATA_DIR = DATA_DIR / "population"
+    # POPULATION_DATA_FILE = Path("../../../data/population/dnk_ppp_2020_constrained.tif")
     POPULATION_DATA_FILE = POPULATION_DATA_DIR / "dnk_ppp_2020_constrained.tif"
     G = download_osm_graph(
         [
@@ -99,9 +101,9 @@ def main() -> None:
         G,
         maximum_distance_to_node,
     ).to_file(
-        "../../../data/population/PopulationGeoDataframe.geojson", driver="GeoJSON"
+        # "../../../data/population/PopulationGeoDataframe.geojson",
+        POPULATION_DATA_DIR / "PopulationGeoDataframe.geojson",
+        driver="GeoJSON"
     )
 
 
-if __name__ == "__main__":
-    main()

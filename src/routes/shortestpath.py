@@ -1,20 +1,22 @@
 import heapq as hq
+import logging
 
 import geopandas as gpd
 import networkx as nx
 from shapely.geometry import Point
+from tqdm import tqdm
 
 vertex = str
 """A tuple containing the latitude and longitude of a point"""
 
-route = list[vertex]
+path = list[vertex]
 """A list of coordinates representing a route"""
 
 
 # based on: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/
 def route_to_safety(
     origin_points: list[vertex], danger_zone: gpd.GeoDataFrame, G: nx.MultiDiGraph
-) -> list[route]:
+) -> list[path]:
     """
     Routes a list of origin points to the nearest safe location.
 
@@ -23,9 +25,10 @@ def route_to_safety(
     :param G: A graph corresponding to the road network
     :return: A list of routes where each route corresponds to the origin point at the same index.
     """
+    logging.info("Routing shortest path to safety for all origin points")
     routes = []
 
-    for origin in origin_points:
+    for origin in tqdm(origin_points):
         sptSet = dict((node, False) for node in list(G.nodes))
         dist: list[tuple[float, str]] = [(float("inf"), node) for node in G.nodes]
         node_priority = {node: float("inf") for node in G.nodes}
@@ -80,11 +83,11 @@ def reconstruct_route(predecessor: dict[str, str | None], end: str) -> list[str]
 def is_in_dangerzone(
     v: vertex, danger_zone: gpd.GeoDataFrame, G: nx.MultiDiGraph
 ) -> bool:
-    x, y = G.nodes[v]["pos"]
     p = gpd.GeoSeries(
-        [
-            Point(x, y),
+        data=[
+            Point(G.nodes[v]["x"], G.nodes[v]["y"]),
         ],
+        crs=danger_zone.crs,
     )
     return danger_zone.intersects(p)[0]  # type: ignore
 

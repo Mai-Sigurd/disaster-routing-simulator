@@ -2,6 +2,10 @@ import logging
 
 import geopandas as gpd
 
+POPULATION = "pop"
+NODE_ID = "id"
+GEOMETRY = "geometry"
+
 
 def load_geojson(file_path: str) -> gpd.GeoDataFrame:
     """
@@ -24,5 +28,13 @@ def distribute_population(
     :return: A geopandas dataframe with id corresponding to OSM IDS and population.
     """
     # List to store nodes in the danger zone and their population
-
     return gpd.sjoin(population, danger_zone, how="inner", predicate="intersects")
+
+
+def get_origin_points(population: gpd.GeoDataFrame) -> list[str]:
+    """
+    Returns the origin points for the shortest path algorithm.
+    :param population: A GeoDataFrame containing the population data.
+    :return: A list of origin points.
+    """
+    return list(population['id'])
