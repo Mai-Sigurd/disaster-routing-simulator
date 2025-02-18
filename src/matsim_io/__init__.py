@@ -1,41 +1,37 @@
 import gzip
 import logging
-import random
 
-import matsim
 import networkx as nx
+from matsim.writers import Id
 
 from data_loader import DATA_DIR
-from matsim_io.writers import NetworkWriter
+from matsim_io.writers import NetworkWriter, PlansWriter
 
 MATSIM_DATA_DIR = DATA_DIR / "matsim"
+"""Directory where MATSim network and plan files are saved."""
+LINK_IDS: dict[str, int] = {}
+"""Dictionary mapping OSM link IDs to MATSim link IDs."""
 
 
 def write_network(
     graph: nx.MultiDiGraph,
     network_name: str | None = None,
-    network_file: str = "network.xml",
+    network_filename: str = "network.xml",
     gzip_compress: bool = True,
 ) -> None:
     """
     Write a network to a MATSim network file.
     :param graph: NetworkX graph representing the network.
     :param network_name: Name of the network.
-    :param network_file: Name of the output file.
+    :param network_filename: Name of the output file.
     :param gzip_compress: Whether to save the file as a .gz compressed file.
     """
-    if not network_file.endswith(".xml") or network_file.endswith(".xml.gz"):
-        raise ValueError(
-            f"Invalid file name: {network_file}. Expected .xml or .xml.gz file."
-        )
-    if gzip_compress and not network_file.endswith(".gz"):
-        network_file += ".gz"
-
-    logging.info(f"Writing MATSim network to {network_file}")
+    network_filename = _validate_and_format_filename(network_filename, gzip_compress)
+    logging.info(f"Writing MATSim network to {network_filename}")
 
     open_func = gzip.open if gzip_compress else open
-    with open_func(MATSIM_DATA_DIR / network_file, "wb+") as f_write:
-        writer = NetworkWriter(f_write)  # type: ignore[arg-type]
+    with open_func(MATSIM_DATA_DIR / network_filename, "wb+") as f_write:
+        writer = NetworkWriter(f_write)
         writer.start_network(network_name)
 
         writer.start_nodes()
@@ -47,6 +43,7 @@ def write_network(
         for link_id, (from_node, to_node, link_data) in enumerate(
             graph.edges(data=True), 1
         ):
+            _add_link_id(from_node, to_node, link_id)
             writer.add_link(
                 link_id,
                 from_node,
@@ -59,47 +56,97 @@ def write_network(
 
         writer.end_network()
 
-    logging.info(f"Finished writing MATSim network to {network_file}")
+    logging.info(f"Finished writing MATSim network to {network_filename}")
 
 
-def write_plan(
-    graph: nx.MultiDiGraph,
-    plan_file: str = "plan.xml",
+def write_plans(
+    routes: list[list[Id]],
+    plan_file: str = "plans.xml",
     gzip_compress: bool = True,
 ) -> None:
-    if not plan_file.endswith(".xml") or plan_file.endswith(".xml.gz"):
-        raise ValueError(
-            f"Invalid file name: {plan_file}. Expected .xml or .xml.gz file."
-        )
-    if gzip_compress and not plan_file.endswith(".gz"):
-        plan_file += ".gz"
+    """
+    Write a MATSim plan file based on a given network and routes.
+    :param routes: List of routes where each route is a list of node IDs.
+    :param plan_file: Name of the output file.
+    :param gzip_compress: Whether to save the file as a .gz compressed file.
+    """
+    if not LINK_IDS:
+        raise ValueError("No link IDs found. Please write the network first.")
+    if not routes:
+        logging.warning("No routes given. Writing empty MATSim plan file.")
 
-    nodes = list(graph.nodes)
+    plan_file = _validate_and_format_filename(plan_file, gzip_compress)
+    logging.info(f"Writing MATSim plans to {plan_file}")
 
     open_func = gzip.open if gzip_compress else open
     with open_func(MATSIM_DATA_DIR / plan_file, "wb+") as f_write:
-        writer = matsim.writers.PopulationWriter(f_write)
-
+        writer = PlansWriter(f_write)
         writer.start_population()
-        count = 0
 
-        while count < 2500:
-            v, w = random.sample(nodes, 2)
-            if not nx.has_path(graph, v, w):
-                continue
-            v, w = graph.nodes[v], graph.nodes[w]
-            dep_time = 60 * count
-            for _ in range(5):
-                writer.start_person(count)
-                writer.start_plan(selected=True)
-                writer.add_activity("danger", x=v["x"], y=v["y"], end_time=dep_time)
-                writer.add_leg(mode="car", departure_time=dep_time)
-                writer.add_activity("safe", x=w["x"], y=w["y"])
-                writer.end_plan()
-                writer.end_person()
-                count += 1
+        for i, route in enumerate(routes):
+            writer.start_person(i)
+            writer.start_plan(selected=True)
+
+            # link_pairs = [(route[i], route[i + 1]) for i in range(len(route) - 1)]
+            link_pairs = list(zip(route[:-1], route[1:]))
+            link_ids = [_get_link_id(v, w) for v, w in link_pairs]
+
+            writer.add_activity_with_link("danger", link=link_ids[0], end_time=0)
+            writer.add_leg_with_route(link_ids)
+            writer.add_activity_with_link("safe", link=link_ids[-1])
+
+            writer.end_plan()
+            writer.end_person()
 
         writer.end_population()
+
+    logging.info(f"Finished writing MATSim plans to {plan_file}")
+
+
+def _validate_and_format_filename(network_filename: str, gzip_compress: bool) -> str:
+    """
+    Helper function to check if the network file name is valid and add the .gz extension if needed.
+    :param gzip_compress: Whether to save the file as a .gz compressed file.
+    :param network_filename: Name of the output file.
+    :return: Valid network file name.
+    """
+    if not network_filename.endswith(".xml") or network_filename.endswith(".xml.gz"):
+        raise ValueError(
+            f"Invalid file name: {network_filename}. Expected .xml or .xml.gz file."
+        )
+    if gzip_compress and not network_filename.endswith(".gz"):
+        return network_filename + ".gz"
+    return network_filename
+
+
+def _add_link_id(v: Id, w: Id, link_id: int) -> None:
+    """
+    Helper function to add a link ID to the LINK_IDS dictionary.
+    :param v: OSM node ID.
+    :param w: OSM node ID.
+    :param link_id: MATSim link ID.
+    """
+    LINK_IDS[_link_id_key(v, w)] = link_id
+
+
+def _get_link_id(v: Id, w: Id) -> int:
+    """
+    Helper function to get the link ID from the LINK_IDS dictionary.
+    :param v: OSM node ID.
+    :param w: OSM node ID.
+    :return: MATSim link ID.
+    """
+    return LINK_IDS[_link_id_key(v, w)]
+
+
+def _link_id_key(v: Id, w: Id) -> str:
+    """
+    Helper function to create a unique key for the link between two OSM nodes.
+    :param v: OSM node ID.
+    :param w: OSM node ID.
+    :return: Unique key for the LINK_IDS dictionary.
+    """
+    return f"{min(v, w)}-{max(v, w)}"
 
 
 def _try_parse_min_int(link_data: dict[str, list[str] | str], key: str) -> int | None:

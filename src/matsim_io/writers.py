@@ -1,6 +1,6 @@
-from typing import BinaryIO
+from typing import BinaryIO, Optional
 
-from matsim.writers import XmlWriter
+from matsim.writers import Id, PopulationWriter, XmlWriter
 
 DANISH_SPEED_LIMIT = 130  # km/h
 
@@ -42,7 +42,7 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
         self._write_line("</nodes>")
         self.set_scope(self.NETWORK_SCOPE)
 
-    def add_node(self, node_id: int, x: float, y: float) -> None:
+    def add_node(self, node_id: Id, x: float, y: float) -> None:
         """
         Add a node to the network.
         :param node_id: Unique ID of the node.
@@ -67,9 +67,9 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
 
     def add_link(
         self,
-        link_id: int,
-        from_node: int,
-        to_node: int,
+        link_id: Id,
+        from_node: Id,
+        to_node: Id,
         length: float,
         speed_limit: int | None = None,
         capacity: int | None = None,
@@ -124,6 +124,56 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
             f' capacity="{capacity}"'
             f' permlanes="{perm_lanes}"/>'
         )
+
+
+class PlansWriter(PopulationWriter):  # type: ignore[misc]
+    def __init__(self, writer: BinaryIO):
+        PopulationWriter.__init__(self, writer)
+
+    def add_activity_with_link(
+        self,
+        link_type: str,
+        link: Id,
+        end_time: Optional[int] = None,
+    ) -> None:
+        """
+        Add an activity with a link to the plan.
+        :param link_type: Type of the link.
+        :param link: ID of the link.
+        :param end_time: Time of arrival.
+        """
+        self._require_scope(self.PLAN_SCOPE)
+        self._write_indent()
+        self._write(f'<activity type="{link_type}" link="{link}"')
+        if end_time is not None:
+            self._write(f' end_time="{self.time(end_time)}"')
+        self._write("/>\n")
+
+    def add_leg_with_route(
+        self,
+        route: list[Id],
+        mode: str = "car",
+        departure_time: Optional[int] = None,
+    ) -> None:
+        """
+        Add a leg with a route to the plan.
+        :param route: List of link IDs.
+        :param mode: Mode of transportation.
+        :param departure_time: Time of departure.
+        """
+        self._require_scope(self.PLAN_SCOPE)
+        self._write_indent()
+        self._write(f'<leg mode="{mode}"')
+        if departure_time is not None:
+            self._write(f' dep_time="{self.time(departure_time)}"')
+        self._write(">\n")
+
+        self.indent += 1
+        self._write_indent()
+        self._write(f'<route type="links">{" ".join(map(str, route))}</route>\n')
+        self.indent -= 1
+
+        self._write_line("</leg>")
 
 
 def kmh_to_ms(kmh: float) -> float:
