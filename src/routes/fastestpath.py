@@ -6,15 +6,10 @@ import networkx as nx
 from shapely.geometry import Point
 from tqdm import tqdm
 
-vertex = str
-"""A tuple containing the latitude and longitude of a point"""
-
-path = list[vertex]
-"""A list of coordinates representing a route"""
+from routes.shortestpath import path, vertex
 
 
-# based on: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/
-def route_to_safety(
+def fastest_path(
     origin_points: list[vertex], danger_zone: gpd.GeoDataFrame, G: nx.MultiDiGraph
 ) -> list[path]:
     """
@@ -50,9 +45,14 @@ def route_to_safety(
                     for _, neighbour, edge_data in G.edges(
                         smallest_node, data=True
                     ):  # Multiple edges between two nodes possible
-                        weight = edge_data.get(
-                            "weight", float("inf")
-                        )  # Default weight to inf, weight of edge between popped_node and neighbour
+                        length = edge_data.get(
+                            "length", float("inf")
+                        )  # Edge length in meters
+                        maxspeed = edge_data.get("maxspeed", 50)  # speed limit km/h
+                        maxspeed = maxspeed * 0.27778  # converting km/h to m/s
+
+                        weight = length / maxspeed
+
                         new_distance = priority + weight
 
                         if new_distance < node_priority[neighbour]:
