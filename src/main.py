@@ -25,18 +25,24 @@ if __name__ == "__main__":
     if not CPH_LOADED:
         download_cph()
     G = load_osm("copenhagen.graphml")
-    populationData: GeoDataFrame = load_geojson(
+
+    population_data: GeoDataFrame = load_geojson(
         "../data/population/PopulationGeoDataframe.geojson"
     )
+
     danger_zones: GeoDataFrame = load_danger_zone(
-        "dangerzone_amager.geojson", populationData.crs
+        "dangerzone_amager.geojson", population_data.crs
     )
     danger_zone_population: GeoDataFrame = distribute_population(
-        danger_zones, populationData
+        danger_zones, population_data
     )
 
     origin_points: list[str] = get_origin_points(danger_zone_population)
-    paths: list[path] = route_to_safety(origin_points, danger_zones, G)
+    paths: list[path] = route_to_safety([origin_points[2918]], danger_zones, G)
     routes: list[Route] = create_route_objects(
-        list_of_paths=paths, population_data=populationData, chunks=1, interval=0
+        list_of_paths=paths, population_data=population_data, chunks=1, interval=0
     )
+    logging.info("Routes done")
+    logging.info("Stats ---------------------")
+    logging.info("Amount of routes: %s", len(routes))
+    logging.info("Amount of people: %s", sum([r.num_people_on_route for r in routes]))
