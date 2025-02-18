@@ -3,6 +3,10 @@ import logging
 import networkx as nx
 import osmnx as ox
 
+from data_loader import DATA_DIR
+
+OSM_DIR = DATA_DIR / "osm_graph"
+
 
 def download_osm_graph(queries: list[str]) -> nx.MultiDiGraph:
     def download_query(query: str) -> nx.MultiDiGraph:
@@ -14,3 +18,11 @@ def download_osm_graph(queries: list[str]) -> nx.MultiDiGraph:
         return city_graph
 
     return nx.compose_all([download_query(city) for city in queries])
+
+
+def save_osm(G: nx.MultiDiGraph, filename: str) -> None:
+    ox.save_graphml(G, OSM_DIR / filename)
+
+
+def load_osm(filename: str) -> nx.MultiDiGraph:
+    return ox.load_graphml(OSM_DIR / filename)

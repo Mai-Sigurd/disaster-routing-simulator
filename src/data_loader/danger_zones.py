@@ -8,11 +8,12 @@ from data_loader import DATA_DIR, load_json
 DANGER_ZONES_DIR = DATA_DIR / "danger_zones"
 
 
-def load_danger_zone(file_name: str) -> gpd.GeoDataFrame:
+def load_danger_zone(file_name: str, crs: str) -> gpd.GeoDataFrame:
     """
     Loads a danger zone GeoJSON file and returns a GeoDataFrame.
 
     :param file_name: Name of the GeoJSON file (e.g., "dangerzone_1.geojson")
+    :param crs: Coordinate Reference System
     :return: GeoDataFrame containing the danger zone polygon(s)
     """
     if not file_name.endswith(".geojson"):
@@ -24,4 +25,10 @@ def load_danger_zone(file_name: str) -> gpd.GeoDataFrame:
 
     logging.info(f"Loaded danger zone: {file_name}")
     polygons = [shape(feature["geometry"]) for feature in data["features"]]
-    return gpd.GeoDataFrame(geometry=polygons)
+    return gpd.GeoDataFrame(geometry=polygons, crs=crs)
+
+def set_danger_zone_crs(danger_zone: gpd.GeoDataFrame, crs: str) -> gpd.GeoDataFrame:
+    if danger_zone.crs is None:
+        danger_zone.set_crs(crs, inplace=True)
+
+    return danger_zone.to_crs(crs, inplace=True)

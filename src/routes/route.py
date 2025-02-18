@@ -1,9 +1,12 @@
-from routes.shortestpath import route
+import geopandas as gpd
+
+from data_loader.population.population import NODE_ID, POPULATION
+from routes.shortestpath import path
 
 
 class Route:
-    def __init__(self, path: route, num_people_on_route: int) -> None:
-        self.path = path
+    def __init__(self, route_path: path, num_people_on_route: int) -> None:
+        self.path = route_path
         self.num_people_on_route = num_people_on_route
         self.departure_times: dict[int, int] = {0: num_people_on_route}
 
@@ -33,3 +36,31 @@ class Route:
                 seconds_from_midnight += interval
 
         self.departure_times = departure_times
+
+
+def create_route_objects(
+    list_of_paths: list[path],
+    population_data: gpd.GeoDataFrame,
+    chunks: int,
+    interval: int,
+) -> list[Route]:
+    """
+    Creates a list of Route objects from a list of routes.
+
+    :param list_of_paths: A list of routes.
+    :param population_data: A GeoDataFrame containing the population data.
+    :param chunks: In how many different chunks should the persons on the route depart.
+    :param interval: How long should the interval between each departure be. Given in seconds.
+    :return: A list of Route objects.
+    """
+    result = []
+    for p in list_of_paths:
+        route_path = p
+        num_people_on_route = int(
+            population_data[population_data[NODE_ID] == p[0]][POPULATION].values[0]
+        )
+
+        route_object = Route(route_path, num_people_on_route)
+        route_object.introduce_departure_times(chunks, interval)
+        result.append(route_object)
+    return result
