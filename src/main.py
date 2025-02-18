@@ -9,6 +9,7 @@ from data_loader.population.population import (
     get_origin_points,
     load_geojson,
 )
+from matsim_io import write_network, write_plans
 from routes.route import Route, create_route_objects
 from routes.shortestpath import path, route_to_safety
 
@@ -51,3 +52,6 @@ if __name__ == "__main__":
     routes: list[Route] = create_route_objects(
         list_of_paths=paths, population_data=populationData, chunks=1, interval=0
     )
+
+    write_network(G, network_name="Copenhagen")
+    write_plans(routes)
