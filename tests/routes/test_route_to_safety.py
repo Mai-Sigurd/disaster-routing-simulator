@@ -3,7 +3,7 @@ import networkx as nx
 import pytest
 from shapely.geometry import Point, Polygon
 
-from routes.routes import route_to_safety
+from routes.shortestpath import route_to_safety
 
 # Create a directed graph
 G = nx.MultiDiGraph()
