@@ -1,4 +1,5 @@
 import geopandas as gpd
+from tqdm import tqdm
 
 from data_loader.population.population import NODE_ID, POPULATION
 from routes.shortestpath import path
@@ -54,10 +55,10 @@ def create_route_objects(
     :return: A list of Route objects.
     """
     result = []
-    for p in list_of_paths:
+    for p in tqdm(list_of_paths):
         route_path = p
         num_people_on_route = int(
-            population_data[population_data[NODE_ID] == p[0]][POPULATION].values[0]
+            population_data[population_data[NODE_ID] == p[0]].iloc[0][POPULATION]
         )
 
         route_object = Route(route_path, num_people_on_route)
