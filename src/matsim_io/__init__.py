@@ -6,6 +6,7 @@ from matsim.writers import Id
 
 from data_loader import DATA_DIR
 from matsim_io.writers import NetworkWriter, PlansWriter
+from routes.route import Route
 
 MATSIM_DATA_DIR = DATA_DIR / "matsim"
 """Directory where MATSim network and plan files are saved."""
@@ -60,13 +61,13 @@ def write_network(
 
 
 def write_plans(
-    routes: list[list[Id]],
+    routes: list[Route],
     plan_file: str = "plans.xml",
     gzip_compress: bool = True,
 ) -> None:
     """
     Write a MATSim plan file based on a given network and routes.
-    :param routes: List of routes where each route is a list of node IDs.
+    :param routes: List of routes to turn into MATSim plans.
     :param plan_file: Name of the output file.
     :param gzip_compress: Whether to save the file as a .gz compressed file.
     """
@@ -83,20 +84,25 @@ def write_plans(
         writer = PlansWriter(f_write)
         writer.start_population()
 
-        for i, route in enumerate(routes):
-            writer.start_person(i)
-            writer.start_plan(selected=True)
-
-            # link_pairs = [(route[i], route[i + 1]) for i in range(len(route) - 1)]
-            link_pairs = list(zip(route[:-1], route[1:]))
+        count = 1
+        for route in routes:
+            link_pairs = list(zip(route.path[:-1], route.path[1:]))
             link_ids = [_get_link_id(v, w) for v, w in link_pairs]
 
-            writer.add_activity_with_link("danger", link=link_ids[0], end_time=0)
-            writer.add_leg_with_route(link_ids)
-            writer.add_activity_with_link("safe", link=link_ids[-1])
+            for dep_time, num_people in route.departure_times.items():
+                for _ in range(num_people):
+                    writer.start_person(count)
+                    writer.start_plan(selected=True)
 
-            writer.end_plan()
-            writer.end_person()
+                    writer.add_activity_with_link(
+                        "danger", link=link_ids[0], end_time=dep_time
+                    )
+                    writer.add_leg_with_route(link_ids, departure_time=dep_time)
+                    writer.add_activity_with_link("safe", link=link_ids[-1])
+
+                    writer.end_plan()
+                    writer.end_person()
+                    count += 1
 
         writer.end_population()
 
