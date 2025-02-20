@@ -1,6 +1,8 @@
 # Disaster Routing Simulator
 
-## Virtual environment
+## Setup
+
+### Virtual environment
 
 To create a virtual environment and install the dependencies, execute the following commands:
 
@@ -14,9 +16,12 @@ pip install poetry
 poetry install
 ```
 
-## Running the simulator
+### MATSim GUI
 
-T.B.D.
+To setup and use the MATSim GUI, follow the instructions in
+the [MATSim Installation Guide](https://matsim.org/install/#use-the-matsim-gui)
+
+The MATSim configuration file is located at [here](data/matsim/config.xml).
 
 ## Running the tests
 
