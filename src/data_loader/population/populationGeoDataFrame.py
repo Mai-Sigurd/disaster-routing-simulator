@@ -79,7 +79,6 @@ def save_to_geojson() -> None:
     logging.getLogger().setLevel(logging.INFO)
 
     POPULATION_DATA_DIR = DATA_DIR / "population"
-    # POPULATION_DATA_FILE = Path("../../../data/population/dnk_ppp_2020_constrained.tif")
     POPULATION_DATA_FILE = POPULATION_DATA_DIR / "dnk_ppp_2020_constrained.tif"
     G = download_osm_graph(
         [
@@ -101,7 +100,7 @@ def save_to_geojson() -> None:
         G,
         maximum_distance_to_node,
     ).to_file(
-        # "../../../data/population/PopulationGeoDataframe.geojson",
-        POPULATION_DATA_DIR / "PopulationGeoDataframe.geojson",
+        # "../../../data/population/CPHpop.geojson",
+        POPULATION_DATA_DIR / "CPHpop.geojson",
         driver="GeoJSON",
     )
