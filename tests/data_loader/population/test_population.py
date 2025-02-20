@@ -1,6 +1,6 @@
 import logging
 import sys
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import geopandas as gpd
 import osmnx as ox
@@ -9,19 +9,28 @@ import pytest
 from _pytest.logging import LogCaptureFixture
 from shapely.geometry import LineString, Point, Polygon
 
-from data_loader.population.population import distribute_population, load_geojson
+from data_loader.population.population import (
+    GEO_JSON_DIR,
+    distribute_population,
+    load_geojson,
+)
 from data_loader.population.populationGeoDataFrame import (
     filter_world_pop_to_cph,
     snap_population_to_nodes,
 )
 
 
-def test_load_geojson_success() -> None:
-    mock_gdf = gpd.GeoDataFrame({"geometry": []})  # Mocked empty GeoDataFrame
-    with patch("geopandas.read_file", return_value=mock_gdf) as mock_read_file:
-        result = load_geojson("dummy_path.geojson")
-        assert isinstance(result, gpd.GeoDataFrame)
-        mock_read_file.assert_called_once_with("dummy_path.geojson")
+@patch("geopandas.read_file")
+def test_load_geojson_success(mock_read_file):
+    """Test successful loading of a GeoJSON file."""
+    mock_gdf = MagicMock(spec=gpd.GeoDataFrame)
+    mock_read_file.return_value = mock_gdf
+
+    file_name = "test.geojson"
+    result = load_geojson(file_name)
+
+    mock_read_file.assert_called_once_with(GEO_JSON_DIR / file_name)
+    assert result == mock_gdf
 
 
 def test_load_geojson_failure(caplog: LogCaptureFixture) -> None:
