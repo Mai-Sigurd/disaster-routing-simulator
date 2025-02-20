@@ -75,7 +75,7 @@ def snap_population_to_nodes(
     return result
 
 
-def save_to_geojson() -> None:
+def save_CPH_population_to_geojson() -> None:
     logging.getLogger().setLevel(logging.INFO)
 
     POPULATION_DATA_DIR = DATA_DIR / "population"
@@ -100,7 +100,6 @@ def save_to_geojson() -> None:
         G,
         maximum_distance_to_node,
     ).to_file(
-        # "../../../data/population/CPHpop.geojson",
         POPULATION_DATA_DIR / "CPHpop.geojson",
         driver="GeoJSON",
     )
