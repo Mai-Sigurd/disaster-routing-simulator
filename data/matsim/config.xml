@@ -4,7 +4,7 @@
 
     <module name="global">
         <param name="randomSeed" value="4711"/>
-        <param name="coordinateSystem" value="EPSG:25832"/>
+        <param name="coordinateSystem" value="EPSG:4326"/>
     </module>
 
     <module name="network">
