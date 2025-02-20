@@ -3,10 +3,15 @@ import logging
 
 import geopandas as gpd
 import networkx as nx
-from shapely.geometry import Point
 from tqdm import tqdm
 
-from routes.shortestpath import path, vertex
+from routes.route_utils import (
+    is_in_dangerzone,
+    path,
+    reconstruct_route,
+    update_priority,
+    vertex,
+)
 
 
 def fastest_path(
@@ -24,6 +29,9 @@ def fastest_path(
     routes = []
 
     for origin in tqdm(origin_points):
+        if len(list(G.neighbors(origin))) == 0:
+            logging.info(f"Node {origin} has no neighbors")
+            continue  # Skip if the origin node doesn't have neighbors
         sptSet = dict((node, False) for node in list(G.nodes))
         dist: list[tuple[float, str]] = [(float("inf"), node) for node in G.nodes]
         node_priority = {node: float("inf") for node in G.nodes}
@@ -33,10 +41,15 @@ def fastest_path(
         }  # To track shortest path
 
         update_priority(dist, node_priority, origin, 0)
-
         while dist:
-            priority, smallest_node = hq.heappop(dist)
-
+            priority, smallest_node = hq.heappop(
+                dist
+            )  # popping the node with the current fastest path to origin
+            if priority == float("inf"):
+                logging.info(
+                    f"Node {origin} cannot reach any nodes outside the dangerzone"
+                )
+                break
             if (
                 priority == node_priority[smallest_node]
             ):  # Only use values that are not outdated
@@ -44,7 +57,7 @@ def fastest_path(
                     sptSet[smallest_node] = True
                     for _, neighbour, edge_data in G.edges(
                         smallest_node, data=True
-                    ):  # Multiple edges between two nodes possible
+                    ):  # looping through all adjacent vertices
                         length = edge_data.get(
                             "length", float("inf")
                         )  # Edge length in meters
@@ -63,41 +76,10 @@ def fastest_path(
 
             if not is_in_dangerzone(
                 smallest_node, danger_zone, G
-            ):  # We have found shortest route to node outside dangerzone
-                routes.append(reconstruct_route(predecessor, smallest_node))
-                break  # there is no need to find other routes
-        else:  # if there are no more elements to explore in sptSet
-            raise Exception("There are no reachable nodes outside the dangerzone")
-
+            ):  # We have found fastest route to node outside dangerzone
+                final_route = reconstruct_route(predecessor, smallest_node)
+                if final_route[0] != origin:
+                    logging.error("The first node in the route is not the origin node")
+                routes.append(final_route)
+                break  # there is no need to find other routes for this origin point
     return routes
-
-
-def reconstruct_route(predecessor: dict[str, str | None], end: str) -> list[str]:
-    path = []
-    while end is not None:
-        path.append(end)
-        end = predecessor[end]  # type: ignore
-    return path[::-1]
-
-
-def is_in_dangerzone(
-    v: vertex, danger_zone: gpd.GeoDataFrame, G: nx.MultiDiGraph
-) -> bool:
-    p = gpd.GeoSeries(
-        data=[
-            Point(G.nodes[v]["x"], G.nodes[v]["y"]),
-        ],
-        crs=danger_zone.crs,
-    )
-    return danger_zone.intersects(p)[0]  # type: ignore
-
-
-def update_priority(
-    heap: list[tuple[float, str]],
-    node_priority: dict[str, float],
-    node: str,
-    new_priority: float,
-) -> None:
-    if new_priority < node_priority[node]:  # Only update if the new priority is better
-        hq.heappush(heap, (new_priority, node))  # Push the new priority
-        node_priority[node] = new_priority
