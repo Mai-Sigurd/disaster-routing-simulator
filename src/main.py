@@ -32,7 +32,7 @@ if __name__ == "__main__":
     )
 
     danger_zones: GeoDataFrame = load_danger_zone(
-        "dangerzone_amager.geojson", population_data.crs
+        "mindre_del_af_amager.geojson", population_data.crs
     )
     danger_zone_population: GeoDataFrame = distribute_population(
         danger_zones, population_data
