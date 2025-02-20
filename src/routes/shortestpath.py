@@ -3,14 +3,15 @@ import logging
 
 import geopandas as gpd
 import networkx as nx
-from route_utils import (
+from tqdm import tqdm
+
+from routes.route_utils import (
     is_in_dangerzone,
     path,
     reconstruct_route,
     update_priority,
     vertex,
 )
-from tqdm import tqdm
 
 
 # based on: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/

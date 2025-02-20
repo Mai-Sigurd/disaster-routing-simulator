@@ -1,8 +1,10 @@
 import heapq as hq
+import logging
 
 import geopandas as gpd
 import networkx as nx
 from shapely.geometry import Point
+from tqdm import tqdm
 
 vertex = str
 """A tuple containing the latitude and longitude of a point"""
