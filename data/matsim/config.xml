@@ -4,18 +4,19 @@
 
     <module name="global">
         <param name="randomSeed" value="4711"/>
-        <param name="coordinateSystem" value="Atlantis"/>
+        <param name="coordinateSystem" value="EPSG:25832"/>
     </module>
 
     <module name="network">
         <param name="inputNetworkFile" value="network.xml.gz"/>
+        <param name="inputCRS" value="EPSG:4326"/>
     </module>
 
     <module name="plans">
         <param name="inputPlansFile" value="plans.xml.gz"/>
     </module>
 
-    <module name="controler">
+    <module name="controller">
         <param name="outputDirectory" value="./output"/>
         <param name="firstIteration" value="0"/>
         <param name="lastIteration" value="10"/>
