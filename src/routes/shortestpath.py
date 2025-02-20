@@ -74,7 +74,7 @@ def route_to_safety(
                     raise Exception(
                         "The first node in the route is not the origin node"
                     )
-                routes.append(reconstruct_route(predecessor, smallest_node))
+                routes.append(final_route)
                 break  # there is no need to find other routes
     return routes
 
