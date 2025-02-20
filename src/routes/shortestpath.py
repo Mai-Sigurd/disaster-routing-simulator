@@ -3,14 +3,14 @@ import logging
 
 import geopandas as gpd
 import networkx as nx
-from shapely.geometry import Point
+from route_utils import (
+    is_in_dangerzone,
+    path,
+    reconstruct_route,
+    update_priority,
+    vertex,
+)
 from tqdm import tqdm
-
-vertex = str
-"""A tuple containing the latitude and longitude of a point"""
-
-path = list[vertex]
-"""A list of coordinates representing a route"""
 
 
 # based on: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/
@@ -42,7 +42,9 @@ def route_to_safety(
 
         update_priority(dist, node_priority, origin, 0)
         while dist:
-            priority, smallest_node = hq.heappop(dist)
+            priority, smallest_node = hq.heappop(
+                dist
+            )  # popping the node with the current smallest dist to origin
             if priority == float("inf"):
                 logging.info(
                     f"Node {origin} cannot reach any nodes outside the dangerzone"
@@ -55,9 +57,9 @@ def route_to_safety(
                     sptSet[smallest_node] = True
                     for _, neighbour, edge_data in G.edges(
                         smallest_node, data=True
-                    ):  # Multiple edges between two nodes possible
+                    ):  # looping through all adjacent vertices
                         weight = edge_data.get("length", float("inf"))
-                        # Default weight to inf, weight of edge between popped_node and neighbour
+                        # Default weight to inf, weight of edge between smallest_node and neighbour
                         new_distance = priority + weight
 
                         if new_distance < node_priority[neighbour]:
@@ -73,36 +75,5 @@ def route_to_safety(
                 if final_route[0] != origin:
                     logging.error("The first node in the route is not the origin node")
                 routes.append(final_route)
-                break  # there is no need to find other routes
+                break  # there is no need to find other routes for this origin point
     return routes
-
-
-def reconstruct_route(predecessor: dict[str, str | None], end: str) -> list[str]:
-    path = []
-    while end is not None:
-        path.append(end)
-        end = predecessor[end]  # type: ignore
-    return path[::-1]
-
-
-def is_in_dangerzone(
-    v: vertex, danger_zone: gpd.GeoDataFrame, G: nx.MultiDiGraph
-) -> bool:
-    p = gpd.GeoSeries(
-        data=[
-            Point(G.nodes[v]["x"], G.nodes[v]["y"]),
-        ],
-        crs=danger_zone.crs,
-    )
-    return danger_zone.intersects(p)[0]  # type: ignore
-
-
-def update_priority(
-    heap: list[tuple[float, str]],
-    node_priority: dict[str, float],
-    node: str,
-    new_priority: float,
-) -> None:
-    if new_priority < node_priority[node]:  # Only update if the new priority is better
-        hq.heappush(heap, (new_priority, node))  # Push the new priority
-        node_priority[node] = new_priority
