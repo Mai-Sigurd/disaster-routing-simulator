@@ -1,5 +1,8 @@
+import logging
+
 import geopandas as gpd
 import networkx as nx
+from _pytest.logging import LogCaptureFixture
 from shapely.geometry import Polygon
 
 from routes.shortestpath import route_to_safety
@@ -67,6 +70,29 @@ G2.add_node("B", x=3, y=2)
 G2.add_edge("A", "B", length=1)
 
 
-def test_route_to_safety_all_nodes_are_in_dangerzone() -> None:
-    # TODO: Implement test
-    pass
+def test_route_to_safety_all_nodes_are_in_dangerzone_logging(
+    caplog: LogCaptureFixture,
+) -> None:
+    with caplog.at_level(logging.INFO):
+        route_to_safety(["A"], danger_zone, G2)
+    assert "Node A cannot reach any nodes outside the dangerzone" in caplog.text
+
+
+# Create a directed graph
+G3 = nx.MultiDiGraph()
+
+# Add nodes (coordinates as strings for simplicity)
+G3.add_node("A", x=2, y=2)
+G3.add_node("B", x=3, y=2)
+G3.add_node("C", x=4, y=2)
+
+# Add edges with weights
+G3.add_edge("B", "C", length=1)
+
+
+def test_route_to_safety_origin_has_no_neighbours_logging(
+    caplog: LogCaptureFixture,
+) -> None:
+    with caplog.at_level(logging.INFO):
+        route_to_safety(["A"], danger_zone, G3)
+    assert "Node A has no neighbors" in caplog.text
