@@ -29,6 +29,9 @@ def route_to_safety(
     routes = []
 
     for origin in tqdm(origin_points):
+        if len(list(G.neighbors(origin))) == 0:
+            logging.info(f"Node {origin} has no neighbors")
+            continue  # Skip if the origin node doesn't have neighbors
         sptSet = dict((node, False) for node in list(G.nodes))
         dist: list[tuple[float, str]] = [(float("inf"), node) for node in G.nodes]
         node_priority = {node: float("inf") for node in G.nodes}
@@ -38,10 +41,13 @@ def route_to_safety(
         }  # To track shortest path
 
         update_priority(dist, node_priority, origin, 0)
-
         while dist:
             priority, smallest_node = hq.heappop(dist)
-
+            if priority == float("inf"):
+                logging.info(
+                    f"Node {origin} cannot reach any nodes outside the dangerzone"
+                )
+                break
             if (
                 priority == node_priority[smallest_node]
             ):  # Only use values that are not outdated
@@ -50,9 +56,8 @@ def route_to_safety(
                     for _, neighbour, edge_data in G.edges(
                         smallest_node, data=True
                     ):  # Multiple edges between two nodes possible
-                        weight = edge_data.get(
-                            "weight", float("inf")
-                        )  # Default weight to inf, weight of edge between popped_node and neighbour
+                        weight = edge_data.get("length", float("inf"))
+                        # Default weight to inf, weight of edge between popped_node and neighbour
                         new_distance = priority + weight
 
                         if new_distance < node_priority[neighbour]:
@@ -64,11 +69,11 @@ def route_to_safety(
             if not is_in_dangerzone(
                 smallest_node, danger_zone, G
             ):  # We have found shortest route to node outside dangerzone
-                routes.append(reconstruct_route(predecessor, smallest_node))
+                final_route = reconstruct_route(predecessor, smallest_node)
+                if final_route[0] != origin:
+                    logging.error("The first node in the route is not the origin node")
+                routes.append(final_route)
                 break  # there is no need to find other routes
-        else:  # if there are no more elements to explore in sptSet
-            raise Exception("There are no reachable nodes outside the dangerzone")
-
     return routes
 
 

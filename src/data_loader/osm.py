@@ -20,6 +20,22 @@ def download_osm_graph(queries: list[str]) -> nx.MultiDiGraph:
     return nx.compose_all([download_query(city) for city in queries])
 
 
+def download_cph() -> None:
+    G = download_osm_graph(
+        [
+            "Copenhagen Municipality, Denmark",
+            "Frederiksberg Municipality, Denmark",
+            "Tårnby Municipality, Denmark",
+            "Hvidovre Municipality, Denmark",
+            "Rødovre Municipality, Denmark",
+            "Gentofte Municipality, Denmark",
+            "Gladsaxe Municipality, Denmark",
+            "Herlev Municipality, Denmark",
+        ]
+    )
+    save_osm(G, "copenhagen.graphml")
+
+
 def save_osm(G: nx.MultiDiGraph, filename: str) -> None:
     ox.save_graphml(G, OSM_DIR / filename)
 
