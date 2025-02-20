@@ -71,9 +71,7 @@ def route_to_safety(
             ):  # We have found shortest route to node outside dangerzone
                 final_route = reconstruct_route(predecessor, smallest_node)
                 if final_route[0] != origin:
-                    raise Exception(
-                        "The first node in the route is not the origin node"
-                    )
+                    logging.error("The first node in the route is not the origin node")
                 routes.append(final_route)
                 break  # there is no need to find other routes
     return routes
