@@ -1,0 +1,171 @@
+import gzip
+import logging
+
+import networkx as nx
+from matsim.writers import Id
+
+from data_loader import DATA_DIR
+from matsim_io.writers import NetworkWriter, PlansWriter
+from routes.route import Route
+
+MATSIM_DATA_DIR = DATA_DIR / "matsim"
+"""Directory where MATSim network and plan files are saved."""
+LINK_IDS: dict[str, int] = {}
+"""Dictionary mapping OSM link IDs to MATSim link IDs."""
+
+
+def write_network(
+    graph: nx.MultiDiGraph,
+    network_name: str | None = None,
+    network_filename: str = "network.xml",
+    gzip_compress: bool = True,
+) -> None:
+    """
+    Write a network to a MATSim network file.
+    :param graph: NetworkX graph representing the network.
+    :param network_name: Name of the network.
+    :param network_filename: Name of the output file.
+    :param gzip_compress: Whether to save the file as a .gz compressed file.
+    """
+    network_filename = _validate_and_format_filename(network_filename, gzip_compress)
+    logging.info(f"Writing MATSim network to {network_filename}")
+
+    open_func = gzip.open if gzip_compress else open
+    with open_func(MATSIM_DATA_DIR / network_filename, "wb+") as f_write:
+        writer = NetworkWriter(f_write)
+        writer.start_network(network_name)
+
+        writer.start_nodes()
+        for node_id, node_data in graph.nodes(data=True):
+            writer.add_node(node_id, node_data["x"], node_data["y"])
+        writer.end_nodes()
+
+        writer.start_links()
+        for link_id, (from_node, to_node, link_data) in enumerate(
+            graph.edges(data=True), 1
+        ):
+            _add_link_id(from_node, to_node, link_id)
+            writer.add_link(
+                link_id,
+                from_node,
+                to_node,
+                length=link_data["length"],
+                speed_limit=_try_parse_min_int(link_data, "maxspeed"),
+                perm_lanes=_try_parse_min_int(link_data, "lanes"),
+            )
+        writer.end_links()
+
+        writer.end_network()
+
+    logging.info(f"Finished writing MATSim network to {network_filename}")
+
+
+def write_plans(
+    routes: list[Route],
+    plan_filename: str = "plans.xml",
+    gzip_compress: bool = True,
+) -> None:
+    """
+    Write a MATSim plan file based on a given network and routes.
+    :param routes: List of routes to turn into MATSim plans.
+    :param plan_filename: Name of the output file.
+    :param gzip_compress: Whether to save the file as a .gz compressed file.
+    """
+    if not LINK_IDS:
+        raise ValueError("No link IDs found. Please write the network first.")
+    if not routes:
+        logging.warning("No routes given. Writing empty MATSim plan file.")
+
+    plan_filename = _validate_and_format_filename(plan_filename, gzip_compress)
+    logging.info(f"Writing MATSim plans to {plan_filename}")
+
+    open_func = gzip.open if gzip_compress else open
+    with open_func(MATSIM_DATA_DIR / plan_filename, "wb+") as f_write:
+        writer = PlansWriter(f_write)
+        writer.start_population()
+
+        count = 1
+        for route in routes:
+            link_pairs = list(zip(route.path[:-1], route.path[1:]))
+            link_ids = [_get_link_id(v, w) for v, w in link_pairs]
+
+            for dep_time, num_people in route.departure_times.items():
+                for _ in range(num_people):
+                    writer.start_person(count)
+                    writer.start_plan(selected=True)
+
+                    writer.add_activity_with_link(
+                        "danger", link=link_ids[0], end_time=dep_time
+                    )
+                    writer.add_leg_with_route(link_ids, departure_time=dep_time)
+                    writer.add_activity_with_link("safe", link=link_ids[-1])
+
+                    writer.end_plan()
+                    writer.end_person()
+                    count += 1
+
+        writer.end_population()
+
+    logging.info(f"Finished writing MATSim plans to {plan_filename}")
+
+
+def _validate_and_format_filename(network_filename: str, gzip_compress: bool) -> str:
+    """
+    Helper function to check if the network file name is valid and add the .gz extension if needed.
+    :param gzip_compress: Whether to save the file as a .gz compressed file.
+    :param network_filename: Name of the output file.
+    :return: Valid network file name.
+    """
+    if not (network_filename.endswith(".xml") or network_filename.endswith(".xml.gz")):
+        raise ValueError(
+            f"Invalid file name: {network_filename}. Expected .xml or .xml.gz file."
+        )
+    if gzip_compress and not network_filename.endswith(".gz"):
+        return network_filename + ".gz"
+    return network_filename
+
+
+def _add_link_id(v: Id, w: Id, link_id: int) -> None:
+    """
+    Helper function to add a link ID to the LINK_IDS dictionary.
+    :param v: OSM node ID.
+    :param w: OSM node ID.
+    :param link_id: MATSim link ID.
+    """
+    LINK_IDS[_link_id_key(v, w)] = link_id
+
+
+def _get_link_id(v: Id, w: Id) -> int:
+    """
+    Helper function to get the link ID from the LINK_IDS dictionary.
+    :param v: OSM node ID.
+    :param w: OSM node ID.
+    :return: MATSim link ID.
+    """
+    return LINK_IDS[_link_id_key(v, w)]
+
+
+def _link_id_key(v: Id, w: Id) -> str:
+    """
+    Helper function to create a unique key for the link between two OSM nodes.
+    :param v: OSM node ID.
+    :param w: OSM node ID.
+    :return: Unique key for the LINK_IDS dictionary.
+    """
+    return f"{min(v, w)}-{max(v, w)}"
+
+
+def _try_parse_min_int(link_data: dict[str, list[str] | str], key: str) -> int | None:
+    """
+    Helper function to extract the minimum integer from a string or list of strings.
+    In some cases, when a road has different speed limits, the max_speed of the simplified edge is a list.
+    In those cases, we choose the minimum speed limit of the road.
+    """
+    value = link_data.get(key)
+    if value is None:
+        return None
+    try:
+        return min(map(int, value)) if isinstance(value, list) else int(value)
+    except ValueError:
+        logging.warning(f"Invalid {key} value: {value}")
+        return None

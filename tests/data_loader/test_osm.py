@@ -5,21 +5,6 @@ import pytest
 from data_loader.osm import download_osm_graph
 
 
-@pytest.fixture
-def mock_osm_graph() -> nx.MultiDiGraph:
-    """Creates a fake OSM graph for testing."""
-    graph = nx.MultiDiGraph()
-    # A <-> B
-    graph.add_edge("A", "B", length=100)
-    graph.add_edge("B", "A", length=100)
-    # B <-> C
-    graph.add_edge("B", "C", length=200)
-    graph.add_edge("C", "B", length=200)
-    # C -> A
-    graph.add_edge("C", "A", length=300)
-    return graph
-
-
 def test_download_osm_graph(
     monkeypatch: pytest.MonkeyPatch, mock_osm_graph: nx.MultiDiGraph
 ) -> None:
