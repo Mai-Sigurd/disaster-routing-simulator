@@ -62,7 +62,10 @@ def fastest_path(
                             "length", float("inf")
                         )  # Edge length in meters
                         maxspeed = edge_data.get("maxspeed", 50)  # speed limit km/h
-                        maxspeed = maxspeed * 0.27778  # converting km/h to m/s
+                        maxspeed = (
+                            maxspeed[0] if isinstance(maxspeed, list) else maxspeed
+                        )  # take the first speed limit in case there are more
+                        maxspeed = float(maxspeed) * 0.27778  # converting km/h to m/s
 
                         weight = length / maxspeed
 
