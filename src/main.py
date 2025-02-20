@@ -12,7 +12,7 @@ from data_loader.population.population import (
 from matsim_io import write_network, write_plans
 from routes.fastestpath import fastest_path
 from routes.route import Route, create_route_objects
-from routes.shortestpath import path, route_to_safety
+from routes.shortestpath import path
 
 logging.basicConfig(
     level=logging.INFO,
