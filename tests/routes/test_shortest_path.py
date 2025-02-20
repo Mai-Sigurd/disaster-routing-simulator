@@ -36,9 +36,14 @@ def test_route_to_safety() -> None:
     assert routes == [["A", "B", "C", "D"]]
 
 
-def test_route_to_safety_more_than_one() -> None:
+def test_route_to_safety_two_origin_points() -> None:
     routes = route_to_safety(["A", "B"], danger_zone, G)
     assert routes == [["A", "B", "C", "D"], ["B", "C", "D"]]
+
+
+def test_route_to_safety_three_origin_points() -> None:
+    routes = route_to_safety(["A", "B", "C"], danger_zone, G)
+    assert routes == [["A", "B", "C", "D"], ["B", "C", "D"], ["C", "D"]]
 
 
 # Create a directed graph

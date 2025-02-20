@@ -37,6 +37,16 @@ def test_fastest_path() -> None:
     assert routes == [["A", "B", "C", "D"]]
 
 
+def test_fastest_path_two_origin_points() -> None:
+    routes = fastest_path(["A", "B"], danger_zone, G)
+    assert routes == [["A", "B", "C", "D"], ["B", "C", "D"]]
+
+
+def test_fastest_path_three_origin_points() -> None:
+    routes = fastest_path(["A", "B", "C"], danger_zone, G)
+    assert routes == [["A", "B", "C", "D"], ["B", "C", "D"], ["C", "D"]]
+
+
 # Create a directed graph
 G1 = nx.MultiDiGraph()
 

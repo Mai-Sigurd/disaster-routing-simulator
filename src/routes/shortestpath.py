@@ -26,10 +26,14 @@ def route_to_safety(
     :param G: A graph corresponding to the road network
     :return: A list of routes where each route corresponds to the origin point at the same index.
     """
-    logging.info("Routing shortest path to safety for all origin points")
+    has_path_been_calculated = dict((node, False) for node in origin_points)
     routes = []
 
+    logging.info("Routing shortest path to safety for all origin points")
+
     for origin in tqdm(origin_points):
+        if has_path_been_calculated[origin]:
+            continue  # path has already been calculated in another iteration
         if len(list(G.neighbors(origin))) == 0:
             logging.info(f"Node {origin} has no neighbors")
             continue  # Skip if the origin node doesn't have neighbors
@@ -76,5 +80,18 @@ def route_to_safety(
                 if final_route[0] != origin:
                     logging.error("The first node in the route is not the origin node")
                 routes.append(final_route)
+                has_path_been_calculated[origin] = True
+                for i in range(
+                    len(final_route) - 1
+                ):  # -1 since the last node is outside the dangerzone and therefore does not need a path
+                    if (
+                        final_route[i] in has_path_been_calculated
+                        and not has_path_been_calculated[final_route[i]]
+                    ):
+                        routes.append(
+                            final_route[i:]
+                        )  # we take the route from i and forward
+                        has_path_been_calculated[final_route[i]] = True
+
                 break  # there is no need to find other routes for this origin point
     return routes
