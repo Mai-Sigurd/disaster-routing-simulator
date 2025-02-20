@@ -2,7 +2,7 @@ import geopandas as gpd
 from tqdm import tqdm
 
 from data_loader.population.population import NODE_ID, POPULATION
-from routes.shortestpath import path
+from routes.route_utils import path
 
 
 class Route:

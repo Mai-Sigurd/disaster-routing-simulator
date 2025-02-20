@@ -1,7 +1,10 @@
+import logging
+
 import geopandas as gpd
 import networkx as nx
 import pytest
-from shapely.geometry import Point, Polygon
+from _pytest.logging import LogCaptureFixture
+from shapely.geometry import Polygon
 
 from routes.fastestpath import fastest_path
 
@@ -32,6 +35,16 @@ origin_points = ["A"]
 def test_fastest_path() -> None:
     routes = fastest_path(["A"], danger_zone, G)
     assert routes == [["A", "B", "C", "D"]]
+
+
+def test_fastest_path_two_origin_points() -> None:
+    routes = fastest_path(["A", "B"], danger_zone, G)
+    assert routes == [["A", "B", "C", "D"], ["B", "C", "D"]]
+
+
+def test_fastest_path_three_origin_points() -> None:
+    routes = fastest_path(["A", "B", "C"], danger_zone, G)
+    assert routes == [["A", "B", "C", "D"], ["B", "C", "D"], ["C", "D"]]
 
 
 # Create a directed graph
@@ -69,3 +82,42 @@ G2.add_edge("A", "C", length=5, maxspeed=99)
 def test_fastest_path_takes_fastest_route2() -> None:
     routes = fastest_path(["A"], danger_zone, G2)
     assert routes == [["A", "B"]]
+
+
+# Create a directed graph
+G3 = nx.MultiDiGraph()
+
+# Add nodes (coordinates as strings for simplicity)
+G3.add_node("A", x=2, y=2)
+G3.add_node("B", x=3, y=2)
+
+# Add edges with weights
+G3.add_edge("A", "B", length=1, maxspeed=50)
+
+
+def test_fastest_path_all_nodes_are_in_dangerzone_logging(
+    caplog: LogCaptureFixture,
+) -> None:
+    with caplog.at_level(logging.INFO):
+        fastest_path(["A"], danger_zone, G3)
+    assert "Node A cannot reach any nodes outside the dangerzone" in caplog.text
+
+
+# Create a directed graph
+G4 = nx.MultiDiGraph()
+
+# Add nodes (coordinates as strings for simplicity)
+G4.add_node("A", x=2, y=2)
+G4.add_node("B", x=3, y=2)
+G4.add_node("C", x=4, y=2)
+
+# Add edges with weights
+G4.add_edge("B", "C", length=1, maxspeed=222)
+
+
+def test_fastest_path_origin_has_no_neighbours_logging(
+    caplog: LogCaptureFixture,
+) -> None:
+    with caplog.at_level(logging.INFO):
+        fastest_path(["A"], danger_zone, G4)
+    assert "Node A has no neighbors" in caplog.text
