@@ -38,7 +38,8 @@ if __name__ == "__main__":
     )
 
     origin_points: list[str] = get_origin_points(danger_zone_population)
-    paths: list[path] = route_to_safety([origin_points[2918]], danger_zones, G)
+    #
+    paths: list[path] = route_to_safety(origin_points, danger_zones, G)
     routes: list[Route] = create_route_objects(
         list_of_paths=paths, population_data=population_data, chunks=1, interval=0
     )
@@ -46,3 +47,7 @@ if __name__ == "__main__":
     logging.info("Stats ---------------------")
     logging.info("Amount of routes: %s", len(routes))
     logging.info("Amount of people: %s", sum([r.num_people_on_route for r in routes]))
+    logging.info(
+        "Amount of nodes that could not reach dangerzone: %s",
+        len(origin_points) - len(routes),
+    )

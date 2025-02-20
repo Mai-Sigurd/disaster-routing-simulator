@@ -41,10 +41,13 @@ def route_to_safety(
         }  # To track shortest path
 
         update_priority(dist, node_priority, origin, 0)
-
         while dist:
             priority, smallest_node = hq.heappop(dist)
-
+            if priority == float("inf"):
+                logging.info(
+                    f"Node {origin} cannot reach any nodes outside the dangerzone"
+                )
+                break
             if (
                 priority == node_priority[smallest_node]
             ):  # Only use values that are not outdated
@@ -53,9 +56,8 @@ def route_to_safety(
                     for _, neighbour, edge_data in G.edges(
                         smallest_node, data=True
                     ):  # Multiple edges between two nodes possible
-                        weight = edge_data.get(
-                            "length", float("inf")
-                        )  # Default weight to inf, weight of edge between popped_node and neighbour
+                        weight = edge_data.get("length", float("inf"))
+                        # Default weight to inf, weight of edge between popped_node and neighbour
                         new_distance = priority + weight
 
                         if new_distance < node_priority[neighbour]:
@@ -74,9 +76,6 @@ def route_to_safety(
                     )
                 routes.append(reconstruct_route(predecessor, smallest_node))
                 break  # there is no need to find other routes
-        else:  # if there are no more elements to explore in sptSet
-            raise Exception("There are no reachable nodes outside the dangerzone")
-
     return routes
 
 
