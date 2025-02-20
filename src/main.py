@@ -27,12 +27,10 @@ if __name__ == "__main__":
         download_cph()
     G = load_osm("copenhagen.graphml")
 
-    population_data: GeoDataFrame = load_geojson(
-        "../data/population/PopulationGeoDataframe.geojson"
-    )
+    population_data: GeoDataFrame = load_geojson("CPHpop.geojson")
 
     danger_zones: GeoDataFrame = load_danger_zone(
-        "dangerzone_amager.geojson", population_data.crs
+        "mindre_del_af_amager.geojson", population_data.crs
     )
     danger_zone_population: GeoDataFrame = distribute_population(
         danger_zones, population_data

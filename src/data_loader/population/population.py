@@ -2,19 +2,23 @@ import logging
 
 import geopandas as gpd
 
+from data_loader import DATA_DIR
+
 POPULATION = "pop"
 NODE_ID = "id"
 GEOMETRY = "geometry"
 
+GEO_JSON_DIR = DATA_DIR / "population"
 
-def load_geojson(file_path: str) -> gpd.GeoDataFrame:
+
+def load_geojson(file_name: str) -> gpd.GeoDataFrame:
     """
     Loads a GeoJSON file and returns a GeoDataFrame.
-    :param file_path: The path to the GeoJSON file.
+    :param file_name: The name of the GeoJSON file.
     :return: A GeoDataFrame containing the data from the GeoJSON file.
     """
     try:
-        return gpd.read_file(file_path)
+        return gpd.read_file(GEO_JSON_DIR / file_name)
     except Exception as e:
         logging.error(f"Error loading GeoJSON file: {e}")
         exit(0)
