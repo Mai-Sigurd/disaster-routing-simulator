@@ -5,40 +5,56 @@ import osmnx as ox
 
 from data_loader import DATA_DIR
 
+COPENHAGEN_BBOX = (12.425, 55.550, 12.710, 55.755)
 OSM_DIR = DATA_DIR / "osm_graph"
 
 
-def download_osm_graph(queries: list[str]) -> nx.MultiDiGraph:
-    def download_query(query: str) -> nx.MultiDiGraph:
-        logging.info(f"Downloading graph for {query}")
-        city_graph = ox.graph_from_place(
-            query, network_type="drive_service", simplify=True
-        )
-        logging.info(f"Downloaded graph for {query}")
-        return city_graph
-
-    return nx.compose_all([download_query(city) for city in queries])
-
-
-def download_cph() -> None:
-    G = download_osm_graph(
-        [
-            "Copenhagen Municipality, Denmark",
-            "Frederiksberg Municipality, Denmark",
-            "Tårnby Municipality, Denmark",
-            "Hvidovre Municipality, Denmark",
-            "Rødovre Municipality, Denmark",
-            "Gentofte Municipality, Denmark",
-            "Gladsaxe Municipality, Denmark",
-            "Herlev Municipality, Denmark",
-        ]
+def download_osm_graph(
+    bbox: tuple[float, float, float, float], simplify: bool = True
+) -> nx.MultiDiGraph:
+    """
+    Download an OSM graph from a bounding box.
+    :param bbox: Bounding box of the area to download, formatted (left, bottom, right, top).
+    :param simplify: Whether to simplify the graph.
+    :return: OSM graph containing the road network in the bounding box.
+    """
+    logging.info("Downloading OSM graph")
+    graph = ox.graph_from_bbox(
+        bbox=bbox,
+        network_type="drive_service",
+        simplify=simplify,
     )
-    save_osm(G, "copenhagen.graphml")
+    logging.info(
+        f"Downloaded OSM graph with {len(graph.nodes)} nodes and {len(graph.edges)} edges"
+    )
+    return graph
 
 
-def save_osm(G: nx.MultiDiGraph, filename: str) -> None:
-    ox.save_graphml(G, OSM_DIR / filename)
+def download_cph() -> nx.MultiDiGraph:
+    """Download the OSM graph of Copenhagen."""
+    return download_osm_graph(COPENHAGEN_BBOX)
+
+
+def save_osm(graph: nx.MultiDiGraph, filename: str) -> None:
+    """
+    Save an OSM graph to a file in the OSM data directory.
+    :param graph: OSM graph to save.
+    :param filename: Name of the file to save the graph to.
+    """
+    logging.info(f"Saving OSM graph to {filename}")
+    ox.save_graphml(graph, OSM_DIR / filename)
+    logging.info(f"Saved OSM graph to {filename}")
 
 
 def load_osm(filename: str) -> nx.MultiDiGraph:
-    return ox.load_graphml(OSM_DIR / filename)
+    """
+    Load an OSM graph from a file in the OSM data directory.
+    :param filename: Name of the file to load the graph from.
+    :return: OSM graph loaded from the file.
+    """
+    logging.info(f"Loading OSM graph from {filename}")
+    graph = ox.load_graphml(OSM_DIR / filename)
+    logging.info(
+        f"Loaded OSM graph {len(graph.nodes)} nodes and {len(graph.edges)} from {filename}"
+    )
+    return graph

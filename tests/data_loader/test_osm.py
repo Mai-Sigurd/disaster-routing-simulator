@@ -10,14 +10,16 @@ def test_download_osm_graph(
 ) -> None:
     """Test download_osm_graph without making actual API requests."""
 
-    def mock_graph_from_place(
-        query: str, network_type: str, simplify: bool
+    def mock_graph_from_bbox(
+        bbox: tuple[float, float, float, float],
+        network_type: str,
+        simplify: bool,
     ) -> nx.MultiDiGraph:
         """Mock function that replaces osmnx.graph_from_place."""
         return mock_osm_graph
 
-    monkeypatch.setattr(ox, "graph_from_place", mock_graph_from_place)
+    monkeypatch.setattr(ox, "graph_from_bbox", mock_graph_from_bbox)
 
-    result_graph = download_osm_graph(["Fake City"])
+    result_graph = download_osm_graph(bbox=(0, 0, 1, 1))
     assert isinstance(result_graph, nx.MultiDiGraph)
     assert len(result_graph.edges) == len(mock_osm_graph.edges)
