@@ -4,7 +4,7 @@ from matsim.writers import Id, PopulationWriter, XmlWriter
 
 from utils import kmh_to_ms
 
-DANISH_SPEED_LIMIT = 130  # km/h
+DANISH_DEFAULT_SPEED_LIMIT = 50  # km/h
 
 
 class NetworkWriter(XmlWriter):  # type: ignore[misc]
@@ -73,7 +73,6 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
         to_node: Id,
         length: float,
         speed_limit: int | None = None,
-        capacity: int | None = None,
         perm_lanes: int | None = None,
     ) -> None:
         """
@@ -83,13 +82,10 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
         :param to_node: ID of the node where the link ends.
         :param length: Length of the link in meters.
         :param speed_limit: Maximum allowed speed of the link in meters per second.
-        :param capacity: Maximum number of vehicles that can pass the link per hour.
         :param perm_lanes: Number of lanes on the link.
         """
         if speed_limit is None:
-            speed_limit = DANISH_SPEED_LIMIT
-        if capacity is None:
-            capacity = 1000
+            speed_limit = DANISH_DEFAULT_SPEED_LIMIT
         if perm_lanes is None:
             perm_lanes = 1
 
@@ -99,21 +95,20 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
         assert isinstance(speed_limit, int) and speed_limit > 0, (
             "speed_limit must be a positive integer"
         )
-        assert isinstance(capacity, int) and capacity > 0, (
-            "capacity must be a positive integer"
-        )
         assert isinstance(perm_lanes, int) and perm_lanes > 0, (
             "perm_lanes must be a positive integer"
         )
 
+        free_speed = kmh_to_ms(speed_limit)
+        capacity = _compute_capacity(free_speed)
         self._require_scope(self.LINKS_SCOPE)
         self._write_line(
             f'<link id="{link_id}"'
             f' from="{from_node}"'
             f' to="{to_node}"'
             f' length="{length}"'
-            f' freespeed="{kmh_to_ms(speed_limit):.2f}"'
-            f' capacity="{capacity}"'
+            f' freespeed="{free_speed:.2f}"'
+            f' capacity="{capacity:.2f}"'
             f' permlanes="{perm_lanes}"/>'
         )
 
@@ -166,3 +161,23 @@ class PlansWriter(PopulationWriter):  # type: ignore[misc]
         self.indent -= 1
 
         self._write_line("</leg>")
+
+
+def _compute_capacity(
+    speed_limit: float,
+    vehicle_length: float = 5,
+    min_gap: float = 2.5,
+    tau: float = 1,
+) -> float:
+    """
+    Compute the capacity of a link based on its speed limit.
+    :param speed_limit: Maximum allowed speed of the link in meters per second.
+    :param vehicle_length: Physical length of a vehicle in meters.
+    :param min_gap: Minimum gap between vehicles in a standing queue in meters.
+    :param tau: Desired minimum time headway in seconds.
+    :return: The capacity of the link in vehicles per hour.
+    Reference: https://sumo.dlr.de/docs/Simulation/RoadCapacity.html
+    """
+    # The time it takes for two vehicles to pass the same location.
+    gross_time_headway = (vehicle_length + min_gap) / speed_limit + tau
+    return 3600 / gross_time_headway
