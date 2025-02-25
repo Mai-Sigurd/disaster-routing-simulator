@@ -10,8 +10,9 @@ from data_loader.population.population import (
     load_geojson,
 )
 from matsim_io import write_network, write_plans
+from routes.fastestpath import fastest_path
 from routes.route import Route, create_route_objects
-from routes.shortestpath import path, route_to_safety
+from routes.shortestpath import path
 
 logging.basicConfig(
     level=logging.INFO,
@@ -38,7 +39,7 @@ if __name__ == "__main__":
 
     origin_points: list[str] = get_origin_points(danger_zone_population)
     #
-    paths: list[path] = route_to_safety(origin_points, danger_zones, G)
+    paths: list[path] = fastest_path(origin_points, danger_zones, G)
     routes: list[Route] = create_route_objects(
         list_of_paths=paths, population_data=population_data, chunks=1, interval=0
     )

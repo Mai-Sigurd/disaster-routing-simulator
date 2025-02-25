@@ -3,10 +3,16 @@ import logging
 
 import geopandas as gpd
 import networkx as nx
-from shapely.geometry import Point
 from tqdm import tqdm
 
-from routes.shortestpath import path, vertex
+from routes.route_utils import (
+    is_in_dangerzone,
+    path,
+    reconstruct_route,
+    update_priority,
+    vertex,
+)
+from utils import kmh_to_ms
 
 
 def fastest_path(
@@ -20,23 +26,35 @@ def fastest_path(
     :param G: A graph corresponding to the road network
     :return: A list of routes where each route corresponds to the origin point at the same index.
     """
-    logging.info("Routing shortest path to safety for all origin points")
+    has_path_been_calculated = dict((node, False) for node in origin_points)
     routes = []
 
+    logging.info("Routing fastest path to safety for all origin points")
+
     for origin in tqdm(origin_points):
+        if has_path_been_calculated[origin]:
+            continue  # path has already been calculated in another iteration
+        if len(list(G.neighbors(origin))) == 0:
+            logging.info(f"Node {origin} has no neighbors")
+            continue  # Skip if the origin node doesn't have neighbors
         sptSet = dict((node, False) for node in list(G.nodes))
         dist: list[tuple[float, str]] = [(float("inf"), node) for node in G.nodes]
         node_priority = {node: float("inf") for node in G.nodes}
         hq.heapify(dist)
         predecessor: dict[str, str | None] = {
             node: None for node in G.nodes
-        }  # To track shortest path
+        }  # To track fastest path
 
         update_priority(dist, node_priority, origin, 0)
-
         while dist:
-            priority, smallest_node = hq.heappop(dist)
-
+            priority, smallest_node = hq.heappop(
+                dist
+            )  # popping the node with the current fastest path to origin
+            if priority == float("inf"):
+                logging.info(
+                    f"Node {origin} cannot reach any nodes outside the dangerzone"
+                )
+                break
             if (
                 priority == node_priority[smallest_node]
             ):  # Only use values that are not outdated
@@ -44,12 +62,26 @@ def fastest_path(
                     sptSet[smallest_node] = True
                     for _, neighbour, edge_data in G.edges(
                         smallest_node, data=True
-                    ):  # Multiple edges between two nodes possible
+                    ):  # looping through all adjacent vertices
                         length = edge_data.get(
                             "length", float("inf")
-                        )  # Edge length in meters
-                        maxspeed = edge_data.get("maxspeed", 50)  # speed limit km/h
-                        maxspeed = maxspeed * 0.27778  # converting km/h to m/s
+                        )  # Default weight to inf, weight of edge between smallest_node and neighbour
+
+                        maxspeed = edge_data.get(
+                            "maxspeed", 50
+                        )  # speed limit km/h, default 50
+                        maxspeed = (
+                            maxspeed[0] if isinstance(maxspeed, list) else maxspeed
+                        )  # take the first speed limit in case there are more
+                        try:
+                            maxspeed = kmh_to_ms(
+                                float(maxspeed)
+                            )  # converting km/h to m/s
+                        except ValueError:
+                            logging.error(
+                                f"Maxspeed with value {maxspeed} cannot be parsed as an int"
+                            )
+                            maxspeed = kmh_to_ms(50)  # default to 50 if parsing fails
 
                         weight = length / maxspeed
 
@@ -64,40 +96,22 @@ def fastest_path(
             if not is_in_dangerzone(
                 smallest_node, danger_zone, G
             ):  # We have found shortest route to node outside dangerzone
-                routes.append(reconstruct_route(predecessor, smallest_node))
-                break  # there is no need to find other routes
-        else:  # if there are no more elements to explore in sptSet
-            raise Exception("There are no reachable nodes outside the dangerzone")
+                final_route = reconstruct_route(predecessor, smallest_node)
+                if final_route[0] != origin:
+                    logging.error("The first node in the route is not the origin node")
+                routes.append(final_route)
+                has_path_been_calculated[origin] = True
+                for i in range(
+                    len(final_route) - 1
+                ):  # -1 since the last node is outside the dangerzone and therefore does not need a path
+                    if (
+                        final_route[i] in has_path_been_calculated
+                        and not has_path_been_calculated[final_route[i]]
+                    ):
+                        routes.append(
+                            final_route[i:]
+                        )  # we take the route from i and forward
+                        has_path_been_calculated[final_route[i]] = True
 
+                break  # there is no need to find other routes for this origin point
     return routes
-
-
-def reconstruct_route(predecessor: dict[str, str | None], end: str) -> list[str]:
-    path = []
-    while end is not None:
-        path.append(end)
-        end = predecessor[end]  # type: ignore
-    return path[::-1]
-
-
-def is_in_dangerzone(
-    v: vertex, danger_zone: gpd.GeoDataFrame, G: nx.MultiDiGraph
-) -> bool:
-    p = gpd.GeoSeries(
-        data=[
-            Point(G.nodes[v]["x"], G.nodes[v]["y"]),
-        ],
-        crs=danger_zone.crs,
-    )
-    return danger_zone.intersects(p)[0]  # type: ignore
-
-
-def update_priority(
-    heap: list[tuple[float, str]],
-    node_priority: dict[str, float],
-    node: str,
-    new_priority: float,
-) -> None:
-    if new_priority < node_priority[node]:  # Only update if the new priority is better
-        hq.heappush(heap, (new_priority, node))  # Push the new priority
-        node_priority[node] = new_priority
