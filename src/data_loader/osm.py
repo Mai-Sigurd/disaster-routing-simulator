@@ -9,17 +9,20 @@ COPENHAGEN_BBOX = (12.425, 55.550, 12.710, 55.755)
 OSM_DIR = DATA_DIR / "osm_graph"
 
 
-def download_osm_graph(bbox: tuple[float, float, float, float]) -> nx.MultiDiGraph:
+def download_osm_graph(
+    bbox: tuple[float, float, float, float], simplify: bool = True
+) -> nx.MultiDiGraph:
     """
     Download an OSM graph from a bounding box.
     :param bbox: Bounding box of the area to download, formatted (left, bottom, right, top).
+    :param simplify: Whether to simplify the graph.
     :return: OSM graph containing the road network in the bounding box.
     """
     logging.info("Downloading OSM graph")
     city_graph = ox.graph_from_bbox(
         bbox=bbox,
         network_type="drive_service",
-        retain_all=True,
+        simplify=simplify,
     )
     logging.info("Downloaded OSM graph")
     return city_graph
