@@ -2,6 +2,8 @@ from typing import BinaryIO, Optional
 
 from matsim.writers import Id, PopulationWriter, XmlWriter
 
+from utils import kmh_to_ms
+
 DANISH_SPEED_LIMIT = 130  # km/h
 
 
@@ -110,7 +112,7 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
             f' from="{from_node}"'
             f' to="{to_node}"'
             f' length="{length}"'
-            f' freespeed="{_kmh_to_ms(speed_limit):.2f}"'
+            f' freespeed="{kmh_to_ms(speed_limit):.2f}"'
             f' capacity="{capacity}"'
             f' permlanes="{perm_lanes}"/>'
         )
@@ -164,8 +166,3 @@ class PlansWriter(PopulationWriter):  # type: ignore[misc]
         self.indent -= 1
 
         self._write_line("</leg>")
-
-
-def _kmh_to_ms(kmh: float) -> float:
-    """Convert km/h to m/s."""
-    return kmh * 1000 / 3600
