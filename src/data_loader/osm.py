@@ -19,13 +19,15 @@ def download_osm_graph(
     :return: OSM graph containing the road network in the bounding box.
     """
     logging.info("Downloading OSM graph")
-    city_graph = ox.graph_from_bbox(
+    graph = ox.graph_from_bbox(
         bbox=bbox,
         network_type="drive_service",
         simplify=simplify,
     )
-    logging.info("Downloaded OSM graph")
-    return city_graph
+    logging.info(
+        f"Downloaded OSM graph with {len(graph.nodes)} nodes and {len(graph.edges)} edges"
+    )
+    return graph
 
 
 def download_cph() -> nx.MultiDiGraph:
@@ -52,5 +54,7 @@ def load_osm(filename: str) -> nx.MultiDiGraph:
     """
     logging.info(f"Loading OSM graph from {filename}")
     graph = ox.load_graphml(OSM_DIR / filename)
-    logging.info(f"Loaded OSM graph from {filename}")
+    logging.info(
+        f"Loaded OSM graph {len(graph.nodes)} nodes and {len(graph.edges)} from {filename}"
+    )
     return graph
