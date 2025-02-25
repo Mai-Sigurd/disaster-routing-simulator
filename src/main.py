@@ -1,15 +1,17 @@
 import logging
+import shutil
+import subprocess
 
 from geopandas import GeoDataFrame
 
 from data_loader.danger_zones import load_danger_zone
-from data_loader.osm import download_cph, load_osm
+from data_loader.osm import download_cph, load_osm, save_osm
 from data_loader.population.population import (
     distribute_population,
     get_origin_points,
     load_geojson,
 )
-from matsim_io import write_network, write_plans
+from matsim_io import MATSIM_DATA_DIR, write_network, write_plans
 from routes.fastestpath import fastest_path
 from routes.route import Route, create_route_objects
 from routes.shortestpath import path
@@ -25,8 +27,10 @@ CPH_LOADED = True
 
 if __name__ == "__main__":
     if not CPH_LOADED:
-        download_cph()
-    G = load_osm("copenhagen.graphml")
+        G = download_cph()
+        save_osm(G, "copenhagen.graphml")
+    else:
+        G = load_osm("copenhagen.graphml")
 
     population_data: GeoDataFrame = load_geojson("CPHpop.geojson")
 
