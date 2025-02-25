@@ -81,7 +81,7 @@ def fastest_path(
                             logging.error(
                                 f"Maxspeed with value {maxspeed} cannot be parsed as an int"
                             )
-                            maxspeed = 50 * 0.27778  # default to 50 if parsing fails
+                            maxspeed = kmh_to_ms(50)  # default to 50 if parsing fails
 
                         weight = length / maxspeed
 
