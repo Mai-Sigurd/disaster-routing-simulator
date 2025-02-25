@@ -12,6 +12,7 @@ from routes.route_utils import (
     update_priority,
     vertex,
 )
+from utils import kmh_to_ms
 
 
 def fastest_path(
@@ -66,11 +67,21 @@ def fastest_path(
                             "length", float("inf")
                         )  # Default weight to inf, weight of edge between smallest_node and neighbour
 
-                        maxspeed = edge_data.get("maxspeed", 50)  # speed limit km/h
+                        maxspeed = edge_data.get(
+                            "maxspeed", 50
+                        )  # speed limit km/h, default 50
                         maxspeed = (
                             maxspeed[0] if isinstance(maxspeed, list) else maxspeed
                         )  # take the first speed limit in case there are more
-                        maxspeed = float(maxspeed) * 0.27778  # converting km/h to m/s
+                        try:
+                            maxspeed = kmh_to_ms(
+                                float(maxspeed)
+                            )  # converting km/h to m/s
+                        except ValueError:
+                            logging.error(
+                                f"Maxspeed with value {maxspeed} cannot be parsed as an int"
+                            )
+                            maxspeed = 50 * 0.27778  # default to 50 if parsing fails
 
                         weight = length / maxspeed
 
