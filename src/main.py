@@ -1,6 +1,4 @@
 import logging
-import shutil
-import subprocess
 
 from geopandas import GeoDataFrame
 
@@ -11,7 +9,7 @@ from data_loader.population.population import (
     get_origin_points,
     load_geojson,
 )
-from matsim_io import MATSIM_DATA_DIR, write_network, write_plans
+from matsim_io import write_network, write_plans
 from routes.fastestpath import fastest_path
 from routes.route import Route, create_route_objects
 from routes.shortestpath import path
