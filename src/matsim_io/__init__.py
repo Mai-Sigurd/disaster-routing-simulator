@@ -100,10 +100,10 @@ def write_plans(
                     writer.start_plan(selected=True)
 
                     writer.add_activity_with_link(
-                        "danger", link=link_ids[0], end_time=dep_time
+                        "escape", link=link_ids[0], end_time=dep_time
                     )
                     writer.add_leg_with_route(link_ids, departure_time=dep_time)
-                    writer.add_activity_with_link("safe", link=link_ids[-1])
+                    writer.add_activity_with_link("escape", link=link_ids[-1])
 
                     writer.end_plan()
                     writer.end_person()
