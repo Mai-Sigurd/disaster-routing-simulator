@@ -119,19 +119,19 @@ class PlansWriter(PopulationWriter):  # type: ignore[misc]
 
     def add_activity_with_link(
         self,
-        link_type: str,
+        activity_type: str,
         link: Id,
         end_time: Optional[int] = None,
     ) -> None:
         """
         Add an activity with a link to the plan.
-        :param link_type: Type of the link.
+        :param activity_type: Type of the activity.
         :param link: ID of the link.
         :param end_time: Time of arrival.
         """
         self._require_scope(self.PLAN_SCOPE)
         self._write_indent()
-        self._write(f'<activity type="{link_type}" link="{link}"')
+        self._write(f'<activity type="{activity_type}" link="{link}"')
         if end_time is not None:
             self._write(f' end_time="{self.time(end_time)}"')
         self._write("/>\n")
