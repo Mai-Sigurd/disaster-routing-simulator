@@ -54,7 +54,7 @@ if __name__ == "__main__":
     population_data: GeoDataFrame = load_geojson("CPHpop.geojson")
 
     danger_zones: GeoDataFrame = load_danger_zone(
-        "dangerzone_amager.geojson", population_data.crs
+        "mindre_del_af_amager.geojson", population_data.crs
     )
     danger_zone_population: GeoDataFrame = distribute_population(
         danger_zones, population_data
@@ -78,4 +78,4 @@ if __name__ == "__main__":
     write_network(G, network_name="Copenhagen")
     write_plans(routes)
 
-    run_matsim()
+    # run_matsim()
