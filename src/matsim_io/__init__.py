@@ -40,19 +40,24 @@ def write_network(
             writer.add_node(node_id, node_data["x"], node_data["y"])
         writer.end_nodes()
 
-        writer.start_links()
-        for link_id, (from_node, to_node, link_data) in enumerate(
-            graph.edges(data=True), 1
-        ):
-            _add_link_id(from_node, to_node, link_id)
+        def _add_link(v: Id, w: Id, link_id: int) -> None:
+            _add_link_id(v, w, link_id)
             writer.add_link(
                 link_id,
-                from_node,
-                to_node,
+                from_node=v,
+                to_node=w,
                 length=link_data["length"],
                 speed_limit=_try_parse_min_int(link_data, "maxspeed"),
                 perm_lanes=_try_parse_min_int(link_data, "lanes"),
             )
+
+        writer.start_links()
+        for link_id, (from_node, to_node, link_data) in enumerate(
+            graph.edges(data=True)
+        ):
+            _add_link(from_node, to_node, link_id * 2)
+            if not link_data["oneway"]:
+                _add_link(to_node, from_node, link_id * 2 + 1)
         writer.end_links()
 
         writer.end_network()
@@ -86,8 +91,8 @@ def write_plans(
 
         count = 1
         for route in routes:
-            link_pairs = list(zip(route.path[:-1], route.path[1:]))
-            link_ids = [_get_link_id(v, w) for v, w in link_pairs]
+            node_pairs = list(zip(route.path[:-1], route.path[1:]))
+            link_ids = [_get_link_id(v, w) for v, w in node_pairs]
 
             for dep_time, num_people in route.departure_times.items():
                 for _ in range(num_people):
@@ -95,10 +100,10 @@ def write_plans(
                     writer.start_plan(selected=True)
 
                     writer.add_activity_with_link(
-                        "danger", link=link_ids[0], end_time=dep_time
+                        "escape", link=link_ids[0], end_time=dep_time
                     )
                     writer.add_leg_with_route(link_ids, departure_time=dep_time)
-                    writer.add_activity_with_link("safe", link=link_ids[-1])
+                    writer.add_activity_with_link("escape", link=link_ids[-1])
 
                     writer.end_plan()
                     writer.end_person()
@@ -132,7 +137,7 @@ def _add_link_id(v: Id, w: Id, link_id: int) -> None:
     :param w: OSM node ID.
     :param link_id: MATSim link ID.
     """
-    LINK_IDS[_link_id_key(v, w)] = link_id
+    LINK_IDS[_link_key(v, w)] = link_id
 
 
 def _get_link_id(v: Id, w: Id) -> int:
@@ -141,18 +146,19 @@ def _get_link_id(v: Id, w: Id) -> int:
     :param v: OSM node ID.
     :param w: OSM node ID.
     :return: MATSim link ID.
+    :raises KeyError: If the link ID does not exist.
     """
-    return LINK_IDS[_link_id_key(v, w)]
+    return LINK_IDS[_link_key(v, w)]
 
 
-def _link_id_key(v: Id, w: Id) -> str:
+def _link_key(v: Id, w: Id) -> str:
     """
-    Helper function to create a unique key for the link between two OSM nodes.
+    Helper function to create a unique key for the LINK_IDS dictionary.
     :param v: OSM node ID.
     :param w: OSM node ID.
     :return: Unique key for the LINK_IDS dictionary.
     """
-    return f"{min(v, w)}-{max(v, w)}"
+    return f"{v}-{w}"
 
 
 def _try_parse_min_int(link_data: dict[str, list[str] | str], key: str) -> int | None:

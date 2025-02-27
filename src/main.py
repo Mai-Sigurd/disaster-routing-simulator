@@ -40,7 +40,7 @@ if __name__ == "__main__":
     )
 
     origin_points: list[str] = get_origin_points(danger_zone_population)
-    #
+
     paths: list[path] = fastest_path(origin_points, danger_zones, G)
     routes: list[Route] = create_route_objects(
         list_of_paths=paths, population_data=population_data, chunks=1, interval=0
