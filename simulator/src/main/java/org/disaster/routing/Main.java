@@ -20,6 +20,9 @@ public class Main {
 
         Config config = ConfigUtils.loadConfig(absolutePath);
         config.network().setTimeVariantNetwork(true);
+        config.controller().setOverwriteFileSetting(
+            OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles
+        );
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
