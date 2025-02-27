@@ -34,9 +34,15 @@ def fastest_path(
     for origin in tqdm(origin_points):
         if has_path_been_calculated[origin]:
             continue  # path has already been calculated in another iteration
-        if len(list(G.neighbors(origin))) == 0:
-            logging.info(f"Node {origin} has no neighbors")
-            continue  # Skip if the origin node doesn't have neighbors
+
+        try:
+            if len(list(G.neighbors(origin))) == 0:
+                logging.info(f"Node {origin} has no neighbors")
+                continue  # Skip if the origin node doesn't have neighbors
+        except nx.NetworkXError:
+            logging.error(f"Origin node {origin} is not in the graph")
+            continue
+
         sptSet = dict((node, False) for node in list(G.nodes))
         dist: list[tuple[float, str]] = [(float("inf"), node) for node in G.nodes]
         node_priority = {node: float("inf") for node in G.nodes}
