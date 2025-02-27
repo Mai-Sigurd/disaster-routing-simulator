@@ -1,4 +1,6 @@
 import logging
+import shutil
+import subprocess
 
 from geopandas import GeoDataFrame
 
@@ -9,7 +11,7 @@ from data_loader.population.population import (
     get_origin_points,
     load_geojson,
 )
-from matsim_io import write_network, write_plans
+from matsim_io import MATSIM_DATA_DIR, write_network, write_plans
 from routes.fastestpath import fastest_path
 from routes.route import Route, create_route_objects
 from routes.shortestpath import path
@@ -21,6 +23,25 @@ logging.basicConfig(
 )
 
 CPH_LOADED = True
+
+
+def run_matsim() -> None:
+    """
+    Run the MATSim executable with the config.xml file in the MATSIM_DATA_DIR.
+    """
+    matsim_output_dir = MATSIM_DATA_DIR / "output"
+    if matsim_output_dir.exists() and matsim_output_dir.is_dir():
+        shutil.rmtree(matsim_output_dir)
+
+    args = [
+        "java",
+        "-Xmx4G",
+        "-cp",
+        "matsim-2024.0.jar",
+        "org.matsim.run.RunMatsim",
+        MATSIM_DATA_DIR / "config.xml",
+    ]
+    subprocess.run(args, cwd=MATSIM_DATA_DIR)
 
 
 if __name__ == "__main__":
@@ -40,7 +61,7 @@ if __name__ == "__main__":
     )
 
     origin_points: list[str] = get_origin_points(danger_zone_population)
-    #
+
     paths: list[path] = fastest_path(origin_points, danger_zones, G)
     routes: list[Route] = create_route_objects(
         list_of_paths=paths, population_data=population_data, chunks=1, interval=0
@@ -56,3 +77,5 @@ if __name__ == "__main__":
 
     write_network(G, network_name="Copenhagen")
     write_plans(routes)
+
+    # run_matsim()

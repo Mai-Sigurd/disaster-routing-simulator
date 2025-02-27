@@ -11,7 +11,7 @@ from shapely.geometry import Point
 from tqdm import tqdm
 
 from data_loader import DATA_DIR
-from data_loader.osm import download_osm_graph
+from data_loader.osm import download_cph
 from data_loader.population.population import GEOMETRY, NODE_ID, POPULATION
 
 
@@ -80,18 +80,7 @@ def save_CPH_population_to_geojson() -> None:
 
     POPULATION_DATA_DIR = DATA_DIR / "population"
     POPULATION_DATA_FILE = POPULATION_DATA_DIR / "dnk_ppp_2020_constrained.tif"
-    G = download_osm_graph(
-        [
-            "Copenhagen Municipality, Denmark",
-            "Frederiksberg Municipality, Denmark",
-            "Tårnby Municipality, Denmark",
-            "Hvidovre Municipality, Denmark",
-            "Rødovre Municipality, Denmark",
-            "Gentofte Municipality, Denmark",
-            "Gladsaxe Municipality, Denmark",
-            "Herlev Municipality, Denmark",
-        ]
-    )
+    G = download_cph()
     logging.info("Graph downloaded")
     maximum_distance_to_node = 100
 
@@ -103,3 +92,7 @@ def save_CPH_population_to_geojson() -> None:
         POPULATION_DATA_DIR / "CPHpop.geojson",
         driver="GeoJSON",
     )
+
+
+if __name__ == "__main__":
+    save_CPH_population_to_geojson()
