@@ -7,6 +7,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.simwrapper.SimWrapperModule;
 
 import java.io.File;
 
@@ -21,7 +22,6 @@ public class Main {
 
         Config config = ConfigUtils.loadConfig(absolutePath);
         File outputDir = new File(configFile.getParent(), config.controller().getOutputDirectory());
-
         config.controller().setOutputDirectory(outputDir.getAbsolutePath());
         config.network().setTimeVariantNetwork(true);
         config.controller().setOverwriteFileSetting(
@@ -29,8 +29,8 @@ public class Main {
         );
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
-
         Controller controller = new Controler(scenario);
+        controller.addOverridingModule(new SimWrapperModule());
         controller.run();
     }
 }
