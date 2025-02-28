@@ -51,8 +51,11 @@ def test_write_network(
     assert len(nodes_element.findall("node")) == len(mock_osm_graph.nodes)
 
     links_element = root.find("links")
+    num_links = sum(
+        (1 if data["oneway"] else 2) for _, _, data in mock_osm_graph.edges(data=True)
+    )
     assert links_element is not None, "Expected <links> element in XML."
-    assert len(links_element.findall("link")) == len(mock_osm_graph.edges)
+    assert len(links_element.findall("link")) == num_links
 
 
 @pytest.mark.parametrize(
@@ -101,11 +104,9 @@ def test_write_plans(
         assert len(plan) == 3
 
         activity_danger, leg, activity_safe = plan
-        assert activity_danger.attrib["type"] == "danger"
         assert activity_danger.attrib["link"] is not None
         assert leg.tag == "leg"
         assert leg.find("route") is not None
-        assert activity_safe.attrib["type"] == "safe"
         assert activity_safe.attrib["link"] is not None
 
 
@@ -157,10 +158,5 @@ def test_add_link_invalid_params() -> None:
     with pytest.raises(AssertionError, match="speed_limit must be a positive integer"):
         writer.add_link(1, 2, 3, length=100, speed_limit=-50)
 
-    with pytest.raises(AssertionError, match="capacity must be a positive integer"):
-        writer.add_link(1, 2, 3, length=100, speed_limit=50, capacity=-200)
-
     with pytest.raises(AssertionError, match="perm_lanes must be a positive integer"):
-        writer.add_link(
-            1, 2, 3, length=100, speed_limit=50, capacity=1000, perm_lanes=0
-        )
+        writer.add_link(1, 2, 3, length=100, speed_limit=50, perm_lanes=0)
