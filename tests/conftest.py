@@ -16,15 +16,15 @@ def mock_osm_graph() -> nx.MultiDiGraph:
     graph.add_node("E", x=12.9, y=55.9)
 
     # A <-> B <-> C
-    graph.add_edge("A", "B", length=100, maxspeed=50, lanes=1)
-    graph.add_edge("B", "A", length=100, maxspeed=50, lanes=1)
-    graph.add_edge("B", "C", length=200, maxspeed=50, lanes=1)
-    graph.add_edge("C", "B", length=200, maxspeed=50, lanes=1)
+    graph.add_edge("A", "B", length=100, maxspeed=50, lanes=1, oneway=False)
+    graph.add_edge("B", "A", length=100, maxspeed=50, lanes=1, oneway=False)
+    graph.add_edge("B", "C", length=200, maxspeed=50, lanes=1, oneway=False)
+    graph.add_edge("C", "B", length=200, maxspeed=50, lanes=1, oneway=False)
 
     # A <- C -> D -> E
-    graph.add_edge("C", "A", length=300, maxspeed=80, lanes=2)
-    graph.add_edge("C", "D", length=400, maxspeed=130, lanes=3)
-    graph.add_edge("D", "E", length=150, maxspeed=50, lanes=1)
+    graph.add_edge("C", "A", length=300, maxspeed=80, lanes=2, oneway=True)
+    graph.add_edge("C", "D", length=400, maxspeed=130, lanes=3, oneway=True)
+    graph.add_edge("D", "E", length=150, maxspeed=50, lanes=1, oneway=True)
 
     return graph
 
