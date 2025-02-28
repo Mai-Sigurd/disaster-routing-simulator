@@ -1,6 +1,7 @@
 import logging
 import shutil
 import subprocess
+from pathlib import Path
 
 from geopandas import GeoDataFrame
 
@@ -22,6 +23,7 @@ logging.basicConfig(
     style="{",
 )
 
+SOURCE_DIR = Path(__file__).parent.parent
 CPH_LOADED = True
 
 
@@ -33,15 +35,13 @@ def run_matsim() -> None:
     if matsim_output_dir.exists() and matsim_output_dir.is_dir():
         shutil.rmtree(matsim_output_dir)
 
-    args = [
-        "java",
-        "-Xmx4G",
-        "-cp",
-        "matsim-2024.0.jar",
-        "org.matsim.run.RunMatsim",
-        MATSIM_DATA_DIR / "config.xml",
+    cmd = [
+        "mvn",
+        "exec:java",
+        "-Dexec.mainClass=org.disaster.routing.Main",
+        "-Dexec.args=-Xmx4G",
     ]
-    subprocess.run(args, cwd=MATSIM_DATA_DIR)
+    subprocess.run(cmd, cwd=SOURCE_DIR / "simulator")
 
 
 if __name__ == "__main__":
@@ -78,4 +78,4 @@ if __name__ == "__main__":
     write_network(G, network_name="Copenhagen")
     write_plans(routes)
 
-    # run_matsim()
+    run_matsim()

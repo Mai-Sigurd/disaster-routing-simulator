@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -19,6 +20,9 @@ public class Main {
         }
 
         Config config = ConfigUtils.loadConfig(absolutePath);
+        File outputDir = new File(configFile.getParent(), config.controller().getOutputDirectory());
+
+        config.controller().setOutputDirectory(outputDir.getAbsolutePath());
         config.network().setTimeVariantNetwork(true);
         config.controller().setOverwriteFileSetting(
             OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles
@@ -26,7 +30,7 @@ public class Main {
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
-        Controler controler = new Controler(scenario);
-        controler.run();
+        Controller controller = new Controler(scenario);
+        controller.run();
     }
 }
