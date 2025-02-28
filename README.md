@@ -2,6 +2,8 @@
 
 ## Setup
 
+This project requires **Python 3.12+**.
+
 ### Virtual environment
 
 To create a virtual environment and install the dependencies, execute the following commands:
@@ -16,12 +18,22 @@ pip install poetry
 poetry install
 ```
 
-### MATSim GUI
+### MATSim
 
-To setup and use the MATSim GUI, follow the instructions in
-the [MATSim Installation Guide](https://matsim.org/install/#use-the-matsim-gui)
+To run MATSim, you need to install **Java 23** and **Maven**.
+If you are using macOS, you can install them using Homebrew:
 
-The MATSim configuration file is located at [here](data/matsim/config.xml).
+```bash
+# Install Java 23 and Maven
+brew install openjdk@23 maven
+
+# Add Java 23 to the PATH, since Homebrew does not automatically link Java
+echo 'export JAVA_HOME="$(brew --prefix openjdk@23)"' >> ~/.zshrc
+echo 'export PATH="$JAVA_HOME/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+> **Note:** If you're using **Bash**, update `~/.bashrc` instead of `~/.zshrc`.
 
 ## Running the tests
 
