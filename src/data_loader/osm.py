@@ -5,7 +5,7 @@ import osmnx as ox
 
 from data_loader import DATA_DIR
 
-COPENHAGEN_BBOX = (12.425, 55.550, 12.710, 55.755)
+COPENHAGEN_BBOX = (12.42, 55.55, 12.81, 55.76)
 OSM_DIR = DATA_DIR / "osm_graph"
 
 
@@ -23,6 +23,7 @@ def download_osm_graph(
         bbox=bbox,
         network_type="drive_service",
         simplify=simplify,
+        truncate_by_edge=True,
     )
     logging.info(
         f"Downloaded OSM graph with {len(graph.nodes)} nodes and {len(graph.edges)} edges"
