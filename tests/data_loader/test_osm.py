@@ -14,6 +14,7 @@ def test_download_osm_graph(
         bbox: tuple[float, float, float, float],
         network_type: str,
         simplify: bool,
+        truncate_by_edge: bool,
     ) -> nx.MultiDiGraph:
         """Mock function that replaces osmnx.graph_from_place."""
         return mock_osm_graph
