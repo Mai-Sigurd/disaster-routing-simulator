@@ -56,6 +56,6 @@ def load_osm(filename: str) -> nx.MultiDiGraph:
     logging.info(f"Loading OSM graph from {filename}")
     graph = ox.load_graphml(OSM_DIR / filename)
     logging.info(
-        f"Loaded OSM graph {len(graph.nodes)} nodes and {len(graph.edges)} from {filename}"
+        f"Loaded OSM graph {len(graph.nodes)} nodes and {len(graph.edges)} edges from {filename}"
     )
     return graph
