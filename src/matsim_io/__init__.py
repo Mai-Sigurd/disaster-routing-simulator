@@ -97,22 +97,22 @@ def write_plans(
 
     logging.info(f"Finished writing MATSim plans to {plan_filename}")
 
+
 def _write_route_plan(route: Route, writer: PlansWriter, count: int) -> int:
     node_pairs = list(zip(route.path[:-1], route.path[1:]))
-    link_ids = [_get_link_id(v, w) for v, w in node_pairs]  
+    link_ids = [_get_link_id(v, w) for v, w in node_pairs]
     for dep_time, num_people in route.departure_times.items():
         for _ in range(num_people):
             writer.start_person(count)
-            writer.start_plan(selected=True)    
-            writer.add_activity_with_link(
-                "escape", link=link_ids[0], end_time=dep_time
-            )
+            writer.start_plan(selected=True)
+            writer.add_activity_with_link("escape", link=link_ids[0], end_time=dep_time)
             writer.add_leg_with_route(link_ids, departure_time=dep_time)
-            writer.add_activity_with_link("escape", link=link_ids[-1])  
+            writer.add_activity_with_link("escape", link=link_ids[-1])
             writer.end_plan()
             writer.end_person()
-            count += 1     
-    return count 
+            count += 1
+    return count
+
 
 def _validate_and_format_filename(network_filename: str, gzip_compress: bool) -> str:
     """
