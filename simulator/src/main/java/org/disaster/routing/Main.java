@@ -1,5 +1,6 @@
 package org.disaster.routing;
 
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -37,5 +38,8 @@ public class Main {
         Controller controller = new Controler(scenario);
         controller.addOverridingModule(new SimWrapperModule());
         controller.run();
+
+        // Explicitly shutdown log4j2 to prevent lingering threads
+        LogManager.shutdown();
     }
 }
