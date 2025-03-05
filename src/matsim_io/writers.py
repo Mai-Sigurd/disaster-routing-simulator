@@ -154,12 +154,14 @@ class PlansWriter(PopulationWriter):  # type: ignore[misc]
         self._write(f'<leg mode="{mode}"')
         if departure_time is not None:
             self._write(f' dep_time="{self.time(departure_time)}"')
+        if mat_sim_routing:
+            self._write("/>\n")
+            return
         self._write(">\n")
 
         self.indent += 1
         self._write_indent()
-        if not mat_sim_routing:
-            self._write(f'<route type="links">{" ".join(map(str, route))}</route>\n')
+        self._write(f'<route type="links">{" ".join(map(str, route))}</route>\n')
         self.indent -= 1
 
         self._write_line("</leg>")
