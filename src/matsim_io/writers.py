@@ -136,9 +136,10 @@ class PlansWriter(PopulationWriter):  # type: ignore[misc]
             self._write(f' end_time="{self.time(end_time)}"')
         self._write("/>\n")
 
-    def add_leg_with_route(
+    def add_leg(
         self,
         route: list[Id],
+        mat_sim_routing: bool,
         mode: str = "car",
         departure_time: Optional[int] = None,
     ) -> None:
@@ -157,7 +158,8 @@ class PlansWriter(PopulationWriter):  # type: ignore[misc]
 
         self.indent += 1
         self._write_indent()
-        self._write(f'<route type="links">{" ".join(map(str, route))}</route>\n')
+        if not mat_sim_routing:
+            self._write(f'<route type="links">{" ".join(map(str, route))}</route>\n')
         self.indent -= 1
 
         self._write_line("</leg>")

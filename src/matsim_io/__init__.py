@@ -92,13 +92,15 @@ def write_plans(
 
         count = 1
         for route in routes:
-            count = _write_route_plan(route, writer, count)
+            count = _write_plan(route, writer, count, mat_sim_routing)
         writer.end_population()
 
     logging.info(f"Finished writing MATSim plans to {plan_filename}")
 
 
-def _write_route_plan(route: Route, writer: PlansWriter, count: int) -> int:
+def _write_plan(
+    route: Route, writer: PlansWriter, count: int, mat_sim_routing: bool
+) -> int:
     node_pairs = list(zip(route.path[:-1], route.path[1:]))
     link_ids = [_get_link_id(v, w) for v, w in node_pairs]
     for dep_time, num_people in route.departure_times.items():
@@ -106,7 +108,9 @@ def _write_route_plan(route: Route, writer: PlansWriter, count: int) -> int:
             writer.start_person(count)
             writer.start_plan(selected=True)
             writer.add_activity_with_link("escape", link=link_ids[0], end_time=dep_time)
-            writer.add_leg_with_route(link_ids, departure_time=dep_time)
+            writer.add_leg(
+                link_ids, departure_time=dep_time, mat_sim_routing=mat_sim_routing
+            )
             writer.add_activity_with_link("escape", link=link_ids[-1])
             writer.end_plan()
             writer.end_person()
