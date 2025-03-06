@@ -83,7 +83,12 @@ def test_write_plans(
 
     # write_network is called to populate link IDs for write_plans
     write_network(mock_osm_graph)
-    write_plans(mock_routes, plan_filename=input_filename, gzip_compress=gzip_compress, mat_sim_routing=False)
+    write_plans(
+        mock_routes,
+        plan_filename=input_filename,
+        gzip_compress=gzip_compress,
+        mat_sim_routing=False,
+    )
 
     plans_file = output_path / expected_filename
     assert plans_file.exists(), f"Expected file {plans_file} to exist."
@@ -108,6 +113,7 @@ def test_write_plans(
         assert leg.tag == "leg"
         assert leg.find("route") is not None
         assert activity_safe.attrib["link"] is not None
+
 
 @pytest.mark.parametrize(
     "gzip_compress, input_filename, expected_filename",
@@ -134,7 +140,12 @@ def test_write_plans_with_matsim_routing(
 
     # write_network is called to populate link IDs for write_plans
     write_network(mock_osm_graph)
-    write_plans(mock_routes, plan_filename=input_filename, gzip_compress=gzip_compress, mat_sim_routing=True)
+    write_plans(
+        mock_routes,
+        plan_filename=input_filename,
+        gzip_compress=gzip_compress,
+        mat_sim_routing=True,
+    )
 
     plans_file = output_path / expected_filename
     assert plans_file.exists(), f"Expected file {plans_file} to exist."
@@ -159,7 +170,6 @@ def test_write_plans_with_matsim_routing(
         assert leg.tag == "leg"
         assert leg.find("route") is None
         assert activity_safe.attrib["link"] is not None
-
 
 
 @pytest.mark.parametrize(
