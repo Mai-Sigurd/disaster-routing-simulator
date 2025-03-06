@@ -144,8 +144,9 @@ class PlansWriter(PopulationWriter):  # type: ignore[misc]
         departure_time: Optional[int] = None,
     ) -> None:
         """
-        Add a leg with a route to the plan.
+        Add a leg with to the plan, either with or without already planned route.
         :param route: List of link IDs.
+        :param mat_sim_routing: Whether to use MATSim routing.
         :param mode: Mode of transportation.
         :param departure_time: Time of departure.
         """
