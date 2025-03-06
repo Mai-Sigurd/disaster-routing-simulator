@@ -35,6 +35,22 @@ source ~/.zshrc
 
 > **Note:** If you're using **Bash**, update `~/.bashrc` instead of `~/.zshrc`.
 
+Before running the project, install the MATSim dependencies:
+
+```bash
+# Install MATSim dependencies
+cd simulator
+mvn clean install
+```
+
+## Running the project
+
+To run the project, execute the following command:
+
+```bash
+python src/main.py
+```
+
 ## Running the tests
 
 To run the tests, execute the following command:
