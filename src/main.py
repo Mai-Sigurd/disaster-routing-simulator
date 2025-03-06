@@ -45,11 +45,11 @@ def run_matsim() -> None:
 
 
 if __name__ == "__main__":
-    if not CPH_LOADED:
-        G = download_cph()
-        save_osm(G, "copenhagen.graphml")
-    else:
-        G = load_osm("copenhagen.graphml")
+    # if not CPH_LOADED:
+    #     G = download_cph()
+    #     save_osm(G, "copenhagen.graphml")
+    # else:
+    #     G = load_osm("copenhagen.graphml")
 
     danger_zones: GeoDataFrame = load_danger_zone(
         "mindre_del_af_amager.geojson", "EPSG:4326"
