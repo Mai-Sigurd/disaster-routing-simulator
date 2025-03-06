@@ -14,6 +14,13 @@ RUN mvn package
 FROM python:3.12-slim AS python_base
 WORKDIR /app
 
+# Install GDAL and build tools required for the fiona and rasterio Python dependencies
+RUN apt-get update && apt-get install -y \
+    gdal-bin libgdal-dev \
+    build-essential \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install and configure  Poetry
 RUN pip install --no-cache-dir poetry
 RUN poetry config virtualenvs.in-project true
