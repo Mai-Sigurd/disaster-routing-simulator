@@ -1,4 +1,7 @@
 import logging
+import shutil
+import subprocess
+from pathlib import Path
 
 from geopandas import GeoDataFrame
 
@@ -9,7 +12,7 @@ from data_loader.population.population import (
     get_origin_points,
     load_geojson,
 )
-from matsim_io import write_network, write_plans
+from matsim_io import MATSIM_DATA_DIR, write_network, write_plans
 from routes.fastestpath import fastest_path
 from routes.route import Route, create_route_objects
 from routes.shortestpath import path
@@ -20,7 +23,25 @@ logging.basicConfig(
     style="{",
 )
 
+SOURCE_DIR = Path(__file__).parent.parent
 CPH_LOADED = True
+
+
+def run_matsim() -> None:
+    """
+    Run the MATSim executable with the config.xml file in the MATSIM_DATA_DIR.
+    """
+    matsim_output_dir = MATSIM_DATA_DIR / "output"
+    if matsim_output_dir.exists() and matsim_output_dir.is_dir():
+        shutil.rmtree(matsim_output_dir)
+
+    cmd = [
+        "mvn",
+        "exec:java",
+        "-Dexec.mainClass=org.disaster.routing.Main",
+        "-Dexec.args=-Xmx4G",
+    ]
+    subprocess.run(cmd, cwd=SOURCE_DIR / "simulator")
 
 
 if __name__ == "__main__":
@@ -56,3 +77,5 @@ if __name__ == "__main__":
 
     write_network(G, network_name="Copenhagen")
     write_plans(routes)
+
+    run_matsim()
