@@ -1,6 +1,6 @@
 matplotlib
 numpy
-Shapely==1.8.5
+Shapely
 Fiona
 rtree
 pyproj
@@ -10,7 +10,7 @@ geopandas
 compress-json
 tqdm
 igraph
-eclipse-sumo==1.15.0
-sumolib==1.15.0
-libsumo==1.15.0
+eclipse-sumo
+sumolib
+libsumo
 seaborn

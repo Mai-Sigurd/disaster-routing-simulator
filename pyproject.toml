@@ -11,13 +11,15 @@ readme = "README.md"
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.11"  # Python 3.11, since pygeos (eclipse-sumo dependency) is not available for Python 3.12+
+eclipse-sumo = "1.21.0"  # Hardcoded version, as some versions for ARM64 are not available on PyPI
 geopandas = "^1.0.1"
 matplotlib = "^3.10.1"
 matsim-tools = "^0.0.19"
 osmnx = "^2.0.1"
 pandas = "^2.2.3"
 rasterio = "^1.4.3"
+routing-lib = { path = "src/routing-lib", develop = true }
 scikit-learn = "^1.6.1"
 shapely = "^2.0.7"
 tqdm = "^4.67.1"
@@ -28,7 +30,7 @@ pytest = "^8.3.5"
 ruff = "^0.9.9"
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.11"
 strict = true
 warn_return_any = true
 disallow_untyped_defs = true
