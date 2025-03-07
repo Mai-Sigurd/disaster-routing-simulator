@@ -32,6 +32,7 @@ ruff = "^0.9.9"
 
 [tool.mypy]
 python_version = "3.11"
+exclude = ["src/routing-lib"]
 strict = true
 warn_return_any = true
 disallow_untyped_defs = true
@@ -45,6 +46,9 @@ python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
 pythonpath = ["src"]
+
+[tool.ruff]
+exclude = ["src/routing-lib"]
 
 [tool.ruff.lint]
 extend-select = ["I"]
