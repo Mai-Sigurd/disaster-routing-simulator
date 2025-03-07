@@ -1371,6 +1371,21 @@ numpy = ">=1.4"
 test = ["pytest", "pytest-cov", "scipy"]
 
 [[package]]
+name = "pattern-optimized-routes"
+version = "0.1.6"
+description = "Package to simulate the MultilevelERU (Expected Road Usage) model and the literature baselines results on a road network with a traffic demand."
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "pattern_optimized_routes-0.1.6-py3-none-any.whl", hash = "sha256:c00def9f1feddc36c5d3c0ee8bb8e395039fbb9b2551bffffce8a5a6f911372d"},
+    {file = "pattern_optimized_routes-0.1.6.tar.gz", hash = "sha256:0dae53e358cab4bfd476ed3087f750bca404d80ec763661e4020b9a75d0baf81"},
+]
+
+[package.dependencies]
+routing-lib = "*"
+
+[[package]]
 name = "pillow"
 version = "11.1.0"
 description = "Python Imaging Library (Fork)"
@@ -2407,4 +2422,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "092bd39a50842ef90fb6670ce4b9a1da066602ef8a518e5a127b0c50bff1188d"
+content-hash = "32a9b3a429c9f041c140da84af0e970c3917d6ffe3abad6f811f0c5b8d9ae437"
