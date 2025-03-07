@@ -22,7 +22,7 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
         self._write_line(
             '<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">'
         )
-        self._write_line(f"<network{f' name="{name}"' if name else ''}>")
+        self._write_line(f'<network name="{name}">' if name else "<network>")
         self.indent += 1
         self.set_scope(self.NETWORK_SCOPE)
 
