@@ -11,7 +11,7 @@ COPY simulator .
 RUN mvn package
 
 # Stage 2: Python Environment
-FROM python:3.12-slim AS python_base
+FROM python:3.11-slim AS python_base
 WORKDIR /app
 
 # Install GDAL and build tools required for the fiona and rasterio Python dependencies
@@ -27,6 +27,7 @@ RUN poetry config virtualenvs.in-project true
 
 # Install Python dependencies
 COPY pyproject.toml poetry.lock ./
+COPY src/routing-lib/ src/routing-lib/
 RUN poetry install --no-root
 
 # Stage 3: Final Image (Maven + Python)
