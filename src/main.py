@@ -41,7 +41,12 @@ def run_matsim() -> None:
     if not MATSIM_JAR.exists():
         raise FileNotFoundError(f"MATSim JAR not found: {MATSIM_JAR}")
 
-    cmd = ["java", "-Xmx8G", "-jar", str(MATSIM_JAR)]
+    cmd = [
+        "mvn",
+        "exec:java",
+        "-Dexec.mainClass=org.disaster.routing.Main",
+        "-Dexec.args=-Xmx6G",
+    ]
     subprocess.run(cmd, cwd=SOURCE_DIR / "simulator")
 
 
@@ -55,7 +60,7 @@ if __name__ == "__main__":
     population_data: GeoDataFrame = load_geojson("CPHpop.geojson")
 
     danger_zones: GeoDataFrame = load_danger_zone(
-        "dangerzone_vesterbro.geojson", population_data.crs
+        "mindre_del_af_amager.geojson", population_data.crs
     )
     danger_zone_population: GeoDataFrame = distribute_population(
         danger_zones, population_data
