@@ -2,7 +2,7 @@ import networkx as nx
 import osmnx as ox
 import pytest
 
-from data_loader.osm import download_osm_graph
+from data_loader.osm import download_graph_from_bbox
 
 
 def test_download_osm_graph(
@@ -21,6 +21,6 @@ def test_download_osm_graph(
 
     monkeypatch.setattr(ox, "graph_from_bbox", mock_graph_from_bbox)
 
-    result_graph = download_osm_graph(bbox=(0, 0, 1, 1))
+    result_graph = download_graph_from_bbox(bbox=(0, 0, 1, 1))
     assert isinstance(result_graph, nx.MultiDiGraph)
     assert len(result_graph.edges) == len(mock_osm_graph.edges)
