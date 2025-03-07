@@ -68,12 +68,14 @@ def add_main_window(desc: str, tag: str, width: int, height: int) -> gui_type:
     return t1
 
 
+# TODO add fields
 def add_cph_window(
     parent: str, desc: str, tag: str, width: int, height: int
 ) -> list[gui_type]:
     dpg.add_child_window(
         label="", tag=tag, show=True, parent=parent, width=width, height=height
     )
+    dpg.hide_item(tag)
     return []
 
 
@@ -94,5 +96,5 @@ def change_windows(sender, data) -> None:  # type: ignore # dpg. doesnt have typ
         dpg.hide_item(CPH_WINDOW)
 
 
-def add_go_button(parent: str, tag: str) -> None:
-    dpg.add_button(label=tag, callback=_save_input_data, width=100, parent=parent)
+def add_go_button(parent: str) -> None:
+    dpg.add_button(label="GO", callback=_save_input_data, width=100, parent=parent)

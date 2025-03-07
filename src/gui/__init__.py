@@ -22,6 +22,7 @@ def open_gui() -> None:
         print(e)
 
 
+# TODO add input verificaction step.
 def _open_gui() -> None:
     dpg.create_context()
     dpg.create_viewport(
@@ -35,7 +36,7 @@ def _open_gui() -> None:
         height=HEIGHT,
     )
     bold_text1 = add_field_window(
-        parent=MAIN_WINDOW, tag=FIELD_WINDOW, width=WIDTH, height=HEIGHT - 100
+        parent=MAIN_WINDOW, tag=FIELD_WINDOW, width=WIDTH, height=HEIGHT - 200
     )
     bold_text2 = add_cph_window(
         parent=FIELD_WINDOW,
@@ -44,8 +45,8 @@ def _open_gui() -> None:
         width=WIDTH,
         height=HEIGHT,
     )
+    add_go_button(parent=MAIN_WINDOW)
 
-    add_go_button(parent=FIELD_WINDOW, tag="GO")
     set_fonts(bold_text1 + bold_text2, t1)
     dpg.set_primary_window(MAIN_WINDOW, True)
     dpg.show_viewport()
