@@ -1,4 +1,4 @@
-package org.matsim.simwrapper.dashboard;
+package org.disaster.routing.simwrapper.dashboard;
 
 import org.matsim.application.analysis.population.PopulationAttributeAnalysis;
 import org.matsim.simwrapper.Dashboard;

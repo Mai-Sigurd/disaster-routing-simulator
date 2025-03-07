@@ -1,4 +1,4 @@
-package org.matsim.simwrapper.viz;
+package org.disaster.routing.simwrapper.viz;
 
 /**
  * Utility class that holds some, but not all available color schemes.

@@ -1,4 +1,4 @@
-package org.matsim.simwrapper.viz;
+package org.disaster.routing.simwrapper.viz;
 
 /**
  * Creates a line chart for simwrapper.

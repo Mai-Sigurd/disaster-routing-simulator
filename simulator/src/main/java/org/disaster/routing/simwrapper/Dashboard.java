@@ -1,4 +1,4 @@
-package org.matsim.simwrapper;
+package org.disaster.routing.simwrapper;
 
 /**
  * Function interface that allows to construct dashboards.

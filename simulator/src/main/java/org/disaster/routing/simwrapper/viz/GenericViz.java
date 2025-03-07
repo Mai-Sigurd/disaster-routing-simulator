@@ -1,4 +1,4 @@
-package org.matsim.simwrapper.viz;
+package org.disaster.routing.simwrapper.viz;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;

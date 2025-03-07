@@ -1,4 +1,4 @@
-package org.matsim.simwrapper.viz;
+package org.disaster.routing.simwrapper.viz;
 
 /**
  * Creates an Area Plot for simwrapper.
