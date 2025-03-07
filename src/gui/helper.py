@@ -4,6 +4,7 @@ from pathlib import Path
 import dearpygui.dearpygui as dpg
 
 from data_loader import DATA_DIR
+from gui.input_data import InputData, save_input_data, save_to_json_file
 
 DANGER_ZONES_DIR = DATA_DIR / "danger_zones"
 OSM_BBOX_DIR = DATA_DIR / "osm_graph"
@@ -11,8 +12,12 @@ OSM_BBOX_DIR = DATA_DIR / "osm_graph"
 
 OSM_JSON_BBOX = "OSM_JSON_BBOX"
 DANGER_ZONE = "DANGER_ZONE"
+
 POPULATION = "POPULATION"
+TIFF_FILE = "Worldpop tiff file"
+POPULATION_NUMBER = "Population number"
 RASTER_FILE = "RASTER_FILE"
+
 
 COPENHAGEN = "Copenhagen"
 PICK_AREA = "Pick area"
@@ -24,16 +29,29 @@ GUI_DIR = Path(__file__).resolve().parent
 
 FONTDIR = GUI_DIR / "font/open-sans"
 
+INPUTDATADIR = GUI_DIR / "input_data.json"
 
-def _save_callback() -> None:
-    user_input = dpg.get_value(OSM_JSON_BBOX)  # Get input value
-    print("User entered:", user_input)
 
-    # Save to a file
-    with open("user_input.txt", "w") as file:
-        file.write(user_input)
-    dpg.destroy_context()
-    # TODO: Add the rest of the input fields
+def _save_input_data() -> None:
+    input = InputData()
+    osm_geopandas_json = dpg.get_value(OSM_JSON_BBOX)
+    danger_zones_geopandas_json = dpg.get_value(DANGER_ZONE)
+    interval = dpg.get_value("Interval")
+    chunks = dpg.get_value("Departure time")
+    worldpop = dpg.get_value(POPULATION) == TIFF_FILE
+    population_number = dpg.get_value("Population number")
+    worldpop_filepath = dpg.get_value("Worldpop tiff file")
+    save_input_data(self=input,
+        osm_geopandas_json=osm_geopandas_json,
+        danger_zones_geopandas_json=danger_zones_geopandas_json,
+        interval=interval,
+        chunks=chunks,
+        worldpop=worldpop,
+        population_number=population_number,
+        worldpop_filepath=worldpop_filepath,
+    )
+    save_to_json_file(input, INPUTDATADIR)
+    dpg.stop_dearpygui()
 
 
 def set_fonts(bold_items: [], titel):  # type: ignore
@@ -47,7 +65,7 @@ def set_fonts(bold_items: [], titel):  # type: ignore
         dpg.bind_item_font(item=titel, font=titel_font)
 
 
-def add_main_window(desc, tag, call_back_radio_button_data: str, width, height: int):  # type: ignore  # dpg returns a ( int | str ) type that mypy cant handle
+def add_main_window(desc, tag, input: InputData, width, height: int):  # type: ignore  
     dpg.add_window(
         label="", width=width, height=height, tag=tag, no_collapse=True, no_close=True
     )
@@ -58,7 +76,8 @@ def add_main_window(desc, tag, call_back_radio_button_data: str, width, height: 
     # TODO add callback for radio button
 
 
-def add_field_window(parent, tag: str, width, height: int) -> list:  # type: ignore  # dpg returns a ( int | str ) type that mypy cant handle
+# dpg returns a ( int | str ) type that mypy cant handle
+def add_field_window(parent, tag: str, width, height: int) -> list:  # type: ignore  
     dpg.add_child_window(
         label="", tag=tag, show=True, parent=parent, width=width, height=height
     )
@@ -83,7 +102,7 @@ def add_field_window(parent, tag: str, width, height: int) -> list:  # type: ign
         desc="Choose the population type:",
         desc2="Either download a worldpop tiff file and input the filepath or input a population number which will be evenly distributed across the dangerzone",
         tag=POPULATION,
-        types=["Worldpop tiff file", "Population number"],
+        types=[TIFF_FILE, POPULATION_NUMBER],
         parent=tag,
     )
     t4 = _add_departure_time_input_field(
@@ -99,10 +118,10 @@ def add_field_window(parent, tag: str, width, height: int) -> list:  # type: ign
 
 
 def add_go_button(parent, tag: str):  # type: ignore
-    dpg.add_button(label=tag, callback=_save_callback, width=100, parent=parent)
+    dpg.add_button(label=tag, callback=_save_input_data, width=100, parent=parent)
 
-
-def _add_geo_json_input_field(title, desc, desc2, desc3, tag, parent: str):  # type: ignore  # dpg returns a ( int | str ) type that mypy cant handle
+# dpg returns a ( int | str ) type that mypy cant handle
+def _add_geo_json_input_field(title, desc, desc2, desc3, tag, parent: str):  # type: ignore  
     t1 = dpg.add_text(title, parent=parent)
     dpg.add_text(desc, parent=parent)
     dpg.add_text(desc2, parent=parent)
@@ -121,10 +140,8 @@ def _type_radio_callback(sender, app_data, user_data):  # type: ignore
         dpg.configure_item(i, show=False)
     dpg.configure_item(app_data, show=True)
 
-
-def _add_population_input_field(
-    title, desc, desc2, tag: str, types: list[str], parent: str
-):  # type: ignore  # dpg returns a ( int | str ) type that mypy cant handle
+ # dpg returns a ( int | str ) type that mypy cant handle
+def _add_population_input_field(title, desc, desc2, tag: str, types: list[str], parent: str):  # type: ignore 
     t1 = dpg.add_text(title, parent=parent)
     dpg.add_text(desc, parent=parent)
     dpg.add_text(desc2, parent=parent)
@@ -150,10 +167,8 @@ def _add_population_input_field(
 
     return t1
 
-
-def _add_departure_time_input_field(
-    title, desc_chunk, desc_interval, tag_chunk, tag_interval: str, parent: str
-):  # type: ignore  # dpg returns a ( int | str ) type that mypy cant handle
+# dpg returns a ( int | str ) type that mypy cant handle
+def _add_departure_time_input_field(title, desc_chunk, desc_interval, tag_chunk, tag_interval, parent: str):  # type: ignore  
     t1 = dpg.add_text(title, parent=parent)
     dpg.add_text(desc_chunk, parent=parent)
     dpg.add_input_int(tag=tag_chunk, parent=parent)

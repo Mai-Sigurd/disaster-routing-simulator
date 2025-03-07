@@ -8,6 +8,7 @@ from gui.helper import (
     add_main_window,
     set_fonts,
 )
+from gui.input_data import InputData
 
 WIDTH = 800
 HEIGHT = 1100
@@ -22,7 +23,7 @@ def open_gui() -> None:
     t1 = add_main_window(
         tag=MAIN_WINDOW,
         desc="Choose a city or pick an area",
-        call_back_radio_button_data="soon",
+        input=input,
         width=WIDTH,
         height=HEIGHT,
     )
@@ -34,3 +35,6 @@ def open_gui() -> None:
     dpg.set_primary_window(MAIN_WINDOW, True)
     dpg.show_viewport()
     dpg.start_dearpygui()
+        # After GUI closes, cleanup
+    dpg.destroy_context()
+    print("Dear PyGui has closed, continuing with the program...")
