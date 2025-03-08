@@ -1,11 +1,12 @@
 import dearpygui.dearpygui as dpg
 
-from gui.constants import CPH_WINDOW, FIELD_WINDOW, MAIN_WINDOW
+from gui.constants import CPH_WINDOW, FIELD_WINDOW, MAIN_WINDOW, PICK_AREA
 from gui.controller import (
     add_cph_window,
     add_field_window,
     add_go_button,
     add_main_window,
+    change_windows,
     set_fonts,
 )
 
@@ -39,8 +40,7 @@ def _open_gui() -> None:
         parent=MAIN_WINDOW, tag=FIELD_WINDOW, width=WIDTH, height=HEIGHT - 200
     )
     bold_text2 = add_cph_window(
-        parent=FIELD_WINDOW,
-        desc="Write text here",
+        parent=MAIN_WINDOW,
         tag=CPH_WINDOW,
         width=WIDTH,
         height=HEIGHT,
@@ -48,6 +48,7 @@ def _open_gui() -> None:
     add_go_button(parent=MAIN_WINDOW)
 
     set_fonts(bold_text1 + bold_text2, t1)
+    change_windows(None, PICK_AREA)
     dpg.set_primary_window(MAIN_WINDOW, True)
     dpg.show_viewport()
     dpg.start_dearpygui()

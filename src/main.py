@@ -45,6 +45,11 @@ def run_matsim() -> None:
 
 
 if __name__ == "__main__":
+    open_gui()
+
+    input_data: InputData = InputData()
+    open_json_file(self=input_data, file_path=INPUTDATADIR)
+    pretty_print(input_data)
     # if not CPH_LOADED:
     #     G = download_cph()
     #     save_osm(G, "copenhagen.graphml")

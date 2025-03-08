@@ -23,14 +23,8 @@ def add_input_fields_pick_area(parent: str) -> list[gui_type]:
         tag=OSM_JSON_BBOX,
         parent=parent,
     )
-    t2 = _add_geo_json_input_field(
-        title="Danger Zone",
-        desc="Go to geojson.io and pick a dangerzone, copy the JSON into the below box",
-        desc2="The area should be a polygon of the dangerzone, withing the OSM Graph",
-        desc3="If left blank it will default to a Amager",
-        tag=DANGER_ZONE,
-        parent=parent,
-    )
+    t2 = _add_danger_zone_input_field(parent=parent, tag=DANGER_ZONE)
+
     t3 = _add_population_input_field(
         title="Population",
         desc="Choose the population type:",
@@ -49,6 +43,23 @@ def add_input_fields_pick_area(parent: str) -> list[gui_type]:
     )
 
     return [t1, t2, t3, t4]
+
+
+def add_city_fields(parent: str, city_tag: str) -> list[gui_type]:
+    bold_text = _add_danger_zone_input_field(parent=parent, tag=city_tag)
+    return [bold_text]
+
+
+def _add_danger_zone_input_field(parent: str, tag: str) -> gui_type:
+    t2 = _add_geo_json_input_field(
+        title="Danger Zone",
+        desc="Go to geojson.io and pick a dangerzone, copy the JSON into the below box",
+        desc2="The area should be a polygon of the dangerzone, withing the OSM Graph",
+        desc3="If left blank it will default to a Amager",
+        tag=tag,
+        parent=parent,
+    )
+    return t2
 
 
 def _add_geo_json_input_field(
