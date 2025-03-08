@@ -10,6 +10,8 @@ from data_loader.population.population import (
     load_geojson,
 )
 from gui import open_gui
+from gui.controller import INPUTDATADIR
+from gui.input_data import InputData, open_json_file, pretty_print
 from matsim_io import write_network, write_plans
 from routes.fastestpath import fastest_path
 from routes.route import Route, create_route_objects
@@ -22,11 +24,15 @@ logging.basicConfig(
 )
 
 
-
 CPH_LOADED = True
 
 
 if __name__ == "__main__":
+    open_gui()
+
+    input_data: InputData = InputData()
+    open_json_file(self=input_data, file_path=INPUTDATADIR)
+    pretty_print(input_data)
     # if not CPH_LOADED:
     #     G = download_cph()
     #     save_osm(G, "copenhagen.graphml")
@@ -59,4 +65,3 @@ if __name__ == "__main__":
 
     # write_network(G, network_name="Copenhagen")
     # write_plans(routes)
-    open_gui()

@@ -10,15 +10,15 @@ MENU_TAG = "menu"
 
 OSM_JSON_BBOX = "OSM_JSON_BBOX"
 DANGER_ZONE = "DANGER_ZONE"
+DANGER_ZONE_CPH = "DANGER_ZONE_CPH"
 
 POPULATION = "POPULATION"
 TIFF_FILE = "Worldpop tiff file"
 POPULATION_NUMBER = "Population number"
 RASTER_FILE = "RASTER_FILE"
 
-
-COPENHAGEN = "Copenhagen"
-PICK_AREA = "Pick area"
+MENU_COPENHAGEN = "Copenhagen"
+MENU_PICK_AREA = "Pick area"
 
 MAIN_WINDOW = "main_window"
 FIELD_WINDOW = "field_window"

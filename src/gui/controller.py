@@ -1,20 +1,21 @@
 import dearpygui.dearpygui as dpg
 
 from gui.constants import (
-    COPENHAGEN,
     CPH_WINDOW,
     DANGER_ZONE,
+    DANGER_ZONE_CPH,
     FIELD_WINDOW,
     FONTDIR,
     INPUTDATADIR,
+    MENU_COPENHAGEN,
+    MENU_PICK_AREA,
     MENU_TAG,
     OSM_JSON_BBOX,
-    PICK_AREA,
     POPULATION,
     TIFF_FILE,
     gui_type,
 )
-from gui.fields import add_input_fields_pick_area
+from gui.fields import add_city_fields, add_input_fields_pick_area
 from gui.input_data import InputData, save_input_data, save_to_json_file
 
 
@@ -53,13 +54,11 @@ def set_fonts(bold_items: list[gui_type], titel: str) -> None:
 
 
 def add_main_window(desc: str, tag: str, width: int, height: int) -> gui_type:
-    dpg.add_window(
-        label="", width=width, height=height, tag=tag, no_collapse=True, no_close=True
-    )
+    dpg.add_window(label="", width=width, height=height, tag=tag, no_collapse=True, no_close=True)
     t1 = dpg.add_text(desc, parent=tag)
     dpg.add_radio_button(
         tag=MENU_TAG,
-        items=[PICK_AREA, COPENHAGEN],
+        items=[MENU_PICK_AREA, MENU_COPENHAGEN],
         parent=tag,
         horizontal=True,
         callback=change_windows,
@@ -68,15 +67,12 @@ def add_main_window(desc: str, tag: str, width: int, height: int) -> gui_type:
     return t1
 
 
-# TODO add fields
-def add_cph_window(
-    parent: str, desc: str, tag: str, width: int, height: int
-) -> list[gui_type]:
+def add_city_window(parent: str, tag: str, width: int, height: int) -> list[gui_type]:
     dpg.add_child_window(
         label="", tag=tag, show=True, parent=parent, width=width, height=height
     )
-    dpg.hide_item(tag)
-    return []
+    bold_text = add_city_fields(parent=tag, city_tag=DANGER_ZONE_CPH)
+    return bold_text  # type: ignore
 
 
 def add_field_window(parent: str, tag: str, width: int, height: int) -> list[gui_type]:
@@ -87,8 +83,8 @@ def add_field_window(parent: str, tag: str, width: int, height: int) -> list[gui
     return bold_text  # type: ignore
 
 
-def change_windows(sender, data) -> None:  # type: ignore # dpg. doesnt have types for sender and data
-    if data == COPENHAGEN:
+def change_windows(sender: str, data: str) -> None:  
+    if data == MENU_COPENHAGEN:
         dpg.show_item(CPH_WINDOW)
         dpg.hide_item(FIELD_WINDOW)
     else:
