@@ -2,8 +2,12 @@ import logging
 
 import geopandas as gpd
 import networkx as nx
+from shapely.geometry import Point
 
 from data_loader.population.utils import (
+    GEOMETRY,
+    NODE_ID,
+    POPULATION,
     POPULATION_DIR,
     save_tiff_population_to_geojson,
 )
@@ -51,19 +55,35 @@ def population_data_from_tiff(
 
 
 def population_data_from_number(
-    danger_zone: gpd.GeoDataFrame, population_number: int
+    danger_zone: gpd.GeoDataFrame, population_number: int, G: nx.MultiDiGraph
 ) -> gpd.GeoDataFrame:
     """
-    Creates a dataframe from the dangerzone, where each node has a evenly distributed population.
+    Creates a dataframe with the population number divided by the number of nodes, where each node has a evenly distributed population.
     :param danger_zone: A GeoDataFrame containing the danger zone polygon(s).
     :param population_number: The population number.
     :return: A GeoDataFrame containing the population number.
     """
-    population = population_number / len(danger_zone)
-    return gpd.GeoDataFrame(
+    nodes = [
+        node
+        for node, data in G.nodes(data=True)
+        if any(
+            polygon.intersects(Point(data["x"], data["y"]))
+            for polygon in danger_zone.geometry
+        )
+    ]
+    num_nodes = len(nodes)
+    if num_nodes == 0:
+        raise ValueError("No nodes found within the danger zone.")
+
+    population_per_node = population_number / num_nodes
+
+    result = gpd.GeoDataFrame(
         {
-            "id": list(danger_zone.index),
-            "population": [population] * len(danger_zone),
-            "geometry": list(danger_zone.geometry),
-        }
+            NODE_ID: nodes,
+            POPULATION: [population_per_node] * num_nodes,
+            GEOMETRY: [Point(G.nodes[node]["x"], G.nodes[node]["y"]) for node in nodes],
+        },
+        geometry=GEOMETRY,
     )
+
+    return result

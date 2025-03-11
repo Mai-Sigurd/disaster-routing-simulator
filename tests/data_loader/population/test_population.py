@@ -3,6 +3,7 @@ import sys
 from unittest.mock import MagicMock, patch
 
 import geopandas as gpd
+import networkx as nx
 import osmnx as ox
 import pandas as pd
 import pytest
@@ -11,6 +12,7 @@ from shapely.geometry import LineString, Point, Polygon
 
 from data_loader.population import (
     population_data_from_geojson,
+    population_data_from_number,
 )
 from data_loader.population.population import (
     POPULATION_DIR,
@@ -78,6 +80,30 @@ def test_distribute_population() -> None:
         or danger_zone.geometry.iloc[0].touches(pt)
         for pt in result.geometry
     )
+
+
+def test_population_data_from_number(
+    monkeypatch: pytest.MonkeyPatch, mock_osm_graph: nx.MultiDiGraph
+) -> None:
+    # Create a mock danger zone (polygon)
+    danger_zone = gpd.GeoDataFrame(
+        {"id": [1]},
+        geometry=[Polygon([(0, 0), (0, 60), (60, 60), (60, 0)])],
+        crs="EPSG:4326",
+    )
+    # Create a mock population dataset (points)
+    population = 500
+
+    # Run function
+    result = population_data_from_number(
+        danger_zone=danger_zone, population_number=population, G=mock_osm_graph
+    )
+    # Assertions
+    assert isinstance(result, gpd.GeoDataFrame)
+    assert len(result) == 5
+    assert "pop" in result.columns  # Population column should exist
+    # assert the population is evenly distributed
+    assert all(result["pop"] == 100)
 
 
 def test_filter_world_pop_to_cph() -> None:
