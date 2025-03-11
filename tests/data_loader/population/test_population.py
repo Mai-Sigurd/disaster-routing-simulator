@@ -3,33 +3,37 @@ import sys
 from unittest.mock import MagicMock, patch
 
 import geopandas as gpd
+import networkx as nx
 import osmnx as ox
 import pandas as pd
 import pytest
 from _pytest.logging import LogCaptureFixture
 from shapely.geometry import LineString, Point, Polygon
 
-from data_loader.population.population import (
-    GEO_JSON_DIR,
-    distribute_population,
-    load_geojson,
+from data_loader.population import (
+    population_data_from_geojson,
+    population_data_from_number,
 )
-from data_loader.population.populationGeoDataFrame import (
-    filter_world_pop_to_cph,
+from data_loader.population.population import (
+    POPULATION_DIR,
+    distribute_population,
+)
+from data_loader.population.utils import (
+    filter_world_pop_to_graph_area,
     snap_population_to_nodes,
 )
 
 
 @patch("geopandas.read_file")
-def test_load_geojson_success(mock_read_file):
+def test_load_geojson_success(mock_read_file) -> None:  # type: ignore
     """Test successful loading of a GeoJSON file."""
     mock_gdf = MagicMock(spec=gpd.GeoDataFrame)
     mock_read_file.return_value = mock_gdf
 
     file_name = "test.geojson"
-    result = load_geojson(file_name)
+    result = population_data_from_geojson(file_name)
 
-    mock_read_file.assert_called_once_with(GEO_JSON_DIR / file_name)
+    mock_read_file.assert_called_once_with(POPULATION_DIR / file_name)
     assert result == mock_gdf
 
 
@@ -37,7 +41,7 @@ def test_load_geojson_failure(caplog: LogCaptureFixture) -> None:
     with patch("geopandas.read_file", side_effect=Exception("File not found")):
         with caplog.at_level(logging.ERROR):
             with pytest.raises(SystemExit):  # Since the function calls exit(0)
-                load_geojson("invalid_path.geojson")
+                population_data_from_geojson("invalid_path.geojson")
         assert "Error loading GeoJSON file: File not found" in caplog.text
 
 
@@ -76,6 +80,30 @@ def test_distribute_population() -> None:
         or danger_zone.geometry.iloc[0].touches(pt)
         for pt in result.geometry
     )
+
+
+def test_population_data_from_number(
+    monkeypatch: pytest.MonkeyPatch, mock_osm_graph: nx.MultiDiGraph
+) -> None:
+    # Create a mock danger zone (polygon)
+    danger_zone = gpd.GeoDataFrame(
+        {"id": [1]},
+        geometry=[Polygon([(0, 0), (0, 60), (60, 60), (60, 0)])],
+        crs="EPSG:4326",
+    )
+    # Create a mock population dataset (points)
+    population = 500
+
+    # Run function
+    result = population_data_from_number(
+        danger_zone=danger_zone, population_number=population, G=mock_osm_graph
+    )
+    # Assertions
+    assert isinstance(result, gpd.GeoDataFrame)
+    assert len(result) == 5
+    assert "pop" in result.columns  # Population column should exist
+    # assert the population is evenly distributed
+    assert all(result["pop"] == 100)
 
 
 def test_filter_world_pop_to_cph() -> None:
@@ -118,7 +146,7 @@ def test_filter_world_pop_to_cph() -> None:
     )
 
     # Run function
-    result = filter_world_pop_to_cph(test_df, G)
+    result = filter_world_pop_to_graph_area(test_df, G)
 
     # Assertions
     assert isinstance(result, gpd.GeoDataFrame)

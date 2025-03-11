@@ -1,7 +1,7 @@
 import geopandas as gpd
 from tqdm import tqdm
 
-from data_loader.population.population import NODE_ID, POPULATION
+from data_loader.population.utils import NODE_ID, POPULATION
 from routes.route_utils import path
 
 
