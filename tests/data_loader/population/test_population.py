@@ -9,27 +9,29 @@ import pytest
 from _pytest.logging import LogCaptureFixture
 from shapely.geometry import LineString, Point, Polygon
 
-from data_loader.population.population import (
-    GEO_JSON_DIR,
-    distribute_population,
-    load_geojson,
+from data_loader.population import (
+    population_data_from_geojson,
 )
-from data_loader.population.populationGeoDataFrame import (
-    filter_world_pop_to_cph,
+from data_loader.population.population import (
+    POPULATION_DIR,
+    distribute_population,
+)
+from data_loader.population.utils import (
+    filter_world_pop_to_graph_area,
     snap_population_to_nodes,
 )
 
 
 @patch("geopandas.read_file")
-def test_load_geojson_success(mock_read_file):
+def test_load_geojson_success(mock_read_file) -> None:  # type: ignore
     """Test successful loading of a GeoJSON file."""
     mock_gdf = MagicMock(spec=gpd.GeoDataFrame)
     mock_read_file.return_value = mock_gdf
 
     file_name = "test.geojson"
-    result = load_geojson(file_name)
+    result = population_data_from_geojson(file_name)
 
-    mock_read_file.assert_called_once_with(GEO_JSON_DIR / file_name)
+    mock_read_file.assert_called_once_with(POPULATION_DIR / file_name)
     assert result == mock_gdf
 
 
@@ -37,7 +39,7 @@ def test_load_geojson_failure(caplog: LogCaptureFixture) -> None:
     with patch("geopandas.read_file", side_effect=Exception("File not found")):
         with caplog.at_level(logging.ERROR):
             with pytest.raises(SystemExit):  # Since the function calls exit(0)
-                load_geojson("invalid_path.geojson")
+                population_data_from_geojson("invalid_path.geojson")
         assert "Error loading GeoJSON file: File not found" in caplog.text
 
 
@@ -118,7 +120,7 @@ def test_filter_world_pop_to_cph() -> None:
     )
 
     # Run function
-    result = filter_world_pop_to_cph(test_df, G)
+    result = filter_world_pop_to_graph_area(test_df, G)
 
     # Assertions
     assert isinstance(result, gpd.GeoDataFrame)

@@ -3,7 +3,7 @@ import logging
 import geopandas as gpd
 import networkx as nx
 
-from data_loader.population.populationGeoDataFrame import (
+from data_loader.population.utils import (
     POPULATION_DIR,
     save_tiff_population_to_geojson,
 )
