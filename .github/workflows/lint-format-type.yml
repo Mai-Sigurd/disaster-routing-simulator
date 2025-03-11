@@ -26,10 +26,10 @@ jobs:
         run: pip install ruff mypy
 
       - name: Run Ruff Formatter (Check Formatting)
-        run: ruff format --check src/ --exclude "src/routing_lib/*,*.ipynb"
+        run: ruff format --check src/
 
       - name: Run Ruff Linter (Check Code Quality)
-        run: ruff check src/ --exclude "src/routing_lib/*,*.ipynb"
+        run: ruff check src/
 
       - name: Run Mypy (Type Checking)
-        run: mypy src/ --exclude "src/routing_lib"
+        run: mypy src/
