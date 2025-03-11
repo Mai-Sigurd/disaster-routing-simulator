@@ -24,6 +24,9 @@ logging.basicConfig(
 )
 
 SOURCE_DIR = Path(__file__).parent.parent
+MATSIM_JAR = (
+    SOURCE_DIR / "simulator" / "target" / "disaster-routing-simulator-1.0-SNAPSHOT.jar"
+)
 CPH_LOADED = True
 
 
@@ -35,11 +38,14 @@ def run_matsim() -> None:
     if matsim_output_dir.exists() and matsim_output_dir.is_dir():
         shutil.rmtree(matsim_output_dir)
 
+    if not MATSIM_JAR.exists():
+        raise FileNotFoundError(f"MATSim JAR not found: {MATSIM_JAR}")
+
     cmd = [
         "mvn",
         "exec:java",
         "-Dexec.mainClass=org.disaster.routing.Main",
-        "-Dexec.args=-Xmx4G",
+        "-Dexec.args=-Xmx6G",
     ]
     subprocess.run(cmd, cwd=SOURCE_DIR / "simulator")
 
