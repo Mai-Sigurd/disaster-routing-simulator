@@ -40,7 +40,7 @@ def danger_zone_population(
     elif population_type == PopulationType.NUMBER:
         return population_data_from_number(danger_zone, population_number)
     else:
-        pop_geo = population_data_from_geojson(danger_zone)
+        pop_geo = population_data_from_geojson(geo_file_name)
         return distribute_population(danger_zone, pop_geo)
 
 
