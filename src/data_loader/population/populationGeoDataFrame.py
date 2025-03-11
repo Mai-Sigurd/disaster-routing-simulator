@@ -20,6 +20,7 @@ GEOMETRY = "geometry"
 
 POPULATION_DIR = DATA_DIR / "population"
 
+
 def read_world_pop_data(tif_filename_path: Path) -> gpd.GeoDataFrame:
     with rasterio.open(tif_filename_path) as dataset:
         val = dataset.read(1)  # band 5
@@ -35,7 +36,9 @@ def read_world_pop_data(tif_filename_path: Path) -> gpd.GeoDataFrame:
     return df
 
 
-def filter_world_pop_to_graph_area(df: gpd.GeoDataFrame, G: MultiDiGraph) -> gpd.GeoDataFrame:
+def filter_world_pop_to_graph_area(
+    df: gpd.GeoDataFrame, G: MultiDiGraph
+) -> gpd.GeoDataFrame:
     nodes, edges = ox.graph_to_gdfs(G)
     x_min, y_min, x_max, y_max = nodes.total_bounds
     gdf_filtered = df[
@@ -86,13 +89,18 @@ def snap_population_to_nodes(
     return result
 
 
-def save_tiff_population_to_geojson(tiff_file_name: str, geo_file_name: str, G: nx.MultiDiGraph, maximum_distance_to_node: int) -> None:
+def save_tiff_population_to_geojson(
+    tiff_file_name: str,
+    geo_file_name: str,
+    G: nx.MultiDiGraph,
+    maximum_distance_to_node: int,
+) -> None:
     """
     Save a TIFF file with population data to a GeoJSON file with population data snapped to nodes.
     :param tiff_file_name: Name of the TIFF file.
     :param geo_file_name: Name of the GeoJSON file.
     :param G: OSM graph.
-    :param maximum_distance_to_node: Maximum distance to snap population to a node in meters. 
+    :param maximum_distance_to_node: Maximum distance to snap population to a node in meters.
     """
     logging.getLogger().setLevel(logging.INFO)
 
@@ -110,4 +118,9 @@ def save_tiff_population_to_geojson(tiff_file_name: str, geo_file_name: str, G: 
 
 
 if __name__ == "__main__":
-    save_tiff_population_to_geojson(tiff_file_name="dnk_ppp_2020_constrained.tif", geo_file_name="CPHpop.geojson", G=download_cph(), maximum_distance_to_node=100)
+    save_tiff_population_to_geojson(
+        tiff_file_name="dnk_ppp_2020_constrained.tif",
+        geo_file_name="CPHpop.geojson",
+        G=download_cph(),
+        maximum_distance_to_node=100,
+    )

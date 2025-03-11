@@ -50,8 +50,6 @@ if __name__ == "__main__":
         save_osm(G, "copenhagen.graphml")
     else:
         G = load_osm("copenhagen.graphml")
-        
-
 
     danger_zones: GeoDataFrame = load_danger_zone(
         "mindre_del_af_amager.geojson", "EPSG:4326"
@@ -69,7 +67,10 @@ if __name__ == "__main__":
 
     paths: list[path] = fastest_path(origin_points, danger_zones, G)
     routes: list[Route] = create_route_objects(
-        list_of_paths=paths, population_data=danger_zone_population_data, chunks=1, interval=0
+        list_of_paths=paths,
+        population_data=danger_zone_population_data,
+        chunks=1,
+        interval=0,
     )
     logging.info("Routes done")
     logging.info("Stats ---------------------")
