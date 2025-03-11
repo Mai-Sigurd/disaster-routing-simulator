@@ -31,7 +31,7 @@ def distribute_population(
 ) -> gpd.GeoDataFrame:
     """
     Returns the nodes in the danger zone and the number of people at each node.
-    :return: A geopandas dataframe with id corresponding to OSM IDS and population.
+    :return: A geopandas dataframe with id corresponding to OSM IDS and population, within the dangerzone.
     """
     # List to store nodes in the danger zone and their population
     return gpd.sjoin(population, danger_zone, how="inner", predicate="intersects")
@@ -43,7 +43,7 @@ def population_data_from_tiff(
     """
     Loads a TIFF file and returns a GeoDataFrame.
     :param file_name: The name of the TIFF file.
-    :return: A GeoDataFrame containing the data from the TIFF file.
+    :return: A geopandas dataframe with id corresponding to OSM IDS and population, within the dangerzone.
     """
     save_tiff_population_to_geojson(
         tiff_file_name=tiff_file_name,
@@ -61,7 +61,7 @@ def population_data_from_number(
     Creates a dataframe with the population number divided by the number of nodes, where each node has a evenly distributed population.
     :param danger_zone: A GeoDataFrame containing the danger zone polygon(s).
     :param population_number: The population number.
-    :return: A GeoDataFrame containing the population number.
+    :return: A geopandas dataframe with id corresponding to OSM IDS and population, within the dangerzone.
     """
     nodes = [
         node
