@@ -22,7 +22,7 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
         self._write_line(
             '<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">'
         )
-        self._write_line(f"<network{f' name="{name}"' if name else ''}>")
+        self._write_line(f'<network name="{name}">' if name else "<network>")
         self.indent += 1
         self.set_scope(self.NETWORK_SCOPE)
 
@@ -136,15 +136,17 @@ class PlansWriter(PopulationWriter):  # type: ignore[misc]
             self._write(f' end_time="{self.time(end_time)}"')
         self._write("/>\n")
 
-    def add_leg_with_route(
+    def add_leg(
         self,
         route: list[Id],
+        mat_sim_routing: bool,
         mode: str = "car",
         departure_time: Optional[int] = None,
     ) -> None:
         """
-        Add a leg with a route to the plan.
+        Add a leg with to the plan, either with or without already planned route.
         :param route: List of link IDs.
+        :param mat_sim_routing: Whether to use MATSim routing.
         :param mode: Mode of transportation.
         :param departure_time: Time of departure.
         """
@@ -153,6 +155,9 @@ class PlansWriter(PopulationWriter):  # type: ignore[misc]
         self._write(f'<leg mode="{mode}"')
         if departure_time is not None:
             self._write(f' dep_time="{self.time(departure_time)}"')
+        if mat_sim_routing:
+            self._write("/>\n")
+            return
         self._write(">\n")
 
         self.indent += 1

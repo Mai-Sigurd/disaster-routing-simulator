@@ -83,7 +83,12 @@ def test_write_plans(
 
     # write_network is called to populate link IDs for write_plans
     write_network(mock_osm_graph)
-    write_plans(mock_routes, plan_filename=input_filename, gzip_compress=gzip_compress)
+    write_plans(
+        mock_routes,
+        plan_filename=input_filename,
+        gzip_compress=gzip_compress,
+        mat_sim_routing=False,
+    )
 
     plans_file = output_path / expected_filename
     assert plans_file.exists(), f"Expected file {plans_file} to exist."
@@ -107,6 +112,63 @@ def test_write_plans(
         assert activity_danger.attrib["link"] is not None
         assert leg.tag == "leg"
         assert leg.find("route") is not None
+        assert activity_safe.attrib["link"] is not None
+
+
+@pytest.mark.parametrize(
+    "gzip_compress, input_filename, expected_filename",
+    [
+        (False, "test_plans.xml", "test_plans.xml"),
+        (True, "test_plans.xml.gz", "test_plans.xml.gz"),
+        # Should end in .xml.gz even if .xml was passed
+        (True, "test_plans.xml", "test_plans.xml.gz"),
+    ],
+)
+def test_write_plans_with_matsim_routing(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mock_osm_graph: nx.MultiDiGraph,
+    mock_routes: list[Route],
+    gzip_compress: bool,
+    input_filename: str,
+    expected_filename: str,
+) -> None:
+    """Test writing a MATSim plans file ensuring correct file name formatting and content."""
+    output_path = tmp_path / "matsim"
+    output_path.mkdir(parents=True, exist_ok=True)
+    monkeypatch.setattr("matsim_io.MATSIM_DATA_DIR", output_path)
+
+    # write_network is called to populate link IDs for write_plans
+    write_network(mock_osm_graph)
+    write_plans(
+        mock_routes,
+        plan_filename=input_filename,
+        gzip_compress=gzip_compress,
+        mat_sim_routing=True,
+    )
+
+    plans_file = output_path / expected_filename
+    assert plans_file.exists(), f"Expected file {plans_file} to exist."
+
+    open_func = gzip.open if gzip_compress else open
+    with open_func(plans_file, "rt", encoding="utf-8") as f:
+        tree = ET.parse(f)
+        root = tree.getroot()
+
+    assert root.tag == "population"
+
+    people = root.findall("person")
+    assert len(people) == sum(route.num_people_on_route for route in mock_routes)
+
+    for person in people:
+        plan = person.find("plan")
+        assert plan is not None, "Expected <plan> element in XML."
+        assert len(plan) == 3
+
+        activity_danger, leg, activity_safe = plan
+        assert activity_danger.attrib["link"] is not None
+        assert leg.tag == "leg"
+        assert leg.find("route") is None
         assert activity_safe.attrib["link"] is not None
 
 
