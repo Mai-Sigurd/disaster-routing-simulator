@@ -12,7 +12,13 @@ from data_loader.population import (
     get_origin_points,
 )
 from gui import open_gui
-from input_data import INPUTDATADIR, InputData, open_pickle_file, pretty_print, verify_input
+from input_data import (
+    INPUTDATADIR,
+    InputData,
+    open_pickle_file,
+    pretty_print,
+    verify_input,
+)
 from matsim_io import MATSIM_DATA_DIR, write_network, write_plans
 from routes.fastestpath import fastest_path
 from routes.route import Route, create_route_objects
