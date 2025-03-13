@@ -15,11 +15,7 @@ HEIGHT = 1100
 
 
 def open_gui() -> None:
-    # try:
-        _open_gui()
-    # except Exception as e:
-    #     dpg.stop_dearpygui()
-    #     print(e)
+    _open_gui()
 
 
 def _open_gui() -> None:

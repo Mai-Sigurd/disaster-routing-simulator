@@ -22,7 +22,7 @@ from input_data import InputData, PopulationType, CITY, save_to_pickle, INPUTDAT
 
 
 def _save_input_data() -> None:
-    danger_zones_geopandas_json= dpg.get_value(DANGER_ZONE)
+    danger_zones_geopandas_json = dpg.get_value(DANGER_ZONE)
     interval = dpg.get_value(TAG_INTERVAL)
     chunks = dpg.get_value(TAG_CHUNK)
     pop_type = PopulationType.GEO_JSON_FILE
@@ -39,7 +39,16 @@ def _save_input_data() -> None:
     else:
         pop_type = PopulationType.NUMBER
 
-    input_data = InputData(type=pop_type, interval=interval, chunks=chunks, city=city, population_number=population_number, osm_geopandas_json=osm_geopandas_json, danger_zones_geopandas_json=danger_zones_geopandas_json, worldpop_filepath=worldpop_filepath)
+    input_data = InputData(
+        type=pop_type,
+        interval=interval,
+        chunks=chunks,
+        city=city,
+        population_number=population_number,
+        osm_geopandas_json=osm_geopandas_json,
+        danger_zones_geopandas_json=danger_zones_geopandas_json,
+        worldpop_filepath=worldpop_filepath,
+    )
 
     save_to_pickle(input_data, INPUTDATADIR)
     dpg.stop_dearpygui()
@@ -57,7 +66,9 @@ def set_fonts(bold_items: list[gui_type], titel: str) -> None:
 
 
 def add_main_window(desc: str, tag: str, width: int, height: int) -> gui_type:
-    dpg.add_window(label="", width=width, height=height, tag=tag, no_collapse=True, no_close=True)
+    dpg.add_window(
+        label="", width=width, height=height, tag=tag, no_collapse=True, no_close=True
+    )
     t1 = dpg.add_text(desc, parent=tag)
     dpg.add_radio_button(
         tag=MENU_TAG,
@@ -86,7 +97,7 @@ def add_field_window(parent: str, tag: str, width: int, height: int) -> list[gui
     return bold_text  # type: ignore
 
 
-def change_windows(sender: str, data: str) -> None:  
+def change_windows(sender: str, data: str) -> None:
     if data == MENU_COPENHAGEN:
         dpg.show_item(CPH_WINDOW)
         dpg.hide_item(FIELD_WINDOW)
