@@ -45,17 +45,25 @@ def run_matsim() -> None:
 
 
 if __name__ == "__main__":
-    open_gui()
+    if not CPH_LOADED:
+        G = download_cph()
+        save_osm(G, "copenhagen.graphml")
+    else:
+        G = load_osm("copenhagen.graphml")
 
-    input_data: InputData = InputData()
-    open_json_file(self=input_data, file_path=INPUTDATADIR)
-    pretty_print(input_data)
-    # if not CPH_LOADED:
-    #     G = download_cph()
-    #     save_osm(G, "copenhagen.graphml")
-    # else:
-    #     G = load_osm("copenhagen.graphml")
+    danger_zones: GeoDataFrame = load_danger_zone(
+        "mindre_del_af_amager.geojson", "EPSG:4326"
+    )
+    danger_zone_population_data = danger_zone_population(
+        population_type=PopulationType.GEO_JSON_FILE,
+        tiff_file_name="",
+        geo_file_name="CPHpop.geojson",
+        population_number=0,
+        danger_zone=danger_zones,
+        G=G,
+    )
 
+<<<<<<< HEAD
     danger_zones: GeoDataFrame = load_danger_zone(
         "mindre_del_af_amager.geojson", "EPSG:4326"
     )
@@ -90,3 +98,27 @@ if __name__ == "__main__":
     write_plans(routes)
 
     run_matsim()
+=======
+    origin_points: list[str] = get_origin_points(danger_zone_population_data)
+
+    paths: list[path] = fastest_path(origin_points, danger_zones, G)
+    routes: list[Route] = create_route_objects(
+        list_of_paths=paths,
+        population_data=danger_zone_population_data,
+        chunks=1,
+        interval=0,
+    )
+    logging.info("Routes done")
+    logging.info("Stats ---------------------")
+    logging.info("Amount of routes: %s", len(routes))
+    logging.info("Amount of people: %s", sum([r.num_people_on_route for r in routes]))
+    logging.info(
+        "Amount of nodes that could not reach dangerzone: %s",
+        len(origin_points) - len(routes),
+    )
+
+    write_network(G, network_name="Copenhagen")
+    write_plans(routes)
+
+    run_matsim()
+>>>>>>> ea1e8ab (main main.py)
