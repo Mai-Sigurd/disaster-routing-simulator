@@ -12,7 +12,7 @@ from data_loader.population import (
     get_origin_points,
 )
 from gui import open_gui
-from input_data import INPUTDATADIR, InputData, open_pickle_file, pretty_print
+from input_data import INPUTDATADIR, InputData, open_pickle_file, pretty_print, verify_input
 from matsim_io import MATSIM_DATA_DIR, write_network, write_plans
 from routes.fastestpath import fastest_path
 from routes.route import Route, create_route_objects
@@ -50,6 +50,7 @@ def run_matsim() -> None:
 if __name__ == "__main__":
     open_gui()
     input_data = open_pickle_file(file_path=INPUTDATADIR)
+    verify_input(input_data)
     pretty_print(input_data)
     # danger_zones: GeoDataFrame = load_danger_zone(
     #     "mindre_del_af_amager.geojson", "EPSG:4326"
