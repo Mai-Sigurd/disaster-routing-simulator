@@ -14,8 +14,6 @@ class CITY(Enum):
     CPH = 2
 
 
-
-
 class PopulationType(Enum):
     TIFF_FILE = 1
     GEO_JSON_FILE = 2
