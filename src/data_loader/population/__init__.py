@@ -9,12 +9,7 @@ from data_loader.population.population import (
     population_data_from_number,
     population_data_from_tiff,
 )
-
-
-class PopulationType(Enum):
-    TIFF_FILE = 1
-    GEO_JSON_FILE = 2
-    NUMBER = 3
+from input_data import PopulationType
 
 
 def danger_zone_population(

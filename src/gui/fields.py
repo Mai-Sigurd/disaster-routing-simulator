@@ -7,11 +7,11 @@ from gui.constants import (
     OSM_JSON_BBOX,
     POPULATION,
     POPULATION_NUMBER,
+    TAG_CHUNK,
+    TAG_INTERVAL,
     TIFF_FILE,
     gui_type,
 )
-
-# dpg returns a ( int | str ) type that mypy cant handle
 
 
 def add_input_fields_pick_area(parent: str) -> list[gui_type]:
@@ -37,8 +37,8 @@ def add_input_fields_pick_area(parent: str) -> list[gui_type]:
         title="Departure time",
         desc_chunk="Enter the departure time in hours: ",
         desc_interval="Enter the interval in minutes: ",
-        tag_chunk="Departure time",
-        tag_interval="Interval",
+        tag_chunk=TAG_CHUNK,
+        tag_interval=TAG_INTERVAL,
         parent=parent,
     )
 
@@ -78,7 +78,6 @@ def _add_geo_json_input_field(
     return t1
 
 
-# dpg returns a ( int | str ) type that mypy cant handle
 def _add_population_input_field(
     title: str, desc: str, desc2: str, tag: str, types: list[str], parent: str
 ) -> gui_type:
@@ -124,7 +123,7 @@ def _add_departure_time_input_field(
 ) -> gui_type:
     t1 = dpg.add_text(title, parent=parent)
     dpg.add_text(desc_chunk, parent=parent)
-    dpg.add_input_int(tag=tag_chunk, parent=parent)
+    dpg.add_input_int(tag=tag_chunk, show=True, parent=parent, default_value=0)
     dpg.add_text(desc_interval, parent=parent)
-    dpg.add_input_int(tag=tag_interval, parent=parent)
+    dpg.add_input_int(tag=tag_interval, show=True, parent=parent, default_value=0)
     return t1

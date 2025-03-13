@@ -6,39 +6,42 @@ from gui.constants import (
     DANGER_ZONE_CPH,
     FIELD_WINDOW,
     FONTDIR,
-    INPUTDATADIR,
     MENU_COPENHAGEN,
     MENU_PICK_AREA,
     MENU_TAG,
     OSM_JSON_BBOX,
     POPULATION,
+    POPULATION_NUMBER,
+    TAG_CHUNK,
+    TAG_INTERVAL,
     TIFF_FILE,
     gui_type,
 )
 from gui.fields import add_city_fields, add_input_fields_pick_area
-from gui.input_data import InputData, save_input_data, save_to_json_file
+from input_data import InputData, PopulationType, CITY, save_to_pickle, INPUTDATADIR
 
 
 def _save_input_data() -> None:
-    input = InputData()
-    osm_geopandas_json = dpg.get_value(OSM_JSON_BBOX)
-    danger_zones_geopandas_json = dpg.get_value(DANGER_ZONE)
-    interval = dpg.get_value("Interval")
-    chunks = dpg.get_value("Departure time")
-    worldpop = dpg.get_value(POPULATION) == TIFF_FILE
-    population_number = dpg.get_value("Population number")
-    worldpop_filepath = dpg.get_value("Worldpop tiff file")
-    save_input_data(
-        self=input,
-        osm_geopandas_json=osm_geopandas_json,
-        danger_zones_geopandas_json=danger_zones_geopandas_json,
-        interval=interval,
-        chunks=chunks,
-        worldpop=worldpop,
-        population_number=population_number,
-        worldpop_filepath=worldpop_filepath,
-    )
-    save_to_json_file(input, INPUTDATADIR)
+    danger_zones_geopandas_json= dpg.get_value(DANGER_ZONE)
+    interval = dpg.get_value(TAG_INTERVAL)
+    chunks = dpg.get_value(TAG_CHUNK)
+    pop_type = PopulationType.GEO_JSON_FILE
+    city = dpg.get_value(MENU_TAG)
+    population_number = dpg.get_value(POPULATION_NUMBER)
+    worldpop_filepath = dpg.get_value(TIFF_FILE)
+    if city == MENU_COPENHAGEN:
+        city = CITY.CPH
+    else:
+        city = CITY.NONE
+        osm_geopandas_json = dpg.get_value(OSM_JSON_BBOX)
+    if dpg.get_value(POPULATION) == TIFF_FILE:
+        pop_type = PopulationType.TIFF_FILE
+    else:
+        pop_type = PopulationType.NUMBER
+
+    input_data = InputData(type=pop_type, interval=interval, chunks=chunks, city=city, population_number=population_number, osm_geopandas_json=osm_geopandas_json, danger_zones_geopandas_json=danger_zones_geopandas_json, worldpop_filepath=worldpop_filepath)
+
+    save_to_pickle(input_data, INPUTDATADIR)
     dpg.stop_dearpygui()
 
 

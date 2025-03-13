@@ -1,8 +1,8 @@
 import dearpygui.dearpygui as dpg
 
-from gui.constants import CPH_WINDOW, FIELD_WINDOW, MAIN_WINDOW, PICK_AREA
+from gui.constants import CPH_WINDOW, FIELD_WINDOW, MAIN_WINDOW, MENU_PICK_AREA
 from gui.controller import (
-    add_cph_window,
+    add_city_window,
     add_field_window,
     add_go_button,
     add_main_window,
@@ -15,15 +15,13 @@ HEIGHT = 1100
 
 
 def open_gui() -> None:
-    try:
+    # try:
         _open_gui()
-    except Exception as e:
-        dpg.stop_dearpygui()
-        dpg.destroy_context()
-        print(e)
+    # except Exception as e:
+    #     dpg.stop_dearpygui()
+    #     print(e)
 
 
-# TODO add input verificaction step.
 def _open_gui() -> None:
     dpg.create_context()
     dpg.create_viewport(
@@ -39,7 +37,7 @@ def _open_gui() -> None:
     bold_text1 = add_field_window(
         parent=MAIN_WINDOW, tag=FIELD_WINDOW, width=WIDTH, height=HEIGHT - 200
     )
-    bold_text2 = add_cph_window(
+    bold_text2 = add_city_window(
         parent=MAIN_WINDOW,
         tag=CPH_WINDOW,
         width=WIDTH,
@@ -48,9 +46,9 @@ def _open_gui() -> None:
     add_go_button(parent=MAIN_WINDOW)
 
     set_fonts(bold_text1 + bold_text2, t1)
-    change_windows(None, PICK_AREA)
+    change_windows("None", MENU_PICK_AREA)
     dpg.set_primary_window(MAIN_WINDOW, True)
     dpg.show_viewport()
     dpg.start_dearpygui()
     # After GUI closes, cleanup
-    dpg.destroy_context()
+    dpg.stop_dearpygui()
