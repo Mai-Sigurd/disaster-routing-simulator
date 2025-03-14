@@ -1,17 +1,19 @@
 import logging
 import shutil
 import subprocess
+from argparse import Namespace
 from pathlib import Path
+import signal
 
 from geopandas import GeoDataFrame
-
-from data_loader.danger_zones import load_danger_zone
+from data_loader import load_json_file_to_str
+from data_loader.danger_zones import load_danger_zone, load_danger_zone_from_str
 from data_loader.osm import load_osm
 from data_loader.population import (
     danger_zone_population,
     get_origin_points,
 )
-from gui import open_gui
+from gui import open_gui, close_dpg
 from input_data import (
     INPUTDATADIR,
     InputData,
@@ -37,6 +39,7 @@ logging.basicConfig(
 )
 
 SOURCE_DIR = Path(__file__).parent.parent
+
 CPH_G_GRAPHML = "copenhagen.graphml"
 CPH_SMALL_AMAGER_DANGER_ZONE = "mindre_del_af_amager.geojson"
 CPH_AMAGER_DANGER_ZONE = "dangerzone_amager.geojson"
@@ -74,11 +77,11 @@ def set_dev_input_data() -> InputData:
     return InputData(
         type=PopulationType.GEO_JSON_FILE,
         interval=0,
-        chunks=1,
+        chunks=0,
         city=CITY.CPH,
         population_number=0,
         osm_geopandas_json_bbox="",
-        danger_zones_geopandas_json=CPH_SMALL_AMAGER_DANGER_ZONE,
+        danger_zones_geopandas_json=load_json_file_to_str(CPH_SMALL_AMAGER_DANGER_ZONE),
         worldpop_filepath="",
     )
 
@@ -87,9 +90,9 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
     conf = ProgramConfig()
     if input_data.city == CITY.CPH:
         if input_data.danger_zones_geopandas_json == "":
-            input_data.danger_zones_geopandas_json = CPH_AMAGER_DANGER_ZONE
+            input_data.danger_zones_geopandas_json =load_json_file_to_str(CPH_SMALL_AMAGER_DANGER_ZONE)
         conf.G = load_osm(CPH_G_GRAPHML)
-        conf.danger_zones = load_danger_zone(
+        conf.danger_zones = load_danger_zone_from_str(
             input_data.danger_zones_geopandas_json, "EPSG:4326"
         )
         conf.danger_zone_population_data = danger_zone_population(
@@ -103,7 +106,7 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
         conf.origin_points = get_origin_points(conf.danger_zone_population_data)
     if input_data.city == CITY.NONE:
         conf.G = load_osm(input_data.osm_geopandas_json_bbox)
-        conf.danger_zones = load_danger_zone(
+        conf.danger_zones = load_danger_zone_from_str(
             input_data.danger_zones_geopandas_json, "EPSG:4326"
         )
         if input_data.type == PopulationType.TIFF_FILE:
@@ -126,31 +129,35 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
             )
     return conf
 
-def gui_handler(error_message: str = "") -> InputData:
-    open_gui(error_message)
+def gui_handler(gui_error_message: str = "") -> InputData:
+    open_gui(gui_error_message)
+    try:
+        input_data = open_pickle_file(file_path=INPUTDATADIR)
+    except FileNotFoundError:
+        logging.error("No input data found")
+        raise SystemExit
     input_data = open_pickle_file(file_path=INPUTDATADIR)
-    input_is_okay, error_message = verify_input(input_data)
+    input_is_okay, new_error_message = verify_input(input_data)
     if not input_is_okay:
-        gui_handler(error_message)
+        gui_handler(new_error_message)
     pretty_log(input_data)
     return input_data
 
-def start_up() -> ProgramConfig:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-dev", action="store_true", help="Enable dev mode")
-    args = parser.parse_args()
+def start_up(args: Namespace) -> ProgramConfig:
     if not args.dev:
         input_data = gui_handler()
     else:
+        logging.info("Dev mode enabled")
         input_data = set_dev_input_data()
+        pretty_log(input_data)
         input_is_okay, error_message = verify_input(input_data)
         if not input_is_okay:
             logging.info("Error message: %s", error_message)
     return controller_input_data(input_data)
 
 
-def main() -> None:
-    program_config = start_up()
+def main(args: Namespace) -> None:
+    program_config = start_up(args)
     paths: list[path] = fastest_path(
         program_config.origin_points, program_config.danger_zones, program_config.G
     )
@@ -176,4 +183,12 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-dev", action="store_true", help="Enable dev mode")
+    parser.add_argument("-gui-only", action="store_true", help="Run GUI only")
+    args = parser.parse_args()
+    signal.signal(signal.SIGTSTP, close_dpg)
+    if args.gui_only:
+        start_up(args)
+    else:
+        main(args)

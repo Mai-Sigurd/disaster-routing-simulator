@@ -1,17 +1,17 @@
 import logging
-
+import json
 import networkx as nx
 import osmnx as ox
 from shapely.geometry import shape
 from shapely.geometry.polygon import Polygon
 
-from data_loader import DATA_DIR, load_json
+from data_loader import DATA_DIR, load_json_file
 
 COPENHAGEN_BBOX = (12.42, 55.55, 12.81, 55.76)
 OSM_DIR = DATA_DIR / "osm_graph"
 
 
-def download_osm_graph(bbox_file_name: str, simplify: bool = True) -> nx.MultiDiGraph:
+def download_osm_graph_from_file(bbox_file_name: str, simplify: bool = True) -> nx.MultiDiGraph:
     """
     Loads a GeoJSON file containing a single polygon with exactly 5 coordinates
     and extracts its bounding box.
@@ -25,10 +25,26 @@ def download_osm_graph(bbox_file_name: str, simplify: bool = True) -> nx.MultiDi
 
     logging.info(f"Loading bounding box: {bbox_file_name}")
     filepath = DATA_DIR / "bbox" / bbox_file_name
-    data = load_json(filepath)
+    data = load_json_file(filepath)
     logging.info(f"Loaded bounding box: {bbox_file_name}")
 
     polygon = shape(data["features"][0]["geometry"])
+    return _download_osm_graph(polygon, simplify)
+
+def download_osm_graph_geo_string(geo_json: str, simplify: bool = True) -> nx.MultiDiGraph:
+    """
+    Loads a GeoJSON string containing a single polygon with exactly 5 coordinates
+    and extracts its bounding box.
+
+    :param geo_json: GeoJSON string.
+    :param simplify: Whether to simplify the graph.
+    :return: OSM graph containing the road network in the bounding box.
+    """
+    data = json.loads(geo_json)
+    polygon = shape(data["features"][0]["geometry"])
+    return _download_osm_graph(polygon, simplify)
+
+def _download_osm_graph(polygon: Polygon, simplify: bool = True) -> nx.MultiDiGraph:
     if not isinstance(polygon, Polygon):
         raise ValueError("Bounding box must be a single Polygon.")
 
@@ -42,7 +58,6 @@ def download_osm_graph(bbox_file_name: str, simplify: bool = True) -> nx.MultiDi
     logging.info(f"Extracted bounding box: ({left}, {bottom}, {right}, {top})")
 
     return download_graph_from_bbox((left, bottom, right, top), simplify)
-
 
 def download_graph_from_bbox(
     bbox: tuple[float, float, float, float], simplify: bool = True
@@ -68,7 +83,7 @@ def download_graph_from_bbox(
 
 def download_cph() -> nx.MultiDiGraph:
     """Download the OSM graph of Copenhagen."""
-    return download_osm_graph("cph_bbox.geojson")
+    return download_osm_graph_from_file("cph_bbox.geojson")
 
 
 def save_osm(graph: nx.MultiDiGraph, filename: str) -> None:

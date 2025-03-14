@@ -65,7 +65,7 @@ def verify_input(input_data: InputData) -> tuple[bool, str]:
             return False, "OSM dangerzone, Invalid geojson"
     if input_data.city == CITY.CPH:
         if input_data.danger_zones_geopandas_json != "" and not _is_valid_geojson(input_data.danger_zones_geopandas_json):
-                return False, "CPH city, Invalid geojson"
+                return False, "CPH city, danger zone is invalid geojson"
 
     ## POPULATION TYPE
     if input_data.type == PopulationType.TIFF_FILE:
@@ -74,9 +74,6 @@ def verify_input(input_data: InputData) -> tuple[bool, str]:
     elif input_data.type == PopulationType.NUMBER:
         if input_data.population_number <= 0:
             return False, "Population number must be greater than 0"
-    elif input_data.type == PopulationType.GEO_JSON_FILE:
-        if not os.path.exists(input_data.danger_zones_geopandas_json):
-            return False, "Invalid geojson"
     return True, ""
 
 

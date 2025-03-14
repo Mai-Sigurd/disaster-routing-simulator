@@ -55,7 +55,7 @@ def _save_input_data() -> None:
     dpg.stop_dearpygui()
 
 
-def set_fonts(bold_items: list[gui_type], titel: str) -> None:
+def set_fonts_theme(bold_items: list[gui_type], titel: str, e_msg: str) -> None:
     with dpg.font_registry():
         normal_font = dpg.add_font(FONTDIR / "OpenSans-Regular.ttf", 20)
         bold_font = dpg.add_font(FONTDIR / "OpenSans-Bold.ttf", 30)
@@ -64,14 +64,19 @@ def set_fonts(bold_items: list[gui_type], titel: str) -> None:
         for item in bold_items:
             dpg.bind_item_font(item=item, font=bold_font)
         dpg.bind_item_font(item=titel, font=titel_font)
+    with dpg.theme() as error_theme:
+        with dpg.theme_component(dpg.mvText):
+            dpg.add_theme_color(dpg.mvThemeCol_Text, (255, 0, 0, 255))  # RED color in RGBA format
+        dpg.bind_item_theme(e_msg, error_theme)
 
 
-def add_main_window(desc: str, error_message:str, tag: str, width: int, height: int) -> gui_type:
+
+def add_main_window(desc: str, error_message:str, tag: str, width: int, height: int) -> tuple[gui_type, gui_type]:
     dpg.add_window(
         label="", width=width, height=height, tag=tag, no_collapse=True, no_close=True
     )
     t1 = dpg.add_text(desc, parent=tag)
-    dpg.add_text(error_message, parent=tag)
+    e_msg = dpg.add_text(error_message, parent=tag)
     dpg.add_radio_button(
         tag=MENU_TAG,
         items=[MENU_PICK_AREA, MENU_COPENHAGEN],
@@ -80,7 +85,7 @@ def add_main_window(desc: str, error_message:str, tag: str, width: int, height: 
         callback=change_windows,
         default_value=MENU_PICK_AREA,
     )
-    return t1
+    return t1, e_msg
 
 
 def add_city_window(parent: str, tag: str, width: int, height: int) -> list[gui_type]:
