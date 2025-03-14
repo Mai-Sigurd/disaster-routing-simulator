@@ -43,6 +43,7 @@ SOURCE_DIR = Path(__file__).parent.parent
 CPH_G_GRAPHML = "copenhagen.graphml"
 CPH_SMALL_AMAGER_DANGER_ZONE = "mindre_del_af_amager.geojson"
 CPH_AMAGER_DANGER_ZONE = "dangerzone_amager.geojson"
+CPH_POPULATION_DATA = "CPHpop.geojson"
 
 
 @dataclass
@@ -100,7 +101,7 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
         conf.danger_zone_population_data = danger_zone_population(
             population_type=input_data.type,
             tiff_file_name="",
-            geo_file_name=input_data.danger_zones_geopandas_json,
+            geo_file_name=CPH_POPULATION_DATA,
             population_number=input_data.population_number,
             danger_zone=conf.danger_zones,
             G=conf.G,

@@ -46,7 +46,6 @@ def _save_input_data() -> None:
         city = CITY.NONE
         osm_geopandas_json = dpg.get_value(OSM_JSON_BBOX)
 
-
     input_data = InputData(
         type=pop_type,
         interval=interval,
