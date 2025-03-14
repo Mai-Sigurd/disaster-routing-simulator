@@ -1,3 +1,5 @@
+import logging
+
 import dearpygui.dearpygui as dpg
 
 from gui.constants import CPH_WINDOW, FIELD_WINDOW, MAIN_WINDOW, MENU_PICK_AREA
@@ -9,7 +11,6 @@ from gui.controller import (
     change_windows,
     set_fonts_theme,
 )
-import logging
 
 WIDTH = 800
 HEIGHT = 1100

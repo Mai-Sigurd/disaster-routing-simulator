@@ -1,5 +1,6 @@
-import logging
 import json
+import logging
+
 import networkx as nx
 import osmnx as ox
 from shapely.geometry import shape

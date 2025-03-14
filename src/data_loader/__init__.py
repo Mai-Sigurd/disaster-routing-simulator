@@ -2,7 +2,6 @@ import json
 import logging
 from pathlib import Path
 
-
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 DANGER_ZONES_DIR = DATA_DIR / "danger_zones"
 

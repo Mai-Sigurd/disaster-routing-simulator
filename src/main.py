@@ -1,36 +1,36 @@
+import argparse
 import logging
 import shutil
+import signal
 import subprocess
 from argparse import Namespace
+from dataclasses import dataclass, field
 from pathlib import Path
-import signal
 
+import networkx as nx
 from geopandas import GeoDataFrame
+
 from data_loader import load_json_file_to_str
 from data_loader.danger_zones import load_danger_zone_from_str
-from data_loader.osm import load_osm, download_osm_graph_geo_string
+from data_loader.osm import download_osm_graph_geo_string, load_osm
 from data_loader.population import (
     danger_zone_population,
     get_origin_points,
 )
-from gui import open_gui, close_gui
+from gui import close_gui, open_gui
 from input_data import (
+    CITY,
     INPUTDATADIR,
     InputData,
+    PopulationType,
     open_pickle_file,
     pretty_log,
     verify_input,
-    CITY,
-    PopulationType,
 )
 from matsim_io import MATSIM_DATA_DIR, write_network, write_plans
 from routes.fastestpath import fastest_path
 from routes.route import Route, create_route_objects
-from dataclasses import dataclass, field
 from routes.shortestpath import path
-import networkx as nx
-import argparse
-
 
 logging.basicConfig(
     level=logging.INFO,

@@ -1,5 +1,6 @@
-from input_data import PopulationType, CITY, InputData, verify_input
 import pytest
+
+from input_data import CITY, InputData, PopulationType, verify_input
 
 
 def test_verify(

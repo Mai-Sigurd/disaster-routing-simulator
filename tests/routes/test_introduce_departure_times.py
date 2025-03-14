@@ -1,4 +1,3 @@
-import pytest
 
 from routes.route import Route
 

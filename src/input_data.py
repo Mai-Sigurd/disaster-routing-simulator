@@ -1,11 +1,11 @@
+import json
 import logging
 import os
+import pickle
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-import pickle
 from typing import cast
-import json
 
 SRC_DIR = Path(__file__).resolve().parent.parent
 INPUTDATADIR = SRC_DIR / "input_data.pickle"

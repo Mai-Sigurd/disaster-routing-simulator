@@ -20,7 +20,7 @@ from gui.constants import (
     gui_type,
 )
 from gui.fields import add_city_fields, add_input_fields_pick_area
-from input_data import InputData, PopulationType, CITY, save_to_pickle, INPUTDATADIR
+from input_data import CITY, INPUTDATADIR, InputData, PopulationType, save_to_pickle
 
 
 def _save_input_data() -> None:
