@@ -19,7 +19,7 @@ def add_input_fields_pick_area(parent: str) -> list[gui_type]:
         title="OSM Graph",
         desc="Go to geojson.io and pick an area, copy the JSON into the below box",
         desc2="The area should be a bounding box of the city",
-        desc3="If left blank it will default to Copenhagen",
+        desc3="",
         tag=OSM_JSON_BBOX,
         parent=parent,
     )
@@ -45,17 +45,17 @@ def add_input_fields_pick_area(parent: str) -> list[gui_type]:
     return [t1, t2, t3, t4]
 
 
-def add_city_fields(parent: str, city_tag: str) -> list[gui_type]:
-    bold_text = _add_danger_zone_input_field(parent=parent, tag=city_tag)
+def add_city_fields(parent: str, city_tag: str, desc3: str = "") -> list[gui_type]:
+    bold_text = _add_danger_zone_input_field(parent=parent, tag=city_tag, desc3=desc3)
     return [bold_text]
 
 
-def _add_danger_zone_input_field(parent: str, tag: str) -> gui_type:
+def _add_danger_zone_input_field(parent: str, tag: str, desc3: str = "") -> gui_type:
     t2 = _add_geo_json_input_field(
         title="Danger Zone",
         desc="Go to geojson.io and pick a dangerzone, copy the JSON into the below box",
         desc2="The area should be a polygon of the dangerzone, withing the OSM Graph",
-        desc3="If left blank it will default to Amager",
+        desc3=desc3,
         tag=tag,
         parent=parent,
     )
@@ -68,7 +68,8 @@ def _add_geo_json_input_field(
     t1 = dpg.add_text(title, parent=parent)
     dpg.add_text(desc, parent=parent)
     dpg.add_text(desc2, parent=parent)
-    dpg.add_text(desc3, parent=parent)
+    if desc3:
+        dpg.add_text(desc3, parent=parent)
     dpg.add_button(
         label="https://geojson.io/",
         callback=lambda: webbrowser.open("https://geojson.io/"),

@@ -47,6 +47,7 @@ def _open_gui(error_message: str = "") -> None:
         tag=CPH_WINDOW,
         width=INNER_WINDOW_WIDTH,
         height=INNER_WINDOW_HEIGHT,
+        danger_zone_desc="If left blank it will default to Amager",
     )
     add_go_button(parent=MAIN_WINDOW)
 

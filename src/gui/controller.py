@@ -97,11 +97,15 @@ def add_main_window(
     return t1, e_msg
 
 
-def add_city_window(parent: str, tag: str, width: int, height: int) -> list[gui_type]:
+def add_city_window(
+    parent: str, tag: str, width: int, height: int, danger_zone_desc: str
+) -> list[gui_type]:
     dpg.add_child_window(
         label="", tag=tag, show=True, parent=parent, width=width, height=height
     )
-    bold_text = add_city_fields(parent=tag, city_tag=DANGER_ZONE_CPH)
+    bold_text = add_city_fields(
+        parent=tag, city_tag=DANGER_ZONE_CPH, desc3=danger_zone_desc
+    )
     return bold_text  # type: ignore
 
 
