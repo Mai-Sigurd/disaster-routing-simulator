@@ -1,0 +1,16 @@
+matplotlib
+numpy
+Shapely
+Fiona
+rtree
+pyproj
+pygeos
+scikit-mobility
+geopandas
+compress-json
+tqdm
+igraph
+eclipse-sumo
+sumolib
+libsumo
+seaborn

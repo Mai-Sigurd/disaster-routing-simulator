@@ -20,16 +20,16 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.12
+          python-version: 3.11
 
       - name: Install Ruff
         run: pip install ruff mypy
 
       - name: Run Ruff Formatter (Check Formatting)
-        run: ruff format --check src/ --exclude "*.ipynb"
+        run: ruff format --check src/
 
       - name: Run Ruff Linter (Check Code Quality)
-        run: ruff check src/ --exclude "*.ipynb"
+        run: ruff check src/
 
       - name: Run Mypy (Type Checking)
         run: mypy src/

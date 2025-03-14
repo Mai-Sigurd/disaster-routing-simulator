@@ -7,10 +7,10 @@ from geopandas import GeoDataFrame
 
 from data_loader.danger_zones import load_danger_zone
 from data_loader.osm import download_cph, load_osm, save_osm
-from data_loader.population.population import (
-    distribute_population,
+from data_loader.population import (
+    PopulationType,
+    danger_zone_population,
     get_origin_points,
-    load_geojson,
 )
 from matsim_io import MATSIM_DATA_DIR, write_network, write_plans
 from routes.fastestpath import fastest_path
@@ -39,7 +39,7 @@ def run_matsim() -> None:
         "mvn",
         "exec:java",
         "-Dexec.mainClass=org.disaster.routing.Main",
-        "-Dexec.args=-Xmx4G",
+        "-Dexec.args=-Xmx6G",
     ]
     subprocess.run(cmd, cwd=SOURCE_DIR / "simulator")
 
@@ -51,20 +51,26 @@ if __name__ == "__main__":
     else:
         G = load_osm("copenhagen.graphml")
 
-    population_data: GeoDataFrame = load_geojson("CPHpop.geojson")
-
     danger_zones: GeoDataFrame = load_danger_zone(
-        "mindre_del_af_amager.geojson", population_data.crs
+        "mindre_del_af_amager.geojson", "EPSG:4326"
     )
-    danger_zone_population: GeoDataFrame = distribute_population(
-        danger_zones, population_data
+    danger_zone_population_data = danger_zone_population(
+        population_type=PopulationType.GEO_JSON_FILE,
+        tiff_file_name="",
+        geo_file_name="CPHpop.geojson",
+        population_number=0,
+        danger_zone=danger_zones,
+        G=G,
     )
 
-    origin_points: list[str] = get_origin_points(danger_zone_population)
+    origin_points: list[str] = get_origin_points(danger_zone_population_data)
 
     paths: list[path] = fastest_path(origin_points, danger_zones, G)
     routes: list[Route] = create_route_objects(
-        list_of_paths=paths, population_data=population_data, chunks=1, interval=0
+        list_of_paths=paths,
+        population_data=danger_zone_population_data,
+        chunks=1,
+        interval=0,
     )
     logging.info("Routes done")
     logging.info("Stats ---------------------")

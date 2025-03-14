@@ -3,6 +3,7 @@ import logging
 from pathlib import Path
 
 import geopandas as gpd
+import networkx as nx
 import numpy as np
 import osmnx as ox
 import rasterio.warp
@@ -12,7 +13,12 @@ from tqdm import tqdm
 
 from data_loader import DATA_DIR
 from data_loader.osm import download_cph
-from data_loader.population.population import GEOMETRY, NODE_ID, POPULATION
+
+POPULATION = "pop"
+NODE_ID = "id"
+GEOMETRY = "geometry"
+
+POPULATION_DIR = DATA_DIR / "population"
 
 
 def read_world_pop_data(tif_filename_path: Path) -> gpd.GeoDataFrame:
@@ -30,7 +36,9 @@ def read_world_pop_data(tif_filename_path: Path) -> gpd.GeoDataFrame:
     return df
 
 
-def filter_world_pop_to_cph(df: gpd.GeoDataFrame, G: MultiDiGraph) -> gpd.GeoDataFrame:
+def filter_world_pop_to_graph_area(
+    df: gpd.GeoDataFrame, G: MultiDiGraph
+) -> gpd.GeoDataFrame:
     nodes, edges = ox.graph_to_gdfs(G)
     x_min, y_min, x_max, y_max = nodes.total_bounds
     gdf_filtered = df[
@@ -43,13 +51,19 @@ def filter_world_pop_to_cph(df: gpd.GeoDataFrame, G: MultiDiGraph) -> gpd.GeoDat
 
 
 def snap_population_to_nodes(
-    df: gpd.GeoDataFrame, G: MultiDiGraph, maximum_distance_to_node: int
+    pop_geo_frame: gpd.GeoDataFrame, G: MultiDiGraph, maximum_distance_to_node: int
 ) -> gpd.GeoDataFrame:
+    """
+    Snap population data to the nearest node in the graph.
+    :param df: GeoDataFrame with population data.
+    :param G: OSM graph.
+    :param maximum_distance_to_node: Maximum distance to snap population to a node in meters.
+    :return: GeoDataFrame with population data snapped to nodes."""
     nearest_nodes_to_pop = {}
     nodes, edges = ox.graph_to_gdfs(G)
-    for i in tqdm(df.index):
-        point = df.loc[i].geometry
-        pop = df.loc[i].data
+    for i in tqdm(pop_geo_frame.index):
+        point = pop_geo_frame.loc[i].geometry
+        pop = pop_geo_frame.loc[i].data
         (nearest_node, dist) = ox.distance.nearest_nodes(
             G, point.x, point.y, return_dist=True
         )
@@ -75,24 +89,38 @@ def snap_population_to_nodes(
     return result
 
 
-def save_CPH_population_to_geojson() -> None:
+def save_tiff_population_to_geojson(
+    tiff_file_name: str,
+    geo_file_name: str,
+    G: nx.MultiDiGraph,
+    maximum_distance_to_node: int,
+) -> None:
+    """
+    Save a TIFF file with population data to a GeoJSON file with population data snapped to nodes.
+    :param tiff_file_name: Name of the TIFF file.
+    :param geo_file_name: Name of the GeoJSON file.
+    :param G: OSM graph.
+    :param maximum_distance_to_node: Maximum distance to snap population to a node in meters.
+    """
     logging.getLogger().setLevel(logging.INFO)
 
-    POPULATION_DATA_DIR = DATA_DIR / "population"
-    POPULATION_DATA_FILE = POPULATION_DATA_DIR / "dnk_ppp_2020_constrained.tif"
-    G = download_cph()
+    POPULATION_DATA_FILE = POPULATION_DIR / tiff_file_name
     logging.info("Graph downloaded")
-    maximum_distance_to_node = 100
 
     snap_population_to_nodes(
-        filter_world_pop_to_cph(read_world_pop_data(POPULATION_DATA_FILE), G),
+        filter_world_pop_to_graph_area(read_world_pop_data(POPULATION_DATA_FILE), G),
         G,
         maximum_distance_to_node,
     ).to_file(
-        POPULATION_DATA_DIR / "CPHpop.geojson",
+        POPULATION_DIR / geo_file_name,
         driver="GeoJSON",
     )
 
 
 if __name__ == "__main__":
-    save_CPH_population_to_geojson()
+    save_tiff_population_to_geojson(
+        tiff_file_name="dnk_ppp_2020_constrained.tif",
+        geo_file_name="CPHpop.geojson",
+        G=download_cph(),
+        maximum_distance_to_node=100,
+    )
