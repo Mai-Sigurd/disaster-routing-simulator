@@ -1,3 +1,4 @@
+import logging
 import os
 from dataclasses import dataclass
 from enum import Enum
@@ -27,7 +28,7 @@ class InputData:
     chunks: int
     city: CITY
     population_number: int
-    osm_geopandas_json: str
+    osm_geopandas_json_bbox: str
     danger_zones_geopandas_json: str
     worldpop_filepath: str
 
@@ -45,9 +46,9 @@ def open_pickle_file(file_path: str) -> InputData:
     return inputdata
 
 
-def pretty_print(input_data: InputData) -> None:
-    s = f"Input TYPE: {input_data.type}\nosm_geopandas_json: {input_data.osm_geopandas_json}\ndanger_zones_geopandas_json: {input_data.danger_zones_geopandas_json}\ninterval: {input_data.interval}\nchunks: {input_data.chunks}\npopulation_number: {input_data.population_number}\nworldpop_filepath: {input_data.worldpop_filepath}"
-    print(s)
+def pretty_log(input_data: InputData) -> None:
+    s = f"Input TYPE: {input_data.type}\nosm_geopandas_json: {input_data.osm_geopandas_json_bbox}\ndanger_zones_geopandas_json: {input_data.danger_zones_geopandas_json}\ninterval: {input_data.interval}\nchunks: {input_data.chunks}\npopulation_number: {input_data.population_number}\nworldpop_filepath: {input_data.worldpop_filepath}"
+    logging.info(s)
 
 
 def verify_input(input_data: InputData) -> tuple[bool, str]:
@@ -56,7 +57,7 @@ def verify_input(input_data: InputData) -> tuple[bool, str]:
     ):
         return False, "Dangerzones file not found"
     if input_data.type == PopulationType.GEO_JSON_FILE:
-        if not os.path.exists(input_data.osm_geopandas_json):
+        if not os.path.exists(input_data.osm_geopandas_json_bbox):
             return False, "Geo JSON FILE not found"
     elif input_data.type == PopulationType.TIFF_FILE:
         if not os.path.exists(input_data.worldpop_filepath):

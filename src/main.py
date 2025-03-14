@@ -6,7 +6,7 @@ from pathlib import Path
 from geopandas import GeoDataFrame
 
 from data_loader.danger_zones import load_danger_zone
-from data_loader.osm import download_cph, load_osm, save_osm
+from data_loader.osm import load_osm
 from data_loader.population import (
     danger_zone_population,
     get_origin_points,
@@ -16,16 +16,18 @@ from input_data import (
     INPUTDATADIR,
     InputData,
     open_pickle_file,
-    pretty_print,
+    pretty_log,
     verify_input,
+    CITY,
+    PopulationType,
 )
 from matsim_io import MATSIM_DATA_DIR, write_network, write_plans
 from routes.fastestpath import fastest_path
 from routes.route import Route, create_route_objects
-# from routes.shortestpath import path
+from dataclasses import dataclass
+from routes.shortestpath import path
+import networkx as nx
 
-# DANGER_ZONES_DIR = DATA_DIR / "danger_zones"
-# OSM_BBOX_DIR = DATA_DIR / "osm_graph"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -34,6 +36,17 @@ logging.basicConfig(
 )
 
 SOURCE_DIR = Path(__file__).parent.parent
+CPH_G_GRAPHML = "copenhagen.graphml"
+CPH_SMALL_AMAGER_DANGER_ZONE = "mindre_del_af_amager.geojson"
+CPH_AMAGER_DANGER_ZONE = "dangerzone_amager.geojson"
+
+
+@dataclass
+class ProgramConfig:
+    danger_zone_population_data: GeoDataFrame = None
+    danger_zones: GeoDataFrame = None
+    G: nx.MultiDiGraph = None
+    origin_points: list[str] = None
 
 
 def run_matsim() -> None:
@@ -53,51 +66,69 @@ def run_matsim() -> None:
     subprocess.run(cmd, cwd=SOURCE_DIR / "simulator")
 
 
+def set_dev_input_data() -> InputData:
+    """
+    Set the input data for development.
+    """
+    return InputData(
+        type=PopulationType.GEO_JSON_FILE,
+        interval=0,
+        chunks=1,
+        city=CITY.CPH,
+        population_number=0,
+        osm_geopandas_json_bbox="",
+        danger_zones_geopandas_json=CPH_SMALL_AMAGER_DANGER_ZONE,
+        worldpop_filepath="",
+    )
+
+
+def controller_input_data(input_d: InputData) -> ProgramConfig:
+    conf = ProgramConfig()
+    if input_d.city == CITY.CPH and input_d.danger_zones_geopandas_json == "":
+        input_d = set_dev_input_data()
+        conf.G = load_osm(CPH_G_GRAPHML)
+        conf.danger_zones = load_danger_zone(
+            input_d.danger_zones_geopandas_json, "EPSG:4326"
+        )
+        conf.danger_zone_population_data = danger_zone_population(
+            population_type=input_d.type,
+            tiff_file_name="",
+            geo_file_name=input_d.danger_zones_geopandas_json,
+            population_number=input_d.population_number,
+            danger_zone=conf.danger_zones,
+            G=conf.G,
+        )
+        conf.origin_points = get_origin_points(conf.danger_zone_population_data)
+
+    return conf
+
+
 if __name__ == "__main__":
     open_gui()
     input_data = open_pickle_file(file_path=INPUTDATADIR)
     verify_input(input_data)
-    pretty_print(input_data)
-    # danger_zones: GeoDataFrame = load_danger_zone(
-    #     "mindre_del_af_amager.geojson", "EPSG:4326"
-    # )
-    # danger_zone_population_data = danger_zone_population(
-    #     population_type=PopulationType.GEO_JSON_FILE,
-    #     tiff_file_name="",
-    #     geo_file_name="CPHpop.geojson",
-    #     population_number=0,
-    #     danger_zone=danger_zones,
-    #     G=G,
-    # )
+    pretty_log(input_data)
+    program_config = controller_input_data(input_data)
 
-    # danger_zone_population_data = danger_zone_population(
-    #     population_type=PopulationType.GEO_JSON_FILE,
-    #     tiff_file_name="",
-    #     geo_file_name="CPHpop.geojson",
-    #     population_number=0,
-    #     danger_zone=danger_zones,
-    #     G=G,
-    # )
+    paths: list[path] = fastest_path(
+        program_config.origin_points, program_config.danger_zones, program_config.G
+    )
+    routes: list[Route] = create_route_objects(
+        list_of_paths=paths,
+        population_data=program_config.danger_zone_population_data,
+        chunks=1,
+        interval=0,
+    )
+    logging.info("Routes done")
+    logging.info("Stats ---------------------")
+    logging.info("Amount of routes: %s", len(routes))
+    logging.info("Amount of people: %s", sum([r.num_people_on_route for r in routes]))
+    logging.info(
+        "Amount of nodes that could not reach dangerzone: %s",
+        len(program_config.origin_points) - len(routes),
+    )
 
-    # origin_points: list[str] = get_origin_points(danger_zone_population_data)
+    write_network(program_config.G, network_name="Copenhagen")
+    write_plans(routes)
 
-    # paths: list[path] = fastest_path(origin_points, danger_zones, G)
-    # routes: list[Route] = create_route_objects(
-    #     list_of_paths=paths,
-    #     population_data=danger_zone_population_data,
-    #     chunks=1,
-    #     interval=0,
-    # )
-    # logging.info("Routes done")
-    # logging.info("Stats ---------------------")
-    # logging.info("Amount of routes: %s", len(routes))
-    # logging.info("Amount of people: %s", sum([r.num_people_on_route for r in routes]))
-    # logging.info(
-    #     "Amount of nodes that could not reach dangerzone: %s",
-    #     len(origin_points) - len(routes),
-    # )
-
-    # write_network(G, network_name="Copenhagen")
-    # write_plans(routes)
-
-    # run_matsim()
+    run_matsim()

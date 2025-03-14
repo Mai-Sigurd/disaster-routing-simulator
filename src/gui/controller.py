@@ -45,7 +45,7 @@ def _save_input_data() -> None:
         chunks=chunks,
         city=city,
         population_number=population_number,
-        osm_geopandas_json=osm_geopandas_json,
+        osm_geopandas_json_bbox=osm_geopandas_json,
         danger_zones_geopandas_json=danger_zones_geopandas_json,
         worldpop_filepath=worldpop_filepath,
     )
