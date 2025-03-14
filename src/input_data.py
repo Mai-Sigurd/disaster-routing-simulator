@@ -35,11 +35,13 @@ class InputData:
 
 
 def save_to_pickle(self: InputData, file_path: str) -> None:
+    logging.info(f"Saving input data to {file_path}")
     with open(file_path, "wb") as file:
         pickle.dump(self, file)
 
 
 def open_pickle_file(file_path: str) -> InputData:
+    logging.info(f"Opening input data from {file_path}")
     with open(file_path, "rb") as file:
         inputdata = cast(InputData, pickle.load(file))
     # delete input_data.pickle file
@@ -73,6 +75,8 @@ def verify_input(input_data: InputData) -> tuple[bool, str]:
     if input_data.type == PopulationType.TIFF_FILE:
         if not os.path.exists(input_data.worldpop_filepath):
             return False, "Worldpop tiff file not found"
+    elif input_data.type == PopulationType.GEO_JSON_FILE:
+        return True, ""
     elif input_data.type == PopulationType.NUMBER:
         if input_data.population_number <= 0:
             return False, "Population number must be greater than 0"

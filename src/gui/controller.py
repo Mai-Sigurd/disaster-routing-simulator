@@ -1,3 +1,5 @@
+import logging
+
 import dearpygui.dearpygui as dpg
 
 from gui.constants import (
@@ -22,6 +24,7 @@ from input_data import InputData, PopulationType, CITY, save_to_pickle, INPUTDAT
 
 
 def _save_input_data() -> None:
+    logging.info("Getting input data from GUI")
     danger_zones_geopandas_json = dpg.get_value(DANGER_ZONE)
     interval = dpg.get_value(TAG_INTERVAL)
     chunks = dpg.get_value(TAG_CHUNK)
@@ -30,15 +33,19 @@ def _save_input_data() -> None:
     population_number = dpg.get_value(POPULATION_NUMBER)
     worldpop_filepath = dpg.get_value(TIFF_FILE)
     osm_geopandas_json = ""
-    if city == MENU_COPENHAGEN:
-        city = CITY.CPH
-    else:
-        city = CITY.NONE
-        osm_geopandas_json = dpg.get_value(OSM_JSON_BBOX)
     if dpg.get_value(POPULATION) == TIFF_FILE:
         pop_type = PopulationType.TIFF_FILE
     else:
         pop_type = PopulationType.NUMBER
+
+    if city == MENU_COPENHAGEN:
+        city = CITY.CPH
+        danger_zones_geopandas_json = dpg.get_value(DANGER_ZONE_CPH)
+        pop_type = PopulationType.GEO_JSON_FILE
+    else:
+        city = CITY.NONE
+        osm_geopandas_json = dpg.get_value(OSM_JSON_BBOX)
+
 
     input_data = InputData(
         type=pop_type,

@@ -13,7 +13,7 @@ from data_loader.population import (
     danger_zone_population,
     get_origin_points,
 )
-from gui import open_gui, close_dpg
+from gui import open_gui, close_gui
 from input_data import (
     INPUTDATADIR,
     InputData,
@@ -139,7 +139,6 @@ def gui_handler(gui_error_message: str = "") -> InputData:
     except FileNotFoundError:
         logging.error("No input data found")
         raise SystemExit
-    input_data = open_pickle_file(file_path=INPUTDATADIR)
     input_is_okay, new_error_message = verify_input(input_data)
     if not input_is_okay:
         gui_handler(new_error_message)
@@ -161,6 +160,7 @@ def start_up(args: Namespace) -> ProgramConfig:
 
 
 def main(args: Namespace) -> None:
+    # TODO [ERROR] Error loading GeoJSON file:
     program_config = start_up(args)
     paths: list[path] = fastest_path(
         program_config.origin_points, program_config.danger_zones, program_config.G
@@ -191,7 +191,7 @@ if __name__ == "__main__":
     parser.add_argument("-dev", action="store_true", help="Enable dev mode")
     parser.add_argument("-gui-only", action="store_true", help="Run GUI only")
     args = parser.parse_args()
-    signal.signal(signal.SIGTSTP, close_dpg)
+    signal.signal(signal.SIGTSTP, close_gui)
     if args.gui_only:
         start_up(args)
     else:

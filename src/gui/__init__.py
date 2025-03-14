@@ -60,7 +60,7 @@ def _open_gui(error_message: str = "") -> None:
     dpg.destroy_context()
 
 
-def close_dpg():  # type: ignore
+def close_gui(signal=None, frame=None):  # type: ignore
     dpg.stop_dearpygui()
     dpg.destroy_context()
     logging.info("GUI closed")
