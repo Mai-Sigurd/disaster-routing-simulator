@@ -161,7 +161,6 @@ def start_up(args: Namespace) -> ProgramConfig:
 
 
 def main(args: Namespace) -> None:
-    # TODO [ERROR] Error loading GeoJSON file:
     program_config = start_up(args)
     paths: list[path] = fastest_path(
         program_config.origin_points, program_config.danger_zones, program_config.G
