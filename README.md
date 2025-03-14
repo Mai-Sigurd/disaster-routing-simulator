@@ -50,6 +50,11 @@ To run the project, execute the following command:
 ```bash
 python src/main.py
 ```
+### Dev mode
+The program supports dev mode which skips the gui, and starts the program on Copenhagen with Amager as the danger zone. 
+```bash
+python src/main.py -dev
+```
 
 ## Running the tests
 
