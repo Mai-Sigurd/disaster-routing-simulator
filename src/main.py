@@ -83,66 +83,74 @@ def set_dev_input_data() -> InputData:
     )
 
 
-def controller_input_data(input_d: InputData) -> ProgramConfig:
+def controller_input_data(input_data: InputData) -> ProgramConfig:
     conf = ProgramConfig()
-    if input_d.city == CITY.CPH:
-        if input_d.danger_zones_geopandas_json == "":
-            input_d.danger_zones_geopandas_json = CPH_AMAGER_DANGER_ZONE
+    if input_data.city == CITY.CPH:
+        if input_data.danger_zones_geopandas_json == "":
+            input_data.danger_zones_geopandas_json = CPH_AMAGER_DANGER_ZONE
         conf.G = load_osm(CPH_G_GRAPHML)
         conf.danger_zones = load_danger_zone(
-            input_d.danger_zones_geopandas_json, "EPSG:4326"
+            input_data.danger_zones_geopandas_json, "EPSG:4326"
         )
         conf.danger_zone_population_data = danger_zone_population(
-            population_type=input_d.type,
+            population_type=input_data.type,
             tiff_file_name="",
-            geo_file_name=input_d.danger_zones_geopandas_json,
-            population_number=input_d.population_number,
+            geo_file_name=input_data.danger_zones_geopandas_json,
+            population_number=input_data.population_number,
             danger_zone=conf.danger_zones,
             G=conf.G,
         )
         conf.origin_points = get_origin_points(conf.danger_zone_population_data)
-    if input_d.city == CITY.NONE:
-        conf.G = load_osm(input_d.osm_geopandas_json_bbox)
+    if input_data.city == CITY.NONE:
+        conf.G = load_osm(input_data.osm_geopandas_json_bbox)
         conf.danger_zones = load_danger_zone(
-            input_d.danger_zones_geopandas_json, "EPSG:4326"
+            input_data.danger_zones_geopandas_json, "EPSG:4326"
         )
-        if input_d.type == PopulationType.TIFF_FILE:
+        if input_data.type == PopulationType.TIFF_FILE:
             conf.danger_zone_population_data = danger_zone_population(
-                population_type=input_d.type,
-                tiff_file_name=input_d.worldpop_filepath,
-                geo_file_name=input_d.danger_zones_geopandas_json,
+                population_type=input_data.type,
+                tiff_file_name=input_data.worldpop_filepath,
+                geo_file_name=input_data.danger_zones_geopandas_json,
                 population_number=0,
                 danger_zone=conf.danger_zones,
                 G=conf.G,
             )
         else:  # PopulationType.NUMBER
             conf.danger_zone_population_data = danger_zone_population(
-                population_type=input_d.type,
+                population_type=input_data.type,
                 tiff_file_name="",
-                geo_file_name=input_d.danger_zones_geopandas_json,
-                population_number=input_d.population_number,
+                geo_file_name=input_data.danger_zones_geopandas_json,
+                population_number=input_data.population_number,
                 danger_zone=conf.danger_zones,
                 G=conf.G,
             )
     return conf
 
+def gui_handler(error_message: str = "") -> InputData:
+    open_gui(error_message)
+    input_data = open_pickle_file(file_path=INPUTDATADIR)
+    input_is_okay, error_message = verify_input(input_data)
+    if not input_is_okay:
+        gui_handler(error_message)
+    pretty_log(input_data)
+    return input_data
 
-if __name__ == "__main__":
+def start_up() -> ProgramConfig:
     parser = argparse.ArgumentParser()
     parser.add_argument("-dev", action="store_true", help="Enable dev mode")
     args = parser.parse_args()
     if not args.dev:
-        open_gui()
-        input_data = open_pickle_file(file_path=INPUTDATADIR)
+        input_data = gui_handler()
     else:
         input_data = set_dev_input_data()
+        input_is_okay, error_message = verify_input(input_data)
+        if not input_is_okay:
+            logging.info("Error message: %s", error_message)
+    return controller_input_data(input_data)
 
-    verify_input(input_data)
-    # TODO should open gui if not verified
-    pretty_log(input_data)
 
-    program_config = controller_input_data(input_data)
-
+def main() -> None:
+    program_config = start_up()
     paths: list[path] = fastest_path(
         program_config.origin_points, program_config.danger_zones, program_config.G
     )
@@ -165,3 +173,7 @@ if __name__ == "__main__":
     write_plans(routes)
 
     run_matsim()
+
+
+if __name__ == "__main__":
+    main()

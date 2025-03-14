@@ -14,12 +14,12 @@ WIDTH = 800
 HEIGHT = 1100
 
 
-def open_gui() -> None:
-    _open_gui()
+def open_gui(error_message:str = "") -> None:
+    _open_gui(error_message)
     # TODO add error message and fix GO button
 
 
-def _open_gui() -> None:
+def _open_gui(error_message:str = "") -> None:
     dpg.create_context()
     dpg.create_viewport(
         title="Disaster Routing", width=800, height=1100
@@ -28,6 +28,7 @@ def _open_gui() -> None:
     t1 = add_main_window(
         tag=MAIN_WINDOW,
         desc="Choose a city or pick an area",
+        error_message=error_message,
         width=WIDTH,
         height=HEIGHT,
     )

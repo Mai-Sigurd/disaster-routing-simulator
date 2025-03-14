@@ -29,6 +29,7 @@ def _save_input_data() -> None:
     city = dpg.get_value(MENU_TAG)
     population_number = dpg.get_value(POPULATION_NUMBER)
     worldpop_filepath = dpg.get_value(TIFF_FILE)
+    osm_geopandas_json = ""
     if city == MENU_COPENHAGEN:
         city = CITY.CPH
     else:
@@ -65,18 +66,19 @@ def set_fonts(bold_items: list[gui_type], titel: str) -> None:
         dpg.bind_item_font(item=titel, font=titel_font)
 
 
-def add_main_window(desc: str, tag: str, width: int, height: int) -> gui_type:
+def add_main_window(desc: str, error_message:str, tag: str, width: int, height: int) -> gui_type:
     dpg.add_window(
         label="", width=width, height=height, tag=tag, no_collapse=True, no_close=True
     )
     t1 = dpg.add_text(desc, parent=tag)
+    dpg.add_text(error_message, parent=tag)
     dpg.add_radio_button(
         tag=MENU_TAG,
         items=[MENU_PICK_AREA, MENU_COPENHAGEN],
         parent=tag,
         horizontal=True,
         callback=change_windows,
-        default_value=1,
+        default_value=MENU_PICK_AREA,
     )
     return t1
 
