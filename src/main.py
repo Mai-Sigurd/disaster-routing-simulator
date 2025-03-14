@@ -7,7 +7,7 @@ import signal
 
 from geopandas import GeoDataFrame
 from data_loader import load_json_file_to_str
-from data_loader.danger_zones import load_danger_zone, load_danger_zone_from_str
+from data_loader.danger_zones import load_danger_zone_from_str
 from data_loader.osm import load_osm
 from data_loader.population import (
     danger_zone_population,
@@ -90,7 +90,9 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
     conf = ProgramConfig()
     if input_data.city == CITY.CPH:
         if input_data.danger_zones_geopandas_json == "":
-            input_data.danger_zones_geopandas_json =load_json_file_to_str(CPH_SMALL_AMAGER_DANGER_ZONE)
+            input_data.danger_zones_geopandas_json = load_json_file_to_str(
+                CPH_SMALL_AMAGER_DANGER_ZONE
+            )
         conf.G = load_osm(CPH_G_GRAPHML)
         conf.danger_zones = load_danger_zone_from_str(
             input_data.danger_zones_geopandas_json, "EPSG:4326"
@@ -129,6 +131,7 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
             )
     return conf
 
+
 def gui_handler(gui_error_message: str = "") -> InputData:
     open_gui(gui_error_message)
     try:
@@ -142,6 +145,7 @@ def gui_handler(gui_error_message: str = "") -> InputData:
         gui_handler(new_error_message)
     pretty_log(input_data)
     return input_data
+
 
 def start_up(args: Namespace) -> ProgramConfig:
     if not args.dev:

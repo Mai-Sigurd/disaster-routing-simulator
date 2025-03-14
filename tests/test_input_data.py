@@ -1,7 +1,9 @@
 from input_data import PopulationType, CITY, InputData, verify_input
 import pytest
 
-def test_verify(monkeypatch: pytest.MonkeyPatch, osm_graph_bbox: str, danger_zone: str
+
+def test_verify(
+    monkeypatch: pytest.MonkeyPatch, osm_graph_bbox: str, danger_zone: str
 ) -> None:
     input_data = InputData(
         type=PopulationType.GEO_JSON_FILE,
@@ -37,7 +39,10 @@ def test_verify(monkeypatch: pytest.MonkeyPatch, osm_graph_bbox: str, danger_zon
         danger_zones_geopandas_json=danger_zone,
         worldpop_filepath="",
     )
-    assert verify_input(input_data) == (False, "Population number must be greater than 0")
+    assert verify_input(input_data) == (
+        False,
+        "Population number must be greater than 0",
+    )
 
     input_data = InputData(
         type=PopulationType.GEO_JSON_FILE,
@@ -73,4 +78,7 @@ def test_verify(monkeypatch: pytest.MonkeyPatch, osm_graph_bbox: str, danger_zon
         danger_zones_geopandas_json="Invalid input",
         worldpop_filepath="",
     )
-    assert verify_input(input_data) == (False, "CPH city, danger zone is invalid geojson")
+    assert verify_input(input_data) == (
+        False,
+        "CPH city, danger zone is invalid geojson",
+    )

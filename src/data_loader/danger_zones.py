@@ -27,6 +27,7 @@ def load_danger_zone(file_name: str, crs: str) -> gpd.GeoDataFrame:
     polygons = [shape(feature["geometry"]) for feature in data["features"]]
     return gpd.GeoDataFrame(geometry=polygons, crs=crs)
 
+
 def load_danger_zone_from_str(geo_json: str, crs: str) -> gpd.GeoDataFrame:
     """
     Loads a danger zone GeoJSON string and returns a GeoDataFrame.

@@ -37,6 +37,7 @@ def mock_routes() -> list[Route]:
         Route(["B", "C", "A"], 10),
     ]
 
+
 @pytest.fixture
 def osm_graph_bbox() -> str:
     return """{"type":"FeatureCollection","features":[{"type":"Feature","properties":{},"geometry":{"coordinates":[[[12.81,55.55],[12.81,55.76],[12.45,55.76],[12.45,55.55],[12.81,55.55]]],"type":"Polygon"}}]}"""

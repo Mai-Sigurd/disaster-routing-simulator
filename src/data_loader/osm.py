@@ -11,7 +11,9 @@ COPENHAGEN_BBOX = (12.42, 55.55, 12.81, 55.76)
 OSM_DIR = DATA_DIR / "osm_graph"
 
 
-def download_osm_graph_from_file(bbox_file_name: str, simplify: bool = True) -> nx.MultiDiGraph:
+def download_osm_graph_from_file(
+    bbox_file_name: str, simplify: bool = True
+) -> nx.MultiDiGraph:
     """
     Loads a GeoJSON file containing a single polygon with exactly 5 coordinates
     and extracts its bounding box.
@@ -31,7 +33,10 @@ def download_osm_graph_from_file(bbox_file_name: str, simplify: bool = True) -> 
     polygon = shape(data["features"][0]["geometry"])
     return _download_osm_graph(polygon, simplify)
 
-def download_osm_graph_geo_string(geo_json: str, simplify: bool = True) -> nx.MultiDiGraph:
+
+def download_osm_graph_geo_string(
+    geo_json: str, simplify: bool = True
+) -> nx.MultiDiGraph:
     """
     Loads a GeoJSON string containing a single polygon with exactly 5 coordinates
     and extracts its bounding box.
@@ -43,6 +48,7 @@ def download_osm_graph_geo_string(geo_json: str, simplify: bool = True) -> nx.Mu
     data = json.loads(geo_json)
     polygon = shape(data["features"][0]["geometry"])
     return _download_osm_graph(polygon, simplify)
+
 
 def _download_osm_graph(polygon: Polygon, simplify: bool = True) -> nx.MultiDiGraph:
     if not isinstance(polygon, Polygon):
@@ -58,6 +64,7 @@ def _download_osm_graph(polygon: Polygon, simplify: bool = True) -> nx.MultiDiGr
     logging.info(f"Extracted bounding box: ({left}, {bottom}, {right}, {top})")
 
     return download_graph_from_bbox((left, bottom, right, top), simplify)
+
 
 def download_graph_from_bbox(
     bbox: tuple[float, float, float, float], simplify: bool = True

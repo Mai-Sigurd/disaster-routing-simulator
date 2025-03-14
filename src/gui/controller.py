@@ -66,12 +66,15 @@ def set_fonts_theme(bold_items: list[gui_type], titel: str, e_msg: str) -> None:
         dpg.bind_item_font(item=titel, font=titel_font)
     with dpg.theme() as error_theme:
         with dpg.theme_component(dpg.mvText):
-            dpg.add_theme_color(dpg.mvThemeCol_Text, (255, 0, 0, 255))  # RED color in RGBA format
+            dpg.add_theme_color(
+                dpg.mvThemeCol_Text, (255, 0, 0, 255)
+            )  # RED color in RGBA format
         dpg.bind_item_theme(e_msg, error_theme)
 
 
-
-def add_main_window(desc: str, error_message:str, tag: str, width: int, height: int) -> tuple[gui_type, gui_type]:
+def add_main_window(
+    desc: str, error_message: str, tag: str, width: int, height: int
+) -> tuple[gui_type, gui_type]:
     dpg.add_window(
         label="", width=width, height=height, tag=tag, no_collapse=True, no_close=True
     )

@@ -10,24 +10,26 @@ from gui.controller import (
     set_fonts_theme,
 )
 import logging
+
 WIDTH = 800
 HEIGHT = 1100
 INNER_WINDOW_WIDTH = 800
 INNER_WINDOW_HEIGHT = 800
 
 
-def open_gui(error_message:str = "") -> None:
+def open_gui(error_message: str = "") -> None:
     if error_message:
         logging.info("Opening GUI with input error message: %s", error_message)
     _open_gui(error_message)
 
-def _open_gui(error_message:str = "") -> None:
+
+def _open_gui(error_message: str = "") -> None:
     dpg.create_context()
     dpg.create_viewport(
         title="Disaster Routing", width=800, height=1100
     )  # Set viewport size
     dpg.setup_dearpygui()
-    t1,e_msg = add_main_window(
+    t1, e_msg = add_main_window(
         tag=MAIN_WINDOW,
         desc="Choose a city or pick an area",
         error_message=error_message,
@@ -35,7 +37,10 @@ def _open_gui(error_message:str = "") -> None:
         height=HEIGHT,
     )
     bold_text1 = add_field_window(
-        parent=MAIN_WINDOW, tag=FIELD_WINDOW, width=INNER_WINDOW_WIDTH, height=INNER_WINDOW_HEIGHT
+        parent=MAIN_WINDOW,
+        tag=FIELD_WINDOW,
+        width=INNER_WINDOW_WIDTH,
+        height=INNER_WINDOW_HEIGHT,
     )
     bold_text2 = add_city_window(
         parent=MAIN_WINDOW,
@@ -54,7 +59,8 @@ def _open_gui(error_message:str = "") -> None:
     logging.info("GUI closed")
     dpg.destroy_context()
 
-def close_dpg(): #type: ignore
+
+def close_dpg():  # type: ignore
     dpg.stop_dearpygui()
     dpg.destroy_context()
     logging.info("GUI closed")

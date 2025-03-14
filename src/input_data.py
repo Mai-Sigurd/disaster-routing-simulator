@@ -64,8 +64,10 @@ def verify_input(input_data: InputData) -> tuple[bool, str]:
         if not _is_valid_geojson(input_data.danger_zones_geopandas_json):
             return False, "OSM dangerzone, Invalid geojson"
     if input_data.city == CITY.CPH:
-        if input_data.danger_zones_geopandas_json != "" and not _is_valid_geojson(input_data.danger_zones_geopandas_json):
-                return False, "CPH city, danger zone is invalid geojson"
+        if input_data.danger_zones_geopandas_json != "" and not _is_valid_geojson(
+            input_data.danger_zones_geopandas_json
+        ):
+            return False, "CPH city, danger zone is invalid geojson"
 
     ## POPULATION TYPE
     if input_data.type == PopulationType.TIFF_FILE:
@@ -77,13 +79,21 @@ def verify_input(input_data: InputData) -> tuple[bool, str]:
     return True, ""
 
 
-
-
 def _is_valid_geojson(geojson_str: str) -> bool:
     try:
         data = json.loads(geojson_str)
         if isinstance(data, dict) and "type" in data:
-            valid_types = {"Feature", "FeatureCollection", "Point", "LineString", "Polygon", "MultiPoint", "MultiLineString", "MultiPolygon", "GeometryCollection"}
+            valid_types = {
+                "Feature",
+                "FeatureCollection",
+                "Point",
+                "LineString",
+                "Polygon",
+                "MultiPoint",
+                "MultiLineString",
+                "MultiPolygon",
+                "GeometryCollection",
+            }
             return data["type"] in valid_types
     except (json.JSONDecodeError, KeyError, TypeError):
         return False
