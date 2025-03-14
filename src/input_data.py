@@ -5,6 +5,7 @@ from enum import Enum
 from pathlib import Path
 import pickle
 from typing import cast
+import json
 
 SRC_DIR = Path(__file__).resolve().parent.parent
 INPUTDATADIR = SRC_DIR / "input_data.pickle"
@@ -52,20 +53,41 @@ def pretty_log(input_data: InputData) -> None:
 
 
 def verify_input(input_data: InputData) -> tuple[bool, str]:
-    ## TODO veryfy geo json string
-    if input_data.city == CITY.NONE and not os.path.exists(
-        input_data.danger_zones_geopandas_json
-    ):
-        return False, "Dangerzones file not found"
-    if input_data.type == PopulationType.GEO_JSON_FILE:
-        if not os.path.exists(input_data.osm_geopandas_json_bbox):
-            ## TODO veryfy geo json string
-            return False, "Geo JSON FILE not found"
+    ## CITY
+    if input_data.city == CITY.NONE:
+        if input_data.osm_geopandas_json_bbox == "":
+            return False, "OSM city, geojson empty"
+        if not _is_valid_geojson(input_data.osm_geopandas_json_bbox):
+            return False, "OSM city, Invalid geojson"
+        if input_data.danger_zones_geopandas_json == "":
+            return False, "OSM dangerzone, geojson empty"
+        if not _is_valid_geojson(input_data.danger_zones_geopandas_json):
+            return False, "OSM dangerzone, Invalid geojson"
+    if input_data.city == CITY.CPH:
+        if input_data.danger_zones_geopandas_json != "" and not _is_valid_geojson(input_data.danger_zones_geopandas_json):
+                return False, "CPH city, Invalid geojson"
 
-    elif input_data.type == PopulationType.TIFF_FILE:
+    ## POPULATION TYPE
+    if input_data.type == PopulationType.TIFF_FILE:
         if not os.path.exists(input_data.worldpop_filepath):
             return False, "Worldpop tiff file not found"
     elif input_data.type == PopulationType.NUMBER:
         if input_data.population_number <= 0:
             return False, "Population number must be greater than 0"
+    elif input_data.type == PopulationType.GEO_JSON_FILE:
+        if not os.path.exists(input_data.danger_zones_geopandas_json):
+            return False, "Invalid geojson"
     return True, ""
+
+
+
+
+def _is_valid_geojson(geojson_str: str) -> bool:
+    try:
+        data = json.loads(geojson_str)
+        if isinstance(data, dict) and "type" in data:
+            valid_types = {"Feature", "FeatureCollection", "Point", "LineString", "Polygon", "MultiPoint", "MultiLineString", "MultiPolygon", "GeometryCollection"}
+            return data["type"] in valid_types
+    except (json.JSONDecodeError, KeyError, TypeError):
+        return False
+    return False
