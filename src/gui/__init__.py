@@ -16,6 +16,7 @@ HEIGHT = 1100
 
 def open_gui() -> None:
     _open_gui()
+    # TODO add error message and fix GO button
 
 
 def _open_gui() -> None:

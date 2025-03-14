@@ -24,9 +24,10 @@ from input_data import (
 from matsim_io import MATSIM_DATA_DIR, write_network, write_plans
 from routes.fastestpath import fastest_path
 from routes.route import Route, create_route_objects
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from routes.shortestpath import path
 import networkx as nx
+import argparse
 
 
 logging.basicConfig(
@@ -46,7 +47,7 @@ class ProgramConfig:
     danger_zone_population_data: GeoDataFrame = None
     danger_zones: GeoDataFrame = None
     G: nx.MultiDiGraph = None
-    origin_points: list[str] = None
+    origin_points: list[str] = field(default_factory=list)
 
 
 def run_matsim() -> None:
@@ -84,8 +85,9 @@ def set_dev_input_data() -> InputData:
 
 def controller_input_data(input_d: InputData) -> ProgramConfig:
     conf = ProgramConfig()
-    if input_d.city == CITY.CPH and input_d.danger_zones_geopandas_json == "":
-        input_d = set_dev_input_data()
+    if input_d.city == CITY.CPH:
+        if input_d.danger_zones_geopandas_json == "":
+            input_d.danger_zones_geopandas_json = CPH_AMAGER_DANGER_ZONE
         conf.G = load_osm(CPH_G_GRAPHML)
         conf.danger_zones = load_danger_zone(
             input_d.danger_zones_geopandas_json, "EPSG:4326"
@@ -99,15 +101,46 @@ def controller_input_data(input_d: InputData) -> ProgramConfig:
             G=conf.G,
         )
         conf.origin_points = get_origin_points(conf.danger_zone_population_data)
-
+    if input_d.city == CITY.NONE:
+        conf.G = load_osm(input_d.osm_geopandas_json_bbox)
+        conf.danger_zones = load_danger_zone(
+            input_d.danger_zones_geopandas_json, "EPSG:4326"
+        )
+        if input_d.type == PopulationType.TIFF_FILE:
+            conf.danger_zone_population_data = danger_zone_population(
+                population_type=input_d.type,
+                tiff_file_name=input_d.worldpop_filepath,
+                geo_file_name=input_d.danger_zones_geopandas_json,
+                population_number=0,
+                danger_zone=conf.danger_zones,
+                G=conf.G,
+            )
+        else:  # PopulationType.NUMBER
+            conf.danger_zone_population_data = danger_zone_population(
+                population_type=input_d.type,
+                tiff_file_name="",
+                geo_file_name=input_d.danger_zones_geopandas_json,
+                population_number=input_d.population_number,
+                danger_zone=conf.danger_zones,
+                G=conf.G,
+            )
     return conf
 
 
 if __name__ == "__main__":
-    open_gui()
-    input_data = open_pickle_file(file_path=INPUTDATADIR)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-dev", action="store_true", help="Enable dev mode")
+    args = parser.parse_args()
+    if not args.dev:
+        open_gui()
+        input_data = open_pickle_file(file_path=INPUTDATADIR)
+    else:
+        input_data = set_dev_input_data()
+
     verify_input(input_data)
+    # TODO should open gui if not verified
     pretty_log(input_data)
+
     program_config = controller_input_data(input_data)
 
     paths: list[path] = fastest_path(

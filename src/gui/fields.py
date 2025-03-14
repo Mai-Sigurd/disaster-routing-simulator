@@ -34,9 +34,9 @@ def add_input_fields_pick_area(parent: str) -> list[gui_type]:
         parent=parent,
     )
     t4 = _add_departure_time_input_field(
-        title="Departure time",
-        desc_chunk="Enter the departure time in hours: ",
-        desc_interval="Enter the interval in minutes: ",
+        title="Departure times",
+        desc_chunk="Enter number of groups population should be split in: ",
+        desc_interval="Enter the interval between the groups in minutes: ",
         tag_chunk=TAG_CHUNK,
         tag_interval=TAG_INTERVAL,
         parent=parent,
@@ -55,7 +55,7 @@ def _add_danger_zone_input_field(parent: str, tag: str) -> gui_type:
         title="Danger Zone",
         desc="Go to geojson.io and pick a dangerzone, copy the JSON into the below box",
         desc2="The area should be a polygon of the dangerzone, withing the OSM Graph",
-        desc3="If left blank it will default to a Amager",
+        desc3="If left blank it will default to Amager",
         tag=tag,
         parent=parent,
     )

@@ -52,13 +52,16 @@ def pretty_log(input_data: InputData) -> None:
 
 
 def verify_input(input_data: InputData) -> tuple[bool, str]:
+    ## TODO veryfy geo json string
     if input_data.city == CITY.NONE and not os.path.exists(
         input_data.danger_zones_geopandas_json
     ):
         return False, "Dangerzones file not found"
     if input_data.type == PopulationType.GEO_JSON_FILE:
         if not os.path.exists(input_data.osm_geopandas_json_bbox):
+            ## TODO veryfy geo json string
             return False, "Geo JSON FILE not found"
+
     elif input_data.type == PopulationType.TIFF_FILE:
         if not os.path.exists(input_data.worldpop_filepath):
             return False, "Worldpop tiff file not found"
