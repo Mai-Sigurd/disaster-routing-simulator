@@ -50,12 +50,19 @@ To run the project, execute the following command:
 ```bash
 python src/main.py
 ```
+
 ### Developer modes
-The program supports dev mode which skips the gui, and starts the program on Copenhagen with Amager as the danger zone. 
+
+The program includes a developer mode, which skips the GUI and starts the program directly in Copenhagen,
+with Amager set as the danger zone.
+
 ```bash
 python src/main.py -dev
 ```
-TO test the gui mode and not run the actual simulator, you can run the following command:
+
+The program also includes a GUI-only mode, which runs the graphical interface without starting the simulation.
+Useful for testing the UI separately.
+
 ```bash
 python src/main.py -gui-only
 ```
