@@ -3,7 +3,6 @@ import logging
 import shutil
 import signal
 import subprocess
-from argparse import Namespace
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -147,7 +146,7 @@ def gui_handler(gui_error_message: str = "") -> InputData:
     return input_data
 
 
-def start_up(args: Namespace) -> ProgramConfig:
+def start_up(args: argparse.Namespace) -> ProgramConfig:
     if not args.dev:
         input_data = gui_handler()
     else:
@@ -160,7 +159,7 @@ def start_up(args: Namespace) -> ProgramConfig:
     return controller_input_data(input_data)
 
 
-def main(args: Namespace) -> None:
+def main(args: argparse.Namespace) -> None:
     program_config = start_up(args)
     paths: list[path] = fastest_path(
         program_config.origin_points, program_config.danger_zones, program_config.G
@@ -188,10 +187,15 @@ def main(args: Namespace) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-dev", action="store_true", help="Enable dev mode")
-    parser.add_argument("-gui-only", action="store_true", help="Run GUI only")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("-dev", action="store_true", help="Enable dev mode (skips GUI)")
+    group.add_argument(
+        "-gui-only", action="store_true", help="Run GUI only (without simulation)"
+    )
     args = parser.parse_args()
+
     signal.signal(signal.SIGTSTP, close_gui)
+
     if args.gui_only:
         start_up(args)
     else:
