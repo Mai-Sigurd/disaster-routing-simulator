@@ -6,7 +6,7 @@ DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 DANGER_ZONES_DIR = DATA_DIR / "danger_zones"
 
 
-def load_json_file(file_path: Path) -> dict:  # type: ignore
+def load_json_file(file_path: Path) -> dict:  # type: ignore[type-arg]
     """
     Loads a GeoJSON file from a given path.
 
@@ -18,7 +18,7 @@ def load_json_file(file_path: Path) -> dict:  # type: ignore
 
     logging.info(f"Loading JSON file: {file_path}")
     with open(file_path, "r") as f:
-        return json.load(f)  # type: ignore
+        return json.load(f)  # type: ignore[no-any-return]
 
 
 def load_json_file_to_str(file_name: str) -> str:
