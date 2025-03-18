@@ -37,6 +37,7 @@ public class Main {
 
         Controller controller = new Controler(scenario);
         controller.addOverridingModule(new SimWrapperModule());
+        controller.addOverridingModule(new DisasterRoutingModule());
         controller.run();
 
         // Explicitly shutdown log4j2 to prevent lingering threads
