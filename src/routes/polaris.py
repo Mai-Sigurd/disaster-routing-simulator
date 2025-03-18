@@ -1,17 +1,16 @@
 import logging
 from enum import Enum
 
-# import meru
-# from meru.multilevel import MultiLevelModel
 import networkx as nx
+from meru.multilevel import MultiLevelModel
 
 from routes.route_utils import path, vertex
 
 
 # Define the weight of the edges
 class Weight(Enum):
-    traveltime = 1
-    length = 2
+    TRAVEL_TIME = "traveltime"
+    LENGTH = "length"
 
 
 def polaris_paths(
@@ -19,8 +18,9 @@ def polaris_paths(
     G: nx.MultiDiGraph,
     weight: Weight,
 ) -> list[path]:
-    meru_model = MultiLevelModel(G, k=3, attribute=weight)
+    meru_model = MultiLevelModel(G, k=3, attribute=weight.value)
     meru_model.parameter_selection(random_state=42)
+    meru_model.fit(random_state=42)
 
     routes = []
     for origin, destination in origin_destination_pairs:

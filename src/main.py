@@ -14,6 +14,7 @@ from data_loader.population.population import (
 )
 from matsim_io import MATSIM_DATA_DIR, write_network, write_plans
 from routes.fastestpath import fastest_path
+from routes.polaris import Weight, polaris_paths
 from routes.route import Route, create_route_objects
 from routes.shortestpath import path
 
@@ -72,16 +73,21 @@ if __name__ == "__main__":
     routes: list[Route] = create_route_objects(
         list_of_paths=paths, population_data=population_data, chunks=1, interval=0
     )
-    logging.info("Routes done")
-    logging.info("Stats ---------------------")
-    logging.info("Amount of routes: %s", len(routes))
-    logging.info("Amount of people: %s", sum([r.num_people_on_route for r in routes]))
-    logging.info(
-        "Amount of nodes that could not reach dangerzone: %s",
-        len(origin_points) - len(routes),
-    )
 
-    write_network(G, network_name="Copenhagen")
-    write_plans(routes)
+    pairs = [(route.path[0], route.path[-1]) for route in routes]
 
-    run_matsim()
+    r = polaris_paths(pairs, G, Weight.LENGTH)
+
+    # logging.info("Routes done")
+    # logging.info("Stats ---------------------")
+    # logging.info("Amount of routes: %s", len(routes))
+    # logging.info("Amount of people: %s", sum([r.num_people_on_route for r in routes]))
+    # logging.info(
+    #     "Amount of nodes that could not reach dangerzone: %s",
+    #     len(origin_points) - len(routes),
+    # )
+
+    # write_network(G, network_name="Copenhagen")
+    # write_plans(routes)
+
+    # run_matsim()
