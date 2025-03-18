@@ -11,7 +11,7 @@ from geopandas import GeoDataFrame
 
 from data_loader import load_json_file_to_str
 from data_loader.danger_zones import load_danger_zone_from_str
-from data_loader.osm import download_osm_graph_geo_string, load_osm
+from data_loader.osm import download_osm_graph_with_bbox_string, load_osm
 from data_loader.population import (
     danger_zone_population,
     get_origin_points,
@@ -106,7 +106,7 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
         )
         conf.origin_points = get_origin_points(conf.danger_zone_population_data)
     if input_data.city == CITY.NONE:
-        conf.G = download_osm_graph_geo_string(input_data.osm_geopandas_json_bbox)
+        conf.G = download_osm_graph_with_bbox_string(input_data.osm_geopandas_json_bbox)
         conf.danger_zones = load_danger_zone_from_str(
             input_data.danger_zones_geopandas_json, "EPSG:4326"
         )
