@@ -9,7 +9,7 @@ import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.disaster.routing.simwrapper.*;
+import org.matsim.simwrapper.SimWrapperModule;
 
 import java.io.File;
 
