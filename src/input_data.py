@@ -5,6 +5,7 @@ import pickle
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
+from textwrap import dedent
 from typing import cast
 
 SRC_DIR = Path(__file__).resolve().parent.parent
@@ -33,6 +34,18 @@ class InputData:
     danger_zones_geopandas_json: str
     worldpop_filepath: str
 
+    def pretty_summary(self) -> str:
+        return dedent(f"""
+            Simulation input summary:
+            - Scenario type: {self.type}
+            - OSM GeoJSON (bbox): {self.osm_geopandas_json_bbox}
+            - Danger zones GeoJSON: {self.danger_zones_geopandas_json}
+            - Time interval: {self.interval}
+            - Number of chunks: {self.chunks}
+            - Population size: {self.population_number}
+            - WorldPop file: {self.worldpop_filepath}
+        """).strip()
+
 
 def save_to_pickle(self: InputData, file_path: str) -> None:
     logging.info(f"Saving input data to {file_path}")
@@ -47,11 +60,6 @@ def open_pickle_file(file_path: str) -> InputData:
     # delete input_data.pickle file
     os.remove(file_path)
     return inputdata
-
-
-def pretty_log(input_data: InputData) -> None:
-    s = f"Input TYPE: {input_data.type}\nosm_geopandas_json: {input_data.osm_geopandas_json_bbox}\ndanger_zones_geopandas_json: {input_data.danger_zones_geopandas_json}\ninterval: {input_data.interval}\nchunks: {input_data.chunks}\npopulation_number: {input_data.population_number}\nworldpop_filepath: {input_data.worldpop_filepath}"
-    logging.info(s)
 
 
 def verify_input(input_data: InputData) -> tuple[bool, str]:

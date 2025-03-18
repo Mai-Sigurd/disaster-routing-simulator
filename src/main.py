@@ -23,7 +23,6 @@ from input_data import (
     InputData,
     PopulationType,
     open_pickle_file,
-    pretty_log,
     verify_input,
 )
 from matsim_io import MATSIM_DATA_DIR, write_network, write_plans
@@ -142,7 +141,7 @@ def gui_handler(gui_error_message: str = "") -> InputData:
     input_is_okay, new_error_message = verify_input(input_data)
     if not input_is_okay:
         gui_handler(new_error_message)
-    pretty_log(input_data)
+    logging.info(input_data.pretty_summary())
     return input_data
 
 
@@ -152,7 +151,7 @@ def start_up(args: argparse.Namespace) -> ProgramConfig:
     else:
         logging.info("Dev mode enabled")
         input_data = set_dev_input_data()
-        pretty_log(input_data)
+        logging.info(input_data.pretty_summary())
         input_is_okay, error_message = verify_input(input_data)
         if not input_is_okay:
             logging.info("Error message: %s", error_message)
