@@ -26,8 +26,6 @@ class PopulationType(Enum):
 @dataclass
 class InputData:
     type: PopulationType
-    interval: int
-    chunks: int
     city: CITY
     population_number: int
     osm_geopandas_json_bbox: str
