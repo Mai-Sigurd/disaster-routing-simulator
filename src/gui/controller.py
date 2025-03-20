@@ -17,6 +17,7 @@ from gui.constants import (
     TAG_CHUNK,
     TAG_INTERVAL,
     TIFF_FILE,
+    TIFF_FILE_RADIO_ORDERING,
     gui_type,
 )
 from gui.fields import add_city_fields, add_input_fields_pick_area
@@ -33,7 +34,7 @@ def _save_input_data() -> None:
     population_number = dpg.get_value(POPULATION_NUMBER)
     worldpop_filepath = dpg.get_value(TIFF_FILE)
     osm_geopandas_json = ""
-    if dpg.get_value(POPULATION) == TIFF_FILE:
+    if dpg.get_value(POPULATION) == TIFF_FILE_RADIO_ORDERING:
         pop_type = PopulationType.TIFF_FILE
     else:
         pop_type = PopulationType.NUMBER

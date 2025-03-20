@@ -60,7 +60,7 @@ def download_osm_graph_with_bbox(
     """
     coords = list(bbox.exterior.coords)
     if len(coords) != 5 or coords[0] != coords[-1]:
-        raise ValueError(
+        logging.fatal(
             "Bounding box polygon must have exactly 5 coordinates, forming a closed shape."
         )
 
