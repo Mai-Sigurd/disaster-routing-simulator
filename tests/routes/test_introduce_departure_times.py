@@ -1,4 +1,3 @@
-
 from routes.route import Route
 
 # setup routes

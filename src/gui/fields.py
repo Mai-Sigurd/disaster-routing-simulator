@@ -30,7 +30,10 @@ def add_input_fields_pick_area(parent: str) -> list[gui_type]:
         desc="Choose the population type:",
         desc2="Either download a worldpop tiff file and input the filepath or input a population number which will be evenly distributed across the dangerzone",
         tag=POPULATION,
-        types=[TIFF_FILE, POPULATION_NUMBER], # if you change the ordering, remember to change ordering constants in constants.py
+        types=[
+            TIFF_FILE,
+            POPULATION_NUMBER,
+        ],  # if you change the ordering, remember to change ordering constants in constants.py
         parent=parent,
     )
     t4 = _add_departure_time_input_field(
