@@ -36,3 +36,60 @@ def mock_routes() -> list[Route]:
         Route(["A", "B", "C", "D", "E"], 20),
         Route(["B", "C", "A"], 10),
     ]
+
+
+@pytest.fixture
+def osm_graph_bbox() -> str:
+    return """{"type":"FeatureCollection","features":[{"type":"Feature","properties":{},"geometry":{"coordinates":[[[12.81,55.55],[12.81,55.76],[12.45,55.76],[12.45,55.55],[12.81,55.55]]],"type":"Polygon"}}]}"""
+
+
+@pytest.fixture
+def danger_zone() -> str:
+    return """{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              12.594123364652546,
+              55.66912772371745
+            ],
+            [
+              12.584146557259686,
+              55.66456970063598
+            ],
+            [
+              12.583388792512977,
+              55.65958322991645
+            ],
+            [
+              12.603720195262099,
+              55.6530278384474
+            ],
+            [
+              12.616980393896057,
+              55.65979627384672
+            ],
+            [
+              12.614835102218962,
+              55.67090934974513
+            ],
+            [
+              12.605110429625654,
+              55.672902898841926
+            ],
+            [
+              12.594123364652546,
+              55.66912772371745
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      }
+    }
+  ]
+}"""

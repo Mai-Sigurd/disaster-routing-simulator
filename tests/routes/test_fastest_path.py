@@ -2,7 +2,6 @@ import logging
 
 import geopandas as gpd
 import networkx as nx
-import pytest
 from _pytest.logging import LogCaptureFixture
 from shapely.geometry import Polygon
 
