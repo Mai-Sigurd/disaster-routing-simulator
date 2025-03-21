@@ -76,6 +76,7 @@ def write_plans(
     :param routes: List of routes to turn into MATSim plans.
     :param plan_filename: Name of the output file.
     :param gzip_compress: Whether to save the file as a .gz compressed file.
+    :param mat_sim_routing: Whether to use MATSim routing or not.
     """
     if not LINK_IDS:
         raise ValueError("No link IDs found. Please write the network first.")
@@ -103,18 +104,22 @@ def _write_plan(
 ) -> int:
     node_pairs = list(zip(route.path[:-1], route.path[1:]))
     link_ids = [_get_link_id(v, w) for v, w in node_pairs]
-    for dep_time, num_people in route.departure_times.items():
-        for _ in range(num_people):
-            writer.start_person(count)
-            writer.start_plan(selected=True)
-            writer.add_activity_with_link("escape", link=link_ids[0], end_time=dep_time)
-            writer.add_leg(
-                link_ids, departure_time=dep_time, mat_sim_routing=mat_sim_routing
-            )
-            writer.add_activity_with_link("escape", link=link_ids[-1])
-            writer.end_plan()
-            writer.end_person()
-            count += 1
+    num_people = route.num_people_on_route
+    for i in range(num_people):
+        writer.start_person(count)
+        writer.start_plan(selected=True)
+        writer.add_activity_with_link(
+            "escape", link=link_ids[0], end_time=route.departure_times[i]
+        )
+        writer.add_leg(
+            link_ids,
+            departure_time=route.departure_times[i],
+            mat_sim_routing=mat_sim_routing,
+        )
+        writer.add_activity_with_link("escape", link=link_ids[-1])
+        writer.end_plan()
+        writer.end_person()
+        count += 1
     return count
 
 

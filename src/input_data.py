@@ -26,8 +26,6 @@ class PopulationType(Enum):
 @dataclass
 class InputData:
     type: PopulationType
-    interval: int
-    chunks: int
     city: CITY
     population_number: int
     osm_geopandas_json_bbox: str
@@ -40,8 +38,6 @@ class InputData:
             - Scenario type: {self.type}
             - OSM GeoJSON (bbox): {self.osm_geopandas_json_bbox}
             - Danger zones GeoJSON: {self.danger_zones_geopandas_json}
-            - Time interval: {self.interval}
-            - Number of chunks: {self.chunks}
             - Population size: {self.population_number}
             - WorldPop file: {self.worldpop_filepath}
         """).strip()

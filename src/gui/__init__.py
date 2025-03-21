@@ -14,9 +14,9 @@ from gui.controller import (
 )
 
 WIDTH = 800
-HEIGHT = 1100
+HEIGHT = 900
 INNER_WINDOW_WIDTH = 800
-INNER_WINDOW_HEIGHT = 800
+INNER_WINDOW_HEIGHT = 700
 
 
 def open_gui(error_message: str = "") -> None:

@@ -7,8 +7,6 @@ from gui.constants import (
     OSM_JSON_BBOX,
     POPULATION,
     POPULATION_NUMBER,
-    TAG_CHUNK,
-    TAG_INTERVAL,
     TIFF_FILE,
     gui_type,
 )
@@ -36,16 +34,7 @@ def add_input_fields_pick_area(parent: str) -> list[gui_type]:
         ],  # if you change the ordering, remember to change ordering constants in constants.py
         parent=parent,
     )
-    t4 = _add_departure_time_input_field(
-        title="Departure times",
-        desc_chunk="Enter number of groups population should be split in: ",
-        desc_interval="Enter the interval between the groups in minutes: ",
-        tag_chunk=TAG_CHUNK,
-        tag_interval=TAG_INTERVAL,
-        parent=parent,
-    )
-
-    return [t1, t2, t3, t4]
+    return [t1, t2, t3]
 
 
 def add_city_fields(parent: str, city_tag: str, desc3: str = "") -> list[gui_type]:
@@ -97,7 +86,7 @@ def _add_population_input_field(
     )
     dpg.add_radio_button(
         items=types,
-        default_value=1,
+        default_value=types[0],
         tag=tag,
         horizontal=True,
         callback=_show_input_field_based_on_radio,
