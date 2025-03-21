@@ -27,7 +27,7 @@ def test_create_route_object_uneven(monkeypatch: pytest.MonkeyPatch) -> None:
 
     def _get_num_people_on_route(route_path: list[str], population_data: gpd.GeoDataFrame, cars_per_person: float) -> int:
         return 7
-    def _get_total_population(population_data: gpd.GeoDataFrame) -> int:
+    def _get_total_population(population_data: gpd.GeoDataFrame, cars_per_person: float) -> int:
         return 21
     monkeypatch.setattr(route,"_get_num_people_on_route", _get_num_people_on_route)
     monkeypatch.setattr(route,"_get_total_population", _get_total_population)
@@ -54,7 +54,7 @@ def test_get_num_people_on_route() -> None:
 
 def test__get_total_population() -> None:
     population_data = gpd.GeoDataFrame(data={"pop": [10, 20]})
-    result = route._get_total_population(population_data)
+    result = route._get_total_population(population_data, 1.0)
     assert result == 30
 
 
