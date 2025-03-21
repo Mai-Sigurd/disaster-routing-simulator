@@ -11,15 +11,15 @@ from routes.route_utils import path
 
 class Route:
     def __init__(
-        self, route_path: path, num_people_on_route: int, depature_times: list[int]
+        self, route_path: path, num_people_on_route: int, departure_times: list[int]
     ) -> None:
-        if len(depature_times) != num_people_on_route:
+        if len(departure_times) != num_people_on_route:
             logging.fatal(
                 "Number of departure times must equal the number of people on route."
             )
         self.path = route_path
         self.num_people_on_route = num_people_on_route
-        self.departure_times: list[int] = depature_times
+        self.departure_times = departure_times
 
 
 def _departure_times(total_population: int, start: int, end: int) -> NDArray[np.int_]:
@@ -36,8 +36,23 @@ def _departure_times(total_population: int, start: int, end: int) -> NDArray[np.
     departures = rng.normal(loc=mean, scale=std_dev, size=total_population).astype(
         np.int_
     )
-
     return departures
+
+def _get_num_people_on_route(route_path: list[str], population_data: gpd.GeoDataFrame, cars_per_person: float) -> int:
+    """
+    Returns the number of people on a given route.
+    :param route_path: A list of node IDs representing the route.
+    :param population_data: A GeoDataFrame containing the population data.
+    :param cars_per_person: The number of cars per person.
+    :return: The number of people on the route.
+    """
+    return int(population_data[population_data[NODE_ID] == route_path[0]].iloc[0][POPULATION] / cars_per_person)
+
+def _get_total_population(population_data: gpd.GeoDataFrame) -> int:
+    result = population_data[POPULATION].sum()
+    if result is None:
+        logging.fatal("Population data is empty")
+    return result  # type: ignore
 
 
 def create_route_objects(
@@ -57,21 +72,17 @@ def create_route_objects(
     :param cars_per_person: The number of cars per person.
     :return: A list of Route objects.
     """
-    total_population = population_data[POPULATION].sum()
+    total_population = _get_total_population(population_data)
     result = []
     departure_times = _departure_times(total_population, start, end)
     for p in tqdm(list_of_paths):
         route_path = p
-        num_people_on_route = int(
-            population_data[population_data[NODE_ID] == p[0]].iloc[0][POPULATION]
-            / cars_per_person
-        )
-
+        num_people_on_route = _get_num_people_on_route(route_path, population_data, cars_per_person)
+        selected, departure_times = np.split(departure_times, [num_people_on_route])
         route_object = Route(
             route_path,
             num_people_on_route,
-            departure_times.take(num_people_on_route).astype(int),
+           list(selected)
         )
-        departure_times = np.delete(departure_times, np.arange(num_people_on_route))
         result.append(route_object)
     return result
