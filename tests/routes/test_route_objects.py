@@ -1,4 +1,3 @@
-from routes.route import Route
 
 # setup routes
 # r1 = Route(["1", "2"], 10)

@@ -1,12 +1,12 @@
 import logging
 
 import geopandas as gpd
-from tqdm import tqdm
 import numpy as np
+from numpy.typing import NDArray
+from tqdm import tqdm
 
 from data_loader.population.utils import NODE_ID, POPULATION
 from routes.route_utils import path
-from numpy.typing import NDArray
 
 
 class Route:
