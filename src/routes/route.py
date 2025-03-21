@@ -38,7 +38,10 @@ def _departure_times(total_population: int, start: int, end: int) -> NDArray[np.
     )
     return departures
 
-def _get_num_people_on_route(route_path: list[str], population_data: gpd.GeoDataFrame, cars_per_person: float) -> int:
+
+def _get_num_people_on_route(
+    route_path: list[str], population_data: gpd.GeoDataFrame, cars_per_person: float
+) -> int:
     """
     Returns the number of people on a given route.
     :param route_path: A list of node IDs representing the route.
@@ -46,13 +49,19 @@ def _get_num_people_on_route(route_path: list[str], population_data: gpd.GeoData
     :param cars_per_person: The number of cars per person.
     :return: The number of people on the route.
     """
-    return int(population_data[population_data[NODE_ID] == route_path[0]].iloc[0][POPULATION] * cars_per_person)
+    return int(
+        population_data[population_data[NODE_ID] == route_path[0]].iloc[0][POPULATION]
+        * cars_per_person
+    )
 
-def _get_total_population(population_data: gpd.GeoDataFrame, cars_per_person: float) -> int:
+
+def _get_total_population(
+    population_data: gpd.GeoDataFrame, cars_per_person: float
+) -> int:
     result = population_data[POPULATION].sum()
     if result is None:
         logging.fatal("Population data is empty")
-    return int(result*cars_per_person)
+    return int(result * cars_per_person)
 
 
 def create_route_objects(
@@ -77,12 +86,10 @@ def create_route_objects(
     departure_times = _departure_times(total_population, start, end)
     for p in tqdm(list_of_paths):
         route_path = p
-        num_people_on_route = _get_num_people_on_route(route_path, population_data, cars_per_person)
-        selected, departure_times = np.split(departure_times, [num_people_on_route])
-        route_object = Route(
-            route_path,
-            num_people_on_route,
-           list(selected)
+        num_people_on_route = _get_num_people_on_route(
+            route_path, population_data, cars_per_person
         )
+        selected, departure_times = np.split(departure_times, [num_people_on_route])
+        route_object = Route(route_path, num_people_on_route, list(selected))
         result.append(route_object)
     return result
