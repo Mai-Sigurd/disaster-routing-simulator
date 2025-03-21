@@ -53,6 +53,7 @@ class ProgramConfig:
     danger_zones: GeoDataFrame = None
     G: nx.MultiDiGraph = None
     origin_points: list[str] = field(default_factory=list)
+    cars_per_person: float = 1
 
 
 def run_matsim() -> None:
@@ -106,6 +107,7 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
             G=conf.G,
         )
         conf.origin_points = get_origin_points(conf.danger_zone_population_data)
+        conf.cars_per_person = 0.24
     if input_data.city == CITY.NONE:
         conf.G = download_osm_graph_with_bbox_string(input_data.osm_geopandas_json_bbox)
         conf.danger_zones = load_danger_zone_from_str(
@@ -167,6 +169,9 @@ def main(args: argparse.Namespace) -> None:
     routes: list[Route] = create_route_objects(
         list_of_paths=paths,
         population_data=program_config.danger_zone_population_data,
+        start=TWO_MINUTES,
+        end=ONE_HOUR,
+
     )
     logging.info("Routes done")
     logging.info("Stats ---------------------")

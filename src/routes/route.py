@@ -1,11 +1,10 @@
-from sys import implementation
-
 import geopandas as gpd
 from tqdm import tqdm
 import numpy as np
 
 from data_loader.population.utils import NODE_ID, POPULATION
 from routes.route_utils import path
+from numpy.typing import NDArray
 
 
 class Route:
@@ -17,11 +16,10 @@ class Route:
         self.departure_times: list[int] = depature_times
 
 
-def _departure_times(total_population: int, start: int, end: int) -> list[int]:
+def _departure_times(total_population: int, start: int, end: int) -> NDArray[np.int_]:
     """
     Introduces different departure times for the persons taking the given route, spread on a normal distribution
     between the given start and end times.
-    :param routes: A list of Route objects.
     :param total_population: The total population.
     :param start: start of normal distribution. Given in seconds.
     :param end: end of normal distribution. Given in seconds.
@@ -29,10 +27,11 @@ def _departure_times(total_population: int, start: int, end: int) -> list[int]:
     mean = (start + end) / 2  # mean
     std_dev = (end - start) / 6  # Approx. 99.7% of values within range
     rng = np.random.default_rng()
-    departures = rng.normal(loc=mean, scale=std_dev, size=total_population)
+    departures = rng.normal(loc=mean, scale=std_dev, size=total_population).astype(np.int_)
+
     # Clip values to ensure they are within [start, end] and round to nearest second
-    departures = np.clip(np.round(departures), start, end).astype(int)
-    raise NotImplementedError("Implement this function")
+
+    return departures
 
 
 def create_route_objects(
@@ -54,6 +53,7 @@ def create_route_objects(
     """
     total_population = population_data[POPULATION].sum()
     result = []
+    departure_times = _departure_times(total_population, start, end)
     for p in tqdm(list_of_paths):
         route_path = p
         num_people_on_route = int(
@@ -61,6 +61,7 @@ def create_route_objects(
             / cars_per_person
         )
 
-        route_object = Route(route_path, num_people_on_route, [0])
+        route_object = Route(route_path, num_people_on_route, departure_times.take(num_people_on_route).astype(int))
+        departure_times = np.delete(departure_times, np.arange(num_people_on_route))
         result.append(route_object)
     return result
