@@ -8,8 +8,6 @@ def test_verify(
 ) -> None:
     input_data = InputData(
         type=PopulationType.GEO_JSON_FILE,
-        interval=0,
-        chunks=0,
         city=CITY.CPH,
         population_number=0,
         osm_geopandas_json_bbox="",
@@ -20,8 +18,6 @@ def test_verify(
 
     input_data = InputData(
         type=PopulationType.TIFF_FILE,
-        interval=0,
-        chunks=0,
         city=CITY.NONE,
         population_number=0,
         osm_geopandas_json_bbox=osm_graph_bbox,
@@ -32,8 +28,6 @@ def test_verify(
 
     input_data = InputData(
         type=PopulationType.NUMBER,
-        interval=0,
-        chunks=0,
         city=CITY.NONE,
         population_number=0,
         osm_geopandas_json_bbox=osm_graph_bbox,
@@ -47,8 +41,6 @@ def test_verify(
 
     input_data = InputData(
         type=PopulationType.GEO_JSON_FILE,
-        interval=0,
-        chunks=0,
         city=CITY.NONE,
         population_number=0,
         osm_geopandas_json_bbox="",
@@ -59,8 +51,6 @@ def test_verify(
 
     input_data = InputData(
         type=PopulationType.GEO_JSON_FILE,
-        interval=0,
-        chunks=0,
         city=CITY.NONE,
         population_number=0,
         osm_geopandas_json_bbox="wrong input",
@@ -71,8 +61,6 @@ def test_verify(
 
     input_data = InputData(
         type=PopulationType.GEO_JSON_FILE,
-        interval=0,
-        chunks=0,
         city=CITY.CPH,
         population_number=0,
         osm_geopandas_json_bbox=osm_graph_bbox,

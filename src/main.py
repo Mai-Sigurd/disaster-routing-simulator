@@ -171,7 +171,7 @@ def main(args: argparse.Namespace) -> None:
         population_data=program_config.danger_zone_population_data,
         start=TWO_MINUTES,
         end=ONE_HOUR,
-
+        cars_per_person=program_config.cars_per_person,
     )
     logging.info("Routes done")
     logging.info("Stats ---------------------")

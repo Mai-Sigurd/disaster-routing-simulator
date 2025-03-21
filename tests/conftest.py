@@ -33,8 +33,8 @@ def mock_osm_graph() -> nx.MultiDiGraph:
 def mock_routes() -> list[Route]:
     """Creates a list of fake routes for testing."""
     return [
-        Route(["A", "B", "C", "D", "E"], 20),
-        Route(["B", "C", "A"], 10),
+        Route(["A", "B", "C", "D", "E"], 20, [0] * 20),
+        Route(["B", "C", "A"], 10, [0] * 10),
     ]
 
 

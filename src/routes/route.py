@@ -1,3 +1,5 @@
+import logging
+
 import geopandas as gpd
 from tqdm import tqdm
 import numpy as np
@@ -11,6 +13,10 @@ class Route:
     def __init__(
         self, route_path: path, num_people_on_route: int, depature_times: list[int]
     ) -> None:
+        if len(depature_times) != num_people_on_route:
+            logging.fatal(
+                "Number of departure times must equal the number of people on route."
+            )
         self.path = route_path
         self.num_people_on_route = num_people_on_route
         self.departure_times: list[int] = depature_times
@@ -27,9 +33,9 @@ def _departure_times(total_population: int, start: int, end: int) -> NDArray[np.
     mean = (start + end) / 2  # mean
     std_dev = (end - start) / 6  # Approx. 99.7% of values within range
     rng = np.random.default_rng()
-    departures = rng.normal(loc=mean, scale=std_dev, size=total_population).astype(np.int_)
-
-    # Clip values to ensure they are within [start, end] and round to nearest second
+    departures = rng.normal(loc=mean, scale=std_dev, size=total_population).astype(
+        np.int_
+    )
 
     return departures
 
@@ -39,7 +45,7 @@ def create_route_objects(
     population_data: gpd.GeoDataFrame,
     start: int,
     end: int,
-    cars_per_person: int,
+    cars_per_person: float,
 ) -> list[Route]:
     """
     Creates a list of Route objects from a list of routes.
@@ -61,7 +67,11 @@ def create_route_objects(
             / cars_per_person
         )
 
-        route_object = Route(route_path, num_people_on_route, departure_times.take(num_people_on_route).astype(int))
+        route_object = Route(
+            route_path,
+            num_people_on_route,
+            departure_times.take(num_people_on_route).astype(int),
+        )
         departure_times = np.delete(departure_times, np.arange(num_people_on_route))
         result.append(route_object)
     return result
