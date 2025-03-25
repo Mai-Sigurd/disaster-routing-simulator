@@ -1,6 +1,6 @@
 package org.disaster.routing;
 
-import org.matsim.application.analysis.LogFileAnalysis;
+import org.disaster.routing.analysis.TripPurposeBy10Min;
 import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.application.analysis.traffic.TrafficAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
@@ -68,17 +68,17 @@ public class DisasterRoutingDashboard implements Dashboard {
     private static void createTripDataRow(Layout layout, String dataType, String tab, String chartTitle, String metric) {
         layout.row(dataType, tab).el(Plotly.class, (viz, data) -> {
             viz.title = chartTitle;
-            viz.description = "by hour and purpose";
+            viz.description = "by 10-minute intervals";
             viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-                    .xAxis(Axis.builder().title("Hour").build())
-                    .yAxis(Axis.builder().title("Share").build())
+                    .xAxis(Axis.builder().title("Time (minutes)").build())
+                    .yAxis(Axis.builder().title("Trips").build())
                     .barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
                     .build();
 
             viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-                    viz.addDataset(data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")).mapping()
+                    viz.addDataset(data.compute(TripPurposeBy10Min.class, "trip_purposes_by_10_minutes.csv")).mapping()
                             .name("purpose", ColorScheme.Spectral)
-                            .x("h")
+                            .x("bin")
                             .y(metric)
             );
         });
