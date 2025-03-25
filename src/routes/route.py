@@ -17,6 +17,7 @@ class Route:
             logging.fatal(
                 "Number of departure times must equal the number of people on route."
             )
+            raise ValueError("Mismatch between departure times and number of people on route.")
         self.path = route_path
         self.num_people_on_route = num_people_on_route
         self.departure_times = departure_times
