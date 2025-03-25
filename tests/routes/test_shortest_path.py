@@ -5,7 +5,7 @@ import networkx as nx
 from _pytest.logging import LogCaptureFixture
 from shapely.geometry import Polygon
 
-from routes.shortestpath import route_to_safety
+from routes.shortestpath import ShortestPath
 
 # Create a directed graph
 G = nx.MultiDiGraph()
@@ -29,20 +29,21 @@ danger_zone = gpd.GeoDataFrame(geometry=[Polygon([(1, 4), (1, 1), (4, 1), (4, 4)
 
 # List of origin points
 origin_points = ["A"]
+sp = ShortestPath()
 
 
 def test_route_to_safety() -> None:
-    routes = route_to_safety(["A"], danger_zone, G)
+    routes = sp.route_to_safety(["A"], danger_zone, G)
     assert routes == [["A", "B", "C", "D"]]
 
 
 def test_route_to_safety_two_origin_points() -> None:
-    routes = route_to_safety(["A", "B"], danger_zone, G)
+    routes = sp.route_to_safety(["A", "B"], danger_zone, G)
     assert routes == [["A", "B", "C", "D"], ["B", "C", "D"]]
 
 
 def test_route_to_safety_three_origin_points() -> None:
-    routes = route_to_safety(["A", "B", "C"], danger_zone, G)
+    routes = sp.route_to_safety(["A", "B", "C"], danger_zone, G)
     assert routes == [["A", "B", "C", "D"], ["B", "C", "D"], ["C", "D"]]
 
 
@@ -60,7 +61,7 @@ G1.add_edge("B", "C", length=1)
 
 
 def test_route_to_safety_endpoint_is_completely_free_from_danger() -> None:
-    routes = route_to_safety(["A"], danger_zone, G1)
+    routes = sp.route_to_safety(["A"], danger_zone, G1)
     assert routes == [["A", "B", "C"]]
 
 
@@ -79,7 +80,7 @@ def test_route_to_safety_all_nodes_are_in_dangerzone_logging(
     caplog: LogCaptureFixture,
 ) -> None:
     with caplog.at_level(logging.INFO):
-        route_to_safety(["A"], danger_zone, G2)
+        sp.route_to_safety(["A"], danger_zone, G2)
     assert "Node A cannot reach any nodes outside the dangerzone" in caplog.text
 
 
@@ -99,5 +100,5 @@ def test_route_to_safety_origin_has_no_neighbours_logging(
     caplog: LogCaptureFixture,
 ) -> None:
     with caplog.at_level(logging.INFO):
-        route_to_safety(["A"], danger_zone, G3)
+        sp.route_to_safety(["A"], danger_zone, G3)
     assert "Node A has no neighbors" in caplog.text

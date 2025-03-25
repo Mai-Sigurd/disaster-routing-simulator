@@ -1,5 +1,4 @@
 import logging
-from types import FrameType
 
 import dearpygui.dearpygui as dpg
 
@@ -63,7 +62,7 @@ def _open_gui(error_message: str = "") -> None:
     dpg.destroy_context()
 
 
-def close_gui(_signal: int, _frame: FrameType | None) -> None:
+def close_gui() -> None:
     dpg.stop_dearpygui()
     dpg.destroy_context()
     logging.info("GUI closed")
