@@ -25,6 +25,7 @@ scikit-learn = "^1.6.1"
 shapely = "^2.0.7"
 simwrapper = "^1.8.5"
 tqdm = "^4.67.1"
+dearpygui = "^2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.15.0"

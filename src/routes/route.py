@@ -1,4 +1,8 @@
+import logging
+
 import geopandas as gpd
+import numpy as np
+from numpy.typing import NDArray
 from tqdm import tqdm
 
 from data_loader.population.utils import NODE_ID, POPULATION
@@ -6,62 +10,93 @@ from routes.route_utils import path
 
 
 class Route:
-    def __init__(self, route_path: path, num_people_on_route: int) -> None:
+    def __init__(
+        self, route_path: path, num_people_on_route: int, departure_times: list[int]
+    ) -> None:
+        if len(departure_times) != num_people_on_route:
+            logging.fatal(
+                "Number of departure times must equal the number of people on route."
+            )
+            raise ValueError(
+                "Mismatch between departure times and number of people on route."
+            )
         self.path = route_path
         self.num_people_on_route = num_people_on_route
-        self.departure_times: dict[int, int] = {0: num_people_on_route}
-
-    def introduce_departure_times(self, chunks: int, interval: int) -> None:
-        """
-        Introduces different departure times for the persons taking the given route.
-
-        :param chunks: In how many different chunks should the persons on the route depart.
-        :param interval: How long should the interval between each departure be. Given in seconds.
-        :return: A dictionary of departure times where keys are seconds after midnight and values are the number of people departing on that time.
-        """
-        departure_times: dict[int, int] = {}
-        people_per_interval = int(self.num_people_on_route / chunks)
-        remaining_people = self.num_people_on_route % chunks
-
-        seconds_from_midnight = 0
-        if chunks < self.num_people_on_route:
-            for i in range(chunks):
-                count = people_per_interval + (
-                    1 if i < remaining_people else 0
-                )  # Distribute remainder evenly
-                departure_times[seconds_from_midnight] = count
-                seconds_from_midnight += interval
-        else:  # There are more chunks than people, so there will be 1 person in the first chunk(s) and then 0 in the remaining. The remaining will not even be present in the departure_times dict.
-            for i in range(self.num_people_on_route):
-                departure_times[seconds_from_midnight] = 1
-                seconds_from_midnight += interval
-
         self.departure_times = departure_times
+
+
+def _departure_times(total_population: int, start: int, end: int) -> NDArray[np.int_]:
+    """
+    Introduces different departure times for the persons taking the given route, spread on a normal distribution
+    between the given start and end times.
+    :param total_population: The total population.
+    :param start: start of normal distribution. Given in seconds.
+    :param end: end of normal distribution. Given in seconds.
+    """
+    mean = (start + end) / 2
+    std_dev = (end - start) / 6  # Approx. 99.7% of values within range
+    rng = np.random.default_rng()
+    departures = rng.normal(loc=mean, scale=std_dev, size=total_population).astype(
+        np.int_
+    )
+    return departures
+
+
+def _get_num_people_on_route(
+    route_path: list[str], population_data: gpd.GeoDataFrame, cars_per_person: float
+) -> int:
+    """
+    Returns the number of people on a given route.
+    :param route_path: A list of node IDs representing the route.
+    :param population_data: A GeoDataFrame containing the population data.
+    :param cars_per_person: The number of cars per person.
+    :return: The number of people on the route.
+    """
+    return int(
+        population_data[population_data[NODE_ID] == route_path[0]].iloc[0][POPULATION]
+        * cars_per_person
+    )
+
+
+def _get_total_population(
+    population_data: gpd.GeoDataFrame, cars_per_person: float
+) -> int:
+    result = population_data[POPULATION].sum()
+    try:
+        if result == 0:
+            raise ValueError("Population data is 0")
+        return int(result * cars_per_person)
+    except TypeError:
+        logging.error("Population data is empty")
+        raise ValueError("Population data is empty")
 
 
 def create_route_objects(
     list_of_paths: list[path],
     population_data: gpd.GeoDataFrame,
-    chunks: int,
-    interval: int,
+    start: int,
+    end: int,
+    cars_per_person: float,
 ) -> list[Route]:
     """
     Creates a list of Route objects from a list of routes.
 
     :param list_of_paths: A list of routes.
     :param population_data: A GeoDataFrame containing the population data.
-    :param chunks: In how many different chunks should the persons on the route depart.
-    :param interval: How long should the interval between each departure be. Given in seconds.
+    :param start: start of normal distribution. Given in seconds.
+    :param end: end of normal distribution. Given in seconds.
+    :param cars_per_person: The number of cars per person.
     :return: A list of Route objects.
     """
+    total_population = _get_total_population(population_data, cars_per_person)
     result = []
+    departure_times = _departure_times(total_population, start, end)
     for p in tqdm(list_of_paths):
         route_path = p
-        num_people_on_route = int(
-            population_data[population_data[NODE_ID] == p[0]].iloc[0][POPULATION]
+        num_people_on_route = _get_num_people_on_route(
+            route_path, population_data, cars_per_person
         )
-
-        route_object = Route(route_path, num_people_on_route)
-        route_object.introduce_departure_times(chunks, interval)
+        selected, departure_times = np.split(departure_times, [num_people_on_route])
+        route_object = Route(route_path, num_people_on_route, list(selected))
         result.append(route_object)
     return result

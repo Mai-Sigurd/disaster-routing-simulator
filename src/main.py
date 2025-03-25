@@ -1,16 +1,29 @@
+import argparse
 import logging
 import shutil
+import signal
 import subprocess
+from dataclasses import dataclass, field
 from pathlib import Path
 
+import networkx as nx
 from geopandas import GeoDataFrame
 
-from data_loader.danger_zones import load_danger_zone
-from data_loader.osm import download_cph, load_osm, save_osm
+from data_loader import load_json_file_to_str
+from data_loader.danger_zones import load_danger_zone_from_str
+from data_loader.osm import download_osm_graph_with_bbox_string, load_osm
 from data_loader.population import (
-    PopulationType,
     danger_zone_population,
     get_origin_points,
+)
+from gui import close_gui, open_gui
+from input_data import (
+    CITY,
+    INPUTDATADIR,
+    InputData,
+    PopulationType,
+    open_pickle_file,
+    verify_input,
 )
 from matsim_io import MATSIM_DATA_DIR, write_network, write_plans
 from routes.fastestpath import fastest_path
@@ -24,7 +37,23 @@ logging.basicConfig(
 )
 
 SOURCE_DIR = Path(__file__).parent.parent
-CPH_LOADED = True
+
+CPH_G_GRAPHML = "copenhagen.graphml"
+CPH_SMALL_AMAGER_DANGER_ZONE = "mindre_del_af_amager.geojson"
+CPH_AMAGER_DANGER_ZONE = "dangerzone_amager.geojson"
+CPH_POPULATION_DATA = "CPHpop.geojson"
+
+TWO_MINUTES = 120
+ONE_HOUR = 3600
+
+
+@dataclass
+class ProgramConfig:
+    danger_zone_population_data: GeoDataFrame = None
+    danger_zones: GeoDataFrame = None
+    G: nx.MultiDiGraph = None
+    origin_points: list[str] = field(default_factory=list)
+    cars_per_person: float = 1
 
 
 def run_matsim() -> None:
@@ -44,33 +73,105 @@ def run_matsim() -> None:
     subprocess.run(cmd, cwd=SOURCE_DIR / "simulator")
 
 
-if __name__ == "__main__":
-    if not CPH_LOADED:
-        G = download_cph()
-        save_osm(G, "copenhagen.graphml")
-    else:
-        G = load_osm("copenhagen.graphml")
-
-    danger_zones: GeoDataFrame = load_danger_zone(
-        "mindre_del_af_amager.geojson", "EPSG:4326"
-    )
-    danger_zone_population_data = danger_zone_population(
-        population_type=PopulationType.GEO_JSON_FILE,
-        tiff_file_name="",
-        geo_file_name="CPHpop.geojson",
+def set_dev_input_data() -> InputData:
+    """
+    Set the input data for development.
+    """
+    return InputData(
+        type=PopulationType.GEO_JSON_FILE,
+        city=CITY.CPH,
         population_number=0,
-        danger_zone=danger_zones,
-        G=G,
+        osm_geopandas_json_bbox="",
+        danger_zones_geopandas_json=load_json_file_to_str(CPH_SMALL_AMAGER_DANGER_ZONE),
+        worldpop_filepath="",
     )
 
-    origin_points: list[str] = get_origin_points(danger_zone_population_data)
 
-    paths: list[path] = fastest_path(origin_points, danger_zones, G)
+def controller_input_data(input_data: InputData) -> ProgramConfig:
+    conf = ProgramConfig()
+    if input_data.city == CITY.CPH:
+        if input_data.danger_zones_geopandas_json == "":
+            input_data.danger_zones_geopandas_json = load_json_file_to_str(
+                CPH_SMALL_AMAGER_DANGER_ZONE
+            )
+        conf.G = load_osm(CPH_G_GRAPHML)
+        conf.danger_zones = load_danger_zone_from_str(
+            input_data.danger_zones_geopandas_json, "EPSG:4326"
+        )
+        conf.danger_zone_population_data = danger_zone_population(
+            population_type=input_data.type,
+            tiff_file_name="",
+            geo_file_name=CPH_POPULATION_DATA,
+            population_number=input_data.population_number,
+            danger_zone=conf.danger_zones,
+            G=conf.G,
+        )
+        conf.origin_points = get_origin_points(conf.danger_zone_population_data)
+        conf.cars_per_person = 0.24
+    if input_data.city == CITY.NONE:
+        conf.G = download_osm_graph_with_bbox_string(input_data.osm_geopandas_json_bbox)
+        conf.danger_zones = load_danger_zone_from_str(
+            input_data.danger_zones_geopandas_json, "EPSG:4326"
+        )
+        if input_data.type == PopulationType.TIFF_FILE:
+            conf.danger_zone_population_data = danger_zone_population(
+                population_type=input_data.type,
+                tiff_file_name=input_data.worldpop_filepath,
+                geo_file_name=input_data.danger_zones_geopandas_json,
+                population_number=0,
+                danger_zone=conf.danger_zones,
+                G=conf.G,
+            )
+        else:  # PopulationType.NUMBER
+            conf.danger_zone_population_data = danger_zone_population(
+                population_type=input_data.type,
+                tiff_file_name="",
+                geo_file_name=input_data.danger_zones_geopandas_json,
+                population_number=input_data.population_number,
+                danger_zone=conf.danger_zones,
+                G=conf.G,
+            )
+    return conf
+
+
+def gui_handler(gui_error_message: str = "") -> InputData:
+    open_gui(gui_error_message)
+    try:
+        input_data = open_pickle_file(file_path=INPUTDATADIR)
+    except FileNotFoundError:
+        logging.error("No input data found")
+        raise SystemExit
+    input_is_okay, new_error_message = verify_input(input_data)
+    if not input_is_okay:
+        gui_handler(new_error_message)
+    logging.info(input_data.pretty_summary())
+    return input_data
+
+
+def start_up(args: argparse.Namespace) -> ProgramConfig:
+    if not args.dev:
+        input_data = gui_handler()
+    else:
+        logging.info("Dev mode enabled")
+        input_data = set_dev_input_data()
+        logging.info(input_data.pretty_summary())
+        input_is_okay, error_message = verify_input(input_data)
+        if not input_is_okay:
+            logging.info("Error message: %s", error_message)
+    return controller_input_data(input_data)
+
+
+def main(args: argparse.Namespace) -> None:
+    program_config = start_up(args)
+    paths: list[path] = fastest_path(
+        program_config.origin_points, program_config.danger_zones, program_config.G
+    )
     routes: list[Route] = create_route_objects(
         list_of_paths=paths,
-        population_data=danger_zone_population_data,
-        chunks=1,
-        interval=0,
+        population_data=program_config.danger_zone_population_data,
+        start=TWO_MINUTES,
+        end=ONE_HOUR,
+        cars_per_person=program_config.cars_per_person,
     )
     logging.info("Routes done")
     logging.info("Stats ---------------------")
@@ -78,10 +179,27 @@ if __name__ == "__main__":
     logging.info("Amount of people: %s", sum([r.num_people_on_route for r in routes]))
     logging.info(
         "Amount of nodes that could not reach dangerzone: %s",
-        len(origin_points) - len(routes),
+        len(program_config.origin_points) - len(routes),
     )
 
-    write_network(G, network_name="Copenhagen")
+    write_network(program_config.G, network_name="Copenhagen")
     write_plans(routes)
 
     run_matsim()
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("-dev", action="store_true", help="Enable dev mode (skips GUI)")
+    group.add_argument(
+        "-gui-only", action="store_true", help="Run GUI only (without simulation)"
+    )
+    args = parser.parse_args()
+
+    signal.signal(signal.SIGTSTP, close_gui)
+
+    if args.gui_only:
+        start_up(args)
+    else:
+        main(args)

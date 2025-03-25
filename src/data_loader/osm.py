@@ -1,3 +1,4 @@
+import json
 import logging
 
 import networkx as nx
@@ -5,13 +6,14 @@ import osmnx as ox
 from shapely.geometry import shape
 from shapely.geometry.polygon import Polygon
 
-from data_loader import DATA_DIR, load_json
+from data_loader import DATA_DIR, load_json_file
 
-COPENHAGEN_BBOX = (12.42, 55.55, 12.81, 55.76)
 OSM_DIR = DATA_DIR / "osm_graph"
 
 
-def download_osm_graph(bbox_file_name: str, simplify: bool = True) -> nx.MultiDiGraph:
+def download_osm_graph_with_bbox_file(
+    bbox_file_name: str, simplify: bool = True
+) -> nx.MultiDiGraph:
     """
     Loads a GeoJSON file containing a single polygon with exactly 5 coordinates
     and extracts its bounding box.
@@ -25,37 +27,46 @@ def download_osm_graph(bbox_file_name: str, simplify: bool = True) -> nx.MultiDi
 
     logging.info(f"Loading bounding box: {bbox_file_name}")
     filepath = DATA_DIR / "bbox" / bbox_file_name
-    data = load_json(filepath)
+    geo_json = load_json_file(filepath)
+    bbox = _geojson_as_polygon(geo_json["features"][0]["geometry"])
     logging.info(f"Loaded bounding box: {bbox_file_name}")
 
-    polygon = shape(data["features"][0]["geometry"])
-    if not isinstance(polygon, Polygon):
-        raise ValueError("Bounding box must be a single Polygon.")
-
-    coords = list(polygon.exterior.coords)
-    if len(coords) != 5 or coords[0] != coords[-1]:
-        raise ValueError(
-            "Bounding box polygon must have exactly 5 coordinates, forming a closed shape."
-        )
-
-    left, bottom, right, top = polygon.bounds
-    logging.info(f"Extracted bounding box: ({left}, {bottom}, {right}, {top})")
-
-    return download_graph_from_bbox((left, bottom, right, top), simplify)
+    return download_osm_graph_with_bbox(bbox, simplify)
 
 
-def download_graph_from_bbox(
-    bbox: tuple[float, float, float, float], simplify: bool = True
+def download_osm_graph_with_bbox_string(
+    geo_json: str, simplify: bool = True
 ) -> nx.MultiDiGraph:
     """
-    Download an OSM graph from a bounding box.
-    :param bbox: Bounding box of the area to download, formatted (left, bottom, right, top).
+    Loads a GeoJSON string containing a single polygon with exactly 5 coordinates
+    and extracts its bounding box.
+
+    :param geo_json: GeoJSON string.
     :param simplify: Whether to simplify the graph.
     :return: OSM graph containing the road network in the bounding box.
     """
-    logging.info("Downloading OSM graph")
+    bbox = _geojson_as_polygon(json.loads(geo_json))
+    return download_osm_graph_with_bbox(bbox, simplify)
+
+
+def download_osm_graph_with_bbox(
+    bbox: Polygon, simplify: bool = True
+) -> nx.MultiDiGraph:
+    """
+    Download an OSM graph from a bounding box.
+    :param bbox: Bounding box polygon with exactly 5 coordinates, where the first and last are the same.
+    :param simplify: Whether to simplify the graph.
+    :return: OSM graph containing the road network in the bounding box.
+    """
+    coords = list(bbox.exterior.coords)
+    if len(coords) != 5 or coords[0] != coords[-1]:
+        logging.fatal(
+            "Bounding box polygon must have exactly 5 coordinates, forming a closed shape."
+        )
+
+    logging.info(f"Downloading OSM graph with bounding box: {bbox.bounds}")
     graph = ox.graph_from_bbox(
-        bbox=bbox,
+        bbox=bbox.bounds,
         network_type="drive_service",
         simplify=simplify,
         truncate_by_edge=True,
@@ -68,7 +79,7 @@ def download_graph_from_bbox(
 
 def download_cph() -> nx.MultiDiGraph:
     """Download the OSM graph of Copenhagen."""
-    return download_osm_graph("cph_bbox.geojson")
+    return download_osm_graph_with_bbox_file("cph_bbox.geojson")
 
 
 def save_osm(graph: nx.MultiDiGraph, filename: str) -> None:
@@ -94,3 +105,10 @@ def load_osm(filename: str) -> nx.MultiDiGraph:
         f"Loaded OSM graph {len(graph.nodes)} nodes and {len(graph.edges)} edges from {filename}"
     )
     return graph
+
+
+def _geojson_as_polygon(data: dict) -> Polygon:  # type: ignore[type-arg]
+    polygon = shape(data["features"][0]["geometry"])
+    if not isinstance(polygon, Polygon):
+        raise ValueError("Bounding box must be a single Polygon.")
+    return polygon
