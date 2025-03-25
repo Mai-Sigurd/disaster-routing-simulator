@@ -62,6 +62,7 @@ def _get_total_population(
     result = population_data[POPULATION].sum()
     if result is None:
         logging.fatal("Population data is empty")
+        raise ValueError("Population data is empty or zero.")
     return int(result * cars_per_person)
 
 
