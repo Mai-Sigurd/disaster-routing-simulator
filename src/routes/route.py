@@ -31,7 +31,7 @@ def _departure_times(total_population: int, start: int, end: int) -> NDArray[np.
     :param start: start of normal distribution. Given in seconds.
     :param end: end of normal distribution. Given in seconds.
     """
-    mean = (start + end) / 2  # mean
+    mean = (start + end) / 2
     std_dev = (end - start) / 6  # Approx. 99.7% of values within range
     rng = np.random.default_rng()
     departures = rng.normal(loc=mean, scale=std_dev, size=total_population).astype(
