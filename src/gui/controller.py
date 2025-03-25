@@ -14,10 +14,7 @@ from gui.constants import (
     OSM_JSON_BBOX,
     POPULATION,
     POPULATION_NUMBER,
-    TAG_CHUNK,
-    TAG_INTERVAL,
     TIFF_FILE,
-    TIFF_FILE_RADIO_ORDERING,
     gui_type,
 )
 from gui.fields import add_city_fields, add_input_fields_pick_area
@@ -27,14 +24,12 @@ from input_data import CITY, INPUTDATADIR, InputData, PopulationType, save_to_pi
 def _save_input_data() -> None:
     logging.info("Getting input data from GUI")
     danger_zones_geopandas_json = dpg.get_value(DANGER_ZONE)
-    interval = dpg.get_value(TAG_INTERVAL)
-    chunks = dpg.get_value(TAG_CHUNK)
     pop_type = PopulationType.GEO_JSON_FILE
     city = dpg.get_value(MENU_TAG)
     population_number = dpg.get_value(POPULATION_NUMBER)
     worldpop_filepath = dpg.get_value(TIFF_FILE)
     osm_geopandas_json = ""
-    if dpg.get_value(POPULATION) == TIFF_FILE_RADIO_ORDERING:
+    if dpg.get_value(POPULATION) == TIFF_FILE:
         pop_type = PopulationType.TIFF_FILE
     else:
         pop_type = PopulationType.NUMBER
@@ -49,8 +44,6 @@ def _save_input_data() -> None:
 
     input_data = InputData(
         type=pop_type,
-        interval=interval,
-        chunks=chunks,
         city=city,
         population_number=population_number,
         osm_geopandas_json_bbox=osm_geopandas_json,

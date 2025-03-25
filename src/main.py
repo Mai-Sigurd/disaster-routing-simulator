@@ -43,6 +43,9 @@ CPH_SMALL_AMAGER_DANGER_ZONE = "mindre_del_af_amager.geojson"
 CPH_AMAGER_DANGER_ZONE = "dangerzone_amager.geojson"
 CPH_POPULATION_DATA = "CPHpop.geojson"
 
+TWO_MINUTES = 120
+ONE_HOUR = 3600
+
 
 @dataclass
 class ProgramConfig:
@@ -50,6 +53,7 @@ class ProgramConfig:
     danger_zones: GeoDataFrame = None
     G: nx.MultiDiGraph = None
     origin_points: list[str] = field(default_factory=list)
+    cars_per_person: float = 1
 
 
 def run_matsim() -> None:
@@ -75,8 +79,6 @@ def set_dev_input_data() -> InputData:
     """
     return InputData(
         type=PopulationType.GEO_JSON_FILE,
-        interval=0,
-        chunks=0,
         city=CITY.CPH,
         population_number=0,
         osm_geopandas_json_bbox="",
@@ -105,6 +107,7 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
             G=conf.G,
         )
         conf.origin_points = get_origin_points(conf.danger_zone_population_data)
+        conf.cars_per_person = 0.24
     if input_data.city == CITY.NONE:
         conf.G = download_osm_graph_with_bbox_string(input_data.osm_geopandas_json_bbox)
         conf.danger_zones = load_danger_zone_from_str(
@@ -166,8 +169,9 @@ def main(args: argparse.Namespace) -> None:
     routes: list[Route] = create_route_objects(
         list_of_paths=paths,
         population_data=program_config.danger_zone_population_data,
-        chunks=1,
-        interval=0,
+        start=TWO_MINUTES,
+        end=ONE_HOUR,
+        cars_per_person=program_config.cars_per_person,
     )
     logging.info("Routes done")
     logging.info("Stats ---------------------")
