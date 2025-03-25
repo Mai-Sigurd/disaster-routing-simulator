@@ -17,7 +17,9 @@ class Route:
             logging.fatal(
                 "Number of departure times must equal the number of people on route."
             )
-            raise ValueError("Mismatch between departure times and number of people on route.")
+            raise ValueError(
+                "Mismatch between departure times and number of people on route."
+            )
         self.path = route_path
         self.num_people_on_route = num_people_on_route
         self.departure_times = departure_times
@@ -60,10 +62,13 @@ def _get_total_population(
     population_data: gpd.GeoDataFrame, cars_per_person: float
 ) -> int:
     result = population_data[POPULATION].sum()
-    if result is None:
-        logging.fatal("Population data is empty")
-        raise ValueError("Population data is empty or zero.")
-    return int(result * cars_per_person)
+    try:
+        if result == 0:
+            raise ValueError("Population data is 0")
+        return int(result * cars_per_person)
+    except TypeError:
+        logging.error("Population data is empty")
+        raise ValueError("Population data is empty")
 
 
 def create_route_objects(
