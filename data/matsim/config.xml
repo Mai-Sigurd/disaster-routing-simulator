@@ -45,4 +45,10 @@
         </parameterset>
     </module>
 
+    <module name="strategy">
+        <param name="maxAgentPlanMemorySize" value="5"/> <!-- 0 means unlimited -->
+        <param name="ModuleProbability_1" value="1"/>
+        <param name="Module_1" value="BestScore"/>
+    </module>
+
 </config>
