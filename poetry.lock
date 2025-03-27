@@ -1593,6 +1593,21 @@ docs = ["matplotlib", "numpydoc (==1.1.*)", "sphinx", "sphinx-book-theme", "sphi
 test = ["pytest", "pytest-cov"]
 
 [[package]]
+name = "simwrapper"
+version = "1.8.5"
+description = "Python support library for SimWrapper data visualization tool"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "simwrapper-1.8.5-py3-none-any.whl", hash = "sha256:f0caacac5119af009ab8cdec7175eefe7d99d86b968de0abf3cd0de2053f6f26"},
+    {file = "simwrapper-1.8.5.tar.gz", hash = "sha256:3b6bc05214e48ac1c70128781bc1e7808cf7b53648c0ad4cf648aad2ec13deb1"},
+]
+
+[package.dependencies]
+Click = "*"
+
+[[package]]
 name = "six"
 version = "1.17.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -1868,5 +1883,7 @@ testing = ["coverage[toml]", "zope.event", "zope.testing"]
 
 [metadata]
 lock-version = "2.1"
+
 python-versions = "^3.10"
 content-hash = "732fe1bf5b88ec1805a2956c021e9ddfc23d346f4530e4dd5d47d7a66e7c5a35"
+
