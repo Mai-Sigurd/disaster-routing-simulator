@@ -1,5 +1,6 @@
 import gzip
 import logging
+import os
 
 import networkx as nx
 from matsim.writers import Id
@@ -12,6 +13,12 @@ MATSIM_DATA_DIR = DATA_DIR / "matsim"
 """Directory where MATSim network and plan files are saved."""
 LINK_IDS: dict[str, int] = {}
 """Dictionary mapping OSM link IDs to MATSim link IDs."""
+
+
+def mat_sim_files_exist(plans_file: str, networks_file: str) -> bool:
+    return os.path.exists(MATSIM_DATA_DIR / plans_file) and os.path.exists(
+        MATSIM_DATA_DIR / networks_file
+    )
 
 
 def write_network(
