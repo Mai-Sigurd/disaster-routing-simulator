@@ -28,38 +28,15 @@
     </repositories>
 
     <dependencies>
-        <!-- MATSim dependencies -->
         <dependency>
             <groupId>org.matsim</groupId>
             <artifactId>matsim</artifactId>
-            <version>2025.0-2025w07</version>
+            <version>2025.0-2025w12</version>
         </dependency>
         <dependency>
             <groupId>org.matsim.contrib</groupId>
             <artifactId>simwrapper</artifactId>
-            <version>2025.0-2025w07</version>
-        </dependency>
-
-        <!-- Override MATSim dependencies to resolve vulnerabilities -->
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.18.0</version>
-        </dependency>
-        <dependency>
-            <groupId>io.airlift</groupId>
-            <artifactId>aircompressor</artifactId>
-            <version>2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-javalite</artifactId>
-            <version>4.29.3</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.classgraph</groupId>
-            <artifactId>classgraph</artifactId>
-            <version>4.8.179</version>
+            <version>2025.0-2025w12</version>
         </dependency>
     </dependencies>
 
