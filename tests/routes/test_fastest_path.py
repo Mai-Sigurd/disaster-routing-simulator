@@ -5,7 +5,7 @@ import networkx as nx
 from _pytest.logging import LogCaptureFixture
 from shapely.geometry import Polygon
 
-from routes.fastestpath import fastest_path
+from routes.fastestpath import FastestPath
 
 # Create a directed graph
 G = nx.MultiDiGraph()
@@ -29,20 +29,21 @@ danger_zone = gpd.GeoDataFrame(geometry=[Polygon([(1, 4), (1, 1), (4, 1), (4, 4)
 
 # List of origin points
 origin_points = ["A"]
+fp = FastestPath()
 
 
 def test_fastest_path() -> None:
-    routes = fastest_path(["A"], danger_zone, G)
+    routes = fp.route_to_safety(["A"], danger_zone, G)
     assert routes == [["A", "B", "C", "D"]]
 
 
 def test_fastest_path_two_origin_points() -> None:
-    routes = fastest_path(["A", "B"], danger_zone, G)
+    routes = fp.route_to_safety(["A", "B"], danger_zone, G)
     assert routes == [["A", "B", "C", "D"], ["B", "C", "D"]]
 
 
 def test_fastest_path_three_origin_points() -> None:
-    routes = fastest_path(["A", "B", "C"], danger_zone, G)
+    routes = fp.route_to_safety(["A", "B", "C"], danger_zone, G)
     assert routes == [["A", "B", "C", "D"], ["B", "C", "D"], ["C", "D"]]
 
 
@@ -61,7 +62,7 @@ G1.add_edge("A", "C", length=2, maxspeed=50)
 
 
 def test_fastest_path_takes_fastest_route() -> None:
-    routes = fastest_path(["A"], danger_zone, G1)
+    routes = fp.route_to_safety(["A"], danger_zone, G1)
     assert routes == [["A", "B", "C"]]
 
 
@@ -79,7 +80,7 @@ G2.add_edge("A", "C", length=5, maxspeed=99)
 
 
 def test_fastest_path_takes_fastest_route2() -> None:
-    routes = fastest_path(["A"], danger_zone, G2)
+    routes = fp.route_to_safety(["A"], danger_zone, G2)
     assert routes == [["A", "B"]]
 
 
@@ -98,7 +99,7 @@ def test_fastest_path_all_nodes_are_in_dangerzone_logging(
     caplog: LogCaptureFixture,
 ) -> None:
     with caplog.at_level(logging.INFO):
-        fastest_path(["A"], danger_zone, G3)
+        fp.route_to_safety(["A"], danger_zone, G3)
     assert "Node A cannot reach any nodes outside the dangerzone" in caplog.text
 
 
@@ -118,5 +119,5 @@ def test_fastest_path_origin_has_no_neighbours_logging(
     caplog: LogCaptureFixture,
 ) -> None:
     with caplog.at_level(logging.INFO):
-        fastest_path(["A"], danger_zone, G4)
+        fp.route_to_safety(["A"], danger_zone, G4)
     assert "Node A has no neighbors" in caplog.text
