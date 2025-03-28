@@ -46,7 +46,7 @@ public class DisasterRoutingDashboard implements Dashboard {
         layout.row("statistics", header.tab)
                 .el(Table.class, (viz, data) -> {
                     viz.title = "Evacuation Statistics";
-                    viz.dataset = data.compute(TripStatsDisaster.class, "trip_stats_disaster.csv");
+                    viz.dataset = data.compute(TripStatsDisaster.class, "trip_stats.csv");
                     viz.showAllRows = true;
                 })
                 .el(Plotly.class, (viz, data) -> {
