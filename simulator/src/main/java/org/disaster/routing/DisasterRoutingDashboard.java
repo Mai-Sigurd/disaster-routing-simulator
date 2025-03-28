@@ -1,6 +1,7 @@
 package org.disaster.routing;
 
 import org.disaster.routing.analysis.TripPurposeBy10Min;
+import org.disaster.routing.analysis.TripStatsDisaster;
 import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.application.analysis.traffic.TrafficAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
@@ -45,7 +46,7 @@ public class DisasterRoutingDashboard implements Dashboard {
         layout.row("statistics", header.tab)
                 .el(Table.class, (viz, data) -> {
                     viz.title = "Evacuation Statistics";
-                    viz.dataset = data.compute(TripAnalysis.class, "trip_stats.csv");
+                    viz.dataset = data.compute(TripStatsDisaster.class, "trip_stats_disaster.csv");
                     viz.showAllRows = true;
                 })
                 .el(Plotly.class, (viz, data) -> {
