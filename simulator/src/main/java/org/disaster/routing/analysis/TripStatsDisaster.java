@@ -43,7 +43,7 @@ import static tech.tablesaw.aggregate.AggregateFunctions.count;
 @CommandLine.Command(name = "trips", description = "Calculates various trip related metrics.")
 @CommandSpec(
         requires = {"trips.csv", "persons.csv"},
-        produces = {"trip_stats.csv"}
+        produces = {"trip_stats_disaster.csv"}
 )
 public class TripStatsDisaster implements MATSimAppCommand {
 
@@ -298,7 +298,7 @@ public class TripStatsDisaster implements MATSimAppCommand {
             beelineDistance.mergeLong(mainMode, trip.getLong("euclidean_distance"), Long::sum);
         }
         String m = "car";
-        try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("trip_stats.csv")), CSVFormat.DEFAULT)) {
+        try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("trip_stats_disaster.csv")), CSVFormat.DEFAULT)) {
 
             printer.print("Info");
             printer.print(m);
@@ -337,9 +337,11 @@ public class TripStatsDisaster implements MATSimAppCommand {
             printer.print("Avg. distance per trip [km]");
             double avg = (travelDistance.getLong(m) / 1000d) / (n.getInt(m));
             printer.print(new BigDecimal(avg).setScale(2, RoundingMode.HALF_UP));
+            printer.println();
 
             printer.print("Number of cars");
             printer.print(numberOfCars);
+            printer.println();
 
             printer.print("Number of persons");
             printer.print(numberOfCars/0.24); //0.24 only holds for Copenhagen
