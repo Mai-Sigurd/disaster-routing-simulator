@@ -285,12 +285,9 @@ public class TripStatsDisaster implements MATSimAppCommand {
         Object2LongMap<String> travelTime = new Object2LongOpenHashMap<>();
         Object2LongMap<String> travelDistance = new Object2LongOpenHashMap<>();
         Object2LongMap<String> beelineDistance = new Object2LongOpenHashMap<>();
-        int numberOfCars = 0;
 
         for (Row trip : trips) {
             String mainMode = trip.getString("main_mode");
-
-            numberOfCars+=
 
             n.mergeInt(mainMode, 1, Integer::sum);
             travelTime.mergeLong(mainMode, durationToSeconds(trip.getString("trav_time")), Long::sum);
@@ -305,7 +302,7 @@ public class TripStatsDisaster implements MATSimAppCommand {
 
             printer.println();
 
-            printer.print("Number of trips");
+            printer.print("Number of cars");
             printer.print(n.getInt(m));
 
             printer.println();
@@ -339,12 +336,9 @@ public class TripStatsDisaster implements MATSimAppCommand {
             printer.print(new BigDecimal(avg).setScale(2, RoundingMode.HALF_UP));
             printer.println();
 
-            printer.print("Number of cars");
-            printer.print(numberOfCars);
-            printer.println();
-
-            printer.print("Number of persons");
-            printer.print(numberOfCars/0.24); //0.24 only holds for Copenhagen
+            printer.print("Avg. traveltime per trip [minutes]");
+            double average = (travelTime.getLong(m) / 60d) / (n.getInt(m));
+            printer.print(new BigDecimal(average).setScale(2, RoundingMode.HALF_UP));
 
             printer.println();
         }
