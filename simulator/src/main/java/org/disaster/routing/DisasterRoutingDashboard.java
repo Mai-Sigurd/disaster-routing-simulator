@@ -76,7 +76,7 @@ public class DisasterRoutingDashboard implements Dashboard {
 				viz.title = "xx";
 				viz.description = "yy";
 
-				Plotly.DataSet ds = viz.addDataset(data.compute(PeopleInSafetyXY.class, "people_in_safety.csv", "--input-ref"));
+				Plotly.DataSet ds = viz.addDataset(data.compute(PeopleInSafetyXY.class, "people_in_safety.csv"));
 
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.xAxis(Axis.builder().title("Time from start of simulation (minutes)").build())
