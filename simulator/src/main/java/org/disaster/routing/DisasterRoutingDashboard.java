@@ -1,9 +1,11 @@
 package org.disaster.routing;
 
+import org.disaster.routing.analysis.PeopleInSafetyXY;
 import org.disaster.routing.analysis.TripPurposeBy10Min;
 import org.disaster.routing.analysis.TripStatsDisaster;
 import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.application.analysis.traffic.TrafficAnalysis;
+import org.matsim.application.analysis.traffic.traveltime.TravelTimeComparison;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
@@ -11,9 +13,11 @@ import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.ColorScheme;
 import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.Plotly;
+import tech.tablesaw.plotly.components.Line;
 import org.matsim.simwrapper.viz.Table;
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.BarTrace;
+import tech.tablesaw.plotly.traces.ScatterTrace;
 
 import java.util.List;
 
@@ -65,6 +69,29 @@ public class DisasterRoutingDashboard implements Dashboard {
         createTripDataRow(layout, "departures", header.tab, "Departures", "departure", "Time from start of simulation (minutes)");
         createTripDataRow(layout, "arrivals", header.tab, "Arrivals", "arrival", "Time from start of simulation (minutes)");
         createTripDataRow(layout, "traveltype", header.tab, "Traveltime", "traveltime", "Time from departure to arrival (minutes)");
+    
+    
+        layout.row("Amount of people in safety").el(Plotly.class, ((viz, data) -> {
+
+				viz.title = "xx";
+				viz.description = "yy";
+
+				Plotly.DataSet ds = viz.addDataset(data.compute(PeopleInSafetyXY.class, "people_in_safety.csv", "--input-ref"));
+
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.xAxis(Axis.builder().title("Time from start of simulation (minutes)").build())
+					.yAxis(Axis.builder().title("Percent of people in safety").build())
+					.build();
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+					.name("People in safety")
+					.mode(ScatterTrace.Mode.LINE)
+					.line(Line.builder().dash(Line.Dash.SOLID).build()).build(), ds.mapping()
+					.x("bin").y("traveltime")
+				);
+
+			}));
+    
     }
 
     private static void createTripDataRow(Layout layout, String dataType, String tab, String chartTitle, String metric, String xAxisTitle) {
