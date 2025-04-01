@@ -76,11 +76,12 @@ public class TripPurposeBy10Min implements MATSimAppCommand {
         tDeparture.replaceColumn(2, tDeparture.numberColumn(2).divide(tDeparture.numberColumn(2).sum()).setName("departure"));
 
         Table tTraveltime = trips.summarize("trip_id", count).by("end_activity_type", "traveltime_10min");
-        tDeparture.column(0).setName("purpose");
-        tDeparture.column(1).setName("bin");
-        tDeparture.replaceColumn(2, tDeparture.numberColumn(2).divide(tDeparture.numberColumn(2).sum()).setName("traveltime"));
+        tTraveltime.column(0).setName("purpose");
+        tTraveltime.column(1).setName("bin");
+        tTraveltime.replaceColumn(2, tTraveltime.numberColumn(2).divide(tTraveltime.numberColumn(2).sum()).setName("traveltime"));
 
-        Table table = new DataFrameJoiner(tArrival, "purpose", "bin").fullOuter(tDeparture).sortOn("purpose", "bin");
+        Table table1 = new DataFrameJoiner(tArrival, "purpose", "bin").fullOuter(tDeparture).sortOn("purpose", "bin");
+        Table table = new DataFrameJoiner(table1, "purpose", "bin").fullOuter(tTraveltime).sortOn("purpose", "bin");
 
         table.doubleColumn("departure").setMissingTo(0.0);
         table.doubleColumn("arrival").setMissingTo(0.0);
