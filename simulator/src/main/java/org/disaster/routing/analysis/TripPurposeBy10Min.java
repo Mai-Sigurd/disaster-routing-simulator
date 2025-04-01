@@ -51,6 +51,7 @@ public class TripPurposeBy10Min implements MATSimAppCommand {
 
         IntColumn departureBins = IntColumn.create("departure_10min");
         IntColumn arrivalBins = IntColumn.create("arrival_10min");
+        IntColumn traveltimeBins = IntColumn.create("traveltime_10min");
 
         for (Row trip : trips) {
             LocalTime dep = trip.getTime("dep_time");
@@ -59,9 +60,10 @@ public class TripPurposeBy10Min implements MATSimAppCommand {
 
             departureBins.append(roundUpTo10(dep));
             arrivalBins.append(roundUpTo10(arr));
+            traveltimeBins.append(roundUpTo10(trav));
         }
 
-        trips.addColumns(departureBins, arrivalBins);
+        trips.addColumns(departureBins, arrivalBins, traveltimeBins);
 
         Table tArrival = trips.summarize("trip_id", count).by("end_activity_type", "arrival_10min");
         tArrival.column(0).setName("purpose");
@@ -73,10 +75,16 @@ public class TripPurposeBy10Min implements MATSimAppCommand {
         tDeparture.column(1).setName("bin");
         tDeparture.replaceColumn(2, tDeparture.numberColumn(2).divide(tDeparture.numberColumn(2).sum()).setName("departure"));
 
+        Table tTraveltime = trips.summarize("trip_id", count).by("end_activity_type", "traveltime_10min");
+        tDeparture.column(0).setName("purpose");
+        tDeparture.column(1).setName("bin");
+        tDeparture.replaceColumn(2, tDeparture.numberColumn(2).divide(tDeparture.numberColumn(2).sum()).setName("traveltime"));
+
         Table table = new DataFrameJoiner(tArrival, "purpose", "bin").fullOuter(tDeparture).sortOn("purpose", "bin");
 
         table.doubleColumn("departure").setMissingTo(0.0);
         table.doubleColumn("arrival").setMissingTo(0.0);
+        table.doubleColumn("traveltime").setMissingTo(0.0);
 
         StringColumn time = StringColumn.create("time", table.rowCount());
         for (int i = 0; i < table.rowCount(); i++) {

@@ -62,16 +62,17 @@ public class DisasterRoutingDashboard implements Dashboard {
                     );
                 });
 
-        createTripDataRow(layout, "departures", header.tab, "Departures", "departure");
-        createTripDataRow(layout, "arrivals", header.tab, "Arrivals", "arrival");
+        createTripDataRow(layout, "departures", header.tab, "Departures", "departure", "Time from start of simulation (minutes)");
+        createTripDataRow(layout, "arrivals", header.tab, "Arrivals", "arrival", "Time from start of simulation (minutes)");
+        createTripDataRow(layout, "traveltype", header.tab, "Traveltime", "traveltime", "Time from departure to arrival (minutes)");
     }
 
-    private static void createTripDataRow(Layout layout, String dataType, String tab, String chartTitle, String metric) {
+    private static void createTripDataRow(Layout layout, String dataType, String tab, String chartTitle, String metric, String xAxisTitle) {
         layout.row(dataType, tab).el(Plotly.class, (viz, data) -> {
             viz.title = chartTitle;
             viz.description = "by 10-minute intervals";
             viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-                    .xAxis(Axis.builder().title("Time (minutes)").build())
+                    .xAxis(Axis.builder().title(xAxisTitle).build())
                     .yAxis(Axis.builder().title("Trips").build())
                     .barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
                     .build();
