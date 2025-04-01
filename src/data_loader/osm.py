@@ -45,7 +45,7 @@ def download_osm_graph_with_bbox_string(
     :param simplify: Whether to simplify the graph.
     :return: OSM graph containing the road network in the bounding box.
     """
-    bbox = _geojson_as_polygon(json.loads(geo_json))
+    bbox = geojson_str_to_polygon(geo_json)
     return download_osm_graph_with_bbox(bbox, simplify)
 
 
@@ -105,6 +105,37 @@ def load_osm(filename: str) -> nx.MultiDiGraph:
         f"Loaded OSM graph {len(graph.nodes)} nodes and {len(graph.edges)} edges from {filename}"
     )
     return graph
+
+
+def get_bbox_from_file(bbox_file_name: str) -> Polygon:
+    """
+    Loads a GeoJSON file containing a single polygon with exactly 5 coordinates
+    and extracts its bounding box.
+
+    :param bbox_file_name: Name of the GeoJSON file (e.g., "bbox.geojson").
+    :return: Polygon containing the bounding box.
+    """
+    if not bbox_file_name.endswith(".geojson"):
+        raise ValueError(f"Invalid file name for bounding box: {bbox_file_name}")
+
+    logging.info(f"Loading bounding box: {bbox_file_name}")
+    filepath = DATA_DIR / "bbox" / bbox_file_name
+    geo_json = load_json_file(filepath)
+    bbox = _geojson_as_polygon(geo_json)
+    logging.info(f"Loaded bounding box: {bbox_file_name}")
+
+    return bbox
+
+
+def geojson_str_to_polygon(geo_json: str) -> Polygon:
+    """
+    Loads a GeoJSON string containing a single polygon with exactly 5 coordinates
+    and extracts its bounding box.
+
+    :param geo_json: GeoJSON string.
+    :return: Polygon containing the bounding box.
+    """
+    return _geojson_as_polygon(json.loads(geo_json))
 
 
 def _geojson_as_polygon(data: dict) -> Polygon:  # type: ignore[type-arg]
