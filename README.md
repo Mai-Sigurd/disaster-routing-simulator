@@ -2,7 +2,7 @@
 
 ## Setup
 
-This project requires **Python 3.12+**.
+This project requires **Python 3.10+**.
 
 ### Virtual environment
 
