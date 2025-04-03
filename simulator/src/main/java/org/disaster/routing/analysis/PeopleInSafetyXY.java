@@ -1,5 +1,6 @@
 package org.disaster.routing.analysis;
 
+import org.apache.logging.log4j.core.tools.picocli.CommandLine.Help.Column;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CsvOptions;
@@ -66,6 +67,7 @@ public class PeopleInSafetyXY implements MATSimAppCommand {
         tTraveltime.column(1).setName("bin");
         tTraveltime.replaceColumn(2, tTraveltime.numberColumn(2).divide(tTraveltime.numberColumn(2).sum()).setName("traveltime"));
 
+        tTraveltime = tTraveltime.sortOn("bin");
         tTraveltime.doubleColumn("traveltime").setMissingTo(0.0);
 
         StringColumn time = StringColumn.create("time", tTraveltime.rowCount());
@@ -74,7 +76,10 @@ public class PeopleInSafetyXY implements MATSimAppCommand {
         }
         tTraveltime.addColumns(time);
 
-        tTraveltime.sortOn("purpose", "bin");
+        DoubleColumn traveltime = tTraveltime.doubleColumn("traveltime");
+        DoubleColumn cumulativeTraveltime = traveltime.cumSum();
+        cumulativeTraveltime.setName("cumulative_traveltime");
+        tTraveltime.addColumns(cumulativeTraveltime);
 
         tTraveltime.write().csv(output.getPath("people_in_safety.csv").toFile());
         return 0;

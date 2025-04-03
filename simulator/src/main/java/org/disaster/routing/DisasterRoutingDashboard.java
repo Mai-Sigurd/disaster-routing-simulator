@@ -87,7 +87,7 @@ public class DisasterRoutingDashboard implements Dashboard {
 					.name("People in safety")
 					.mode(ScatterTrace.Mode.LINE)
 					.line(Line.builder().dash(Line.Dash.SOLID).build()).build(), ds.mapping()
-					.x("bin").y("traveltime")
+					.x("bin").y("cumulative_traveltime")
 				);
 
 			}));
