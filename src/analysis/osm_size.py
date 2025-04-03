@@ -22,7 +22,6 @@ def write_g_and_danger_zone_data_simwrapper_csv(
     city_km2 = city_m2 / 1_000_000
 
     with open(filepath, "w") as file:
-        file.write(f"Danger zone area m^2,{danger_zone_area_m2}\n")
-        file.write(f"Danger zone area km^2,{danger_zone_area_km2}\n")
-        file.write(f"City area m^2,{city_m2}\n")
-        file.write(f"City area km^2,{city_km2}\n")
+        file.write("Area type,Area m^2, Area km^2\n")
+        file.write(f"Danger zone,{danger_zone_area_m2},{danger_zone_area_km2}\n")
+        file.write(f"City(Surrounding),{city_m2},{city_km2}\n")
