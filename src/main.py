@@ -14,6 +14,7 @@ from input_data import (
     verify_input,
 )
 from matsim_io import write_network, write_plans
+from routes.polaris import Weight, polaris_paths
 from routes.route import Route, create_route_objects
 from routes.route_utils import path
 
@@ -50,6 +51,10 @@ def main(args: argparse.Namespace) -> None:
         end=ONE_HOUR,
         cars_per_person=program_config.cars_per_person,
     )
+
+    pairs = [(route.path[0], route.path[-1]) for route in routes]
+    r = polaris_paths(pairs, program_config.G, Weight.LENGTH)
+
     logging.info("Routes done")
     logging.info("Stats ---------------------")
     logging.info("Amount of routes: %s", len(routes))
