@@ -14,7 +14,7 @@ from controller import (
     gui_close,
     gui_handler,
     run_matsim,
-    write_g_and_dangerzone_data
+    write_g_and_dangerzone_data,
 )
 from input_data import (
     InputData,

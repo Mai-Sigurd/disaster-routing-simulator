@@ -1,5 +1,5 @@
-from pyproj import Geod
 import geopandas as gpd
+from pyproj import Geod
 from shapely.geometry import Polygon
 
 
@@ -16,7 +16,9 @@ def write_g_and_danger_zone_data_simwrapper_csv(
     geod = Geod(ellps="WGS84")
 
     # Compute area for each geometry in the GeoDataFrame and sum the results
-    danger_zone_area_m2 = abs(sum(geod.geometry_area_perimeter(geom)[0] for geom in danger_zone.geometry))
+    danger_zone_area_m2 = abs(
+        sum(geod.geometry_area_perimeter(geom)[0] for geom in danger_zone.geometry)
+    )
     danger_zone_area_km2 = danger_zone_area_m2 / 1_000_000
     city_m2 = abs(geod.geometry_area_perimeter(city_bbox_polygon)[0])
     city_km2 = city_m2 / 1_000_000

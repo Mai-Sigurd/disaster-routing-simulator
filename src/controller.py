@@ -11,7 +11,6 @@ from config import (
     CPH_AMAGER_DANGER_ZONE,
     CPH_G_GRAPHML,
     CPH_POPULATION_DATA,
-    CPH_SMALL_AMAGER_DANGER_ZONE,
     ROUTE_ALGOS,
     SOURCE_DIR,
     ProgramConfig,
