@@ -17,6 +17,7 @@ CPH_XTRA_SMALL_AMAGER_DANGER_ZONE = "dangerzone_lillebitteamager.geojson"
 CPH_SMALL_AMAGER_DANGER_ZONE = "mindre_del_af_amager.geojson"
 CPH_AMAGER_DANGER_ZONE = "dangerzone_amager.geojson"
 CPH_POPULATION_DATA = "CPHpop.geojson"
+CPH_AMAGER_BBOX = "bbox_amager.geojson"
 
 TWO_MINUTES = 120
 ONE_HOUR = 3600
@@ -55,7 +56,7 @@ def set_small_data_input_data() -> InputData:
         type=PopulationType.NUMBER,
         city=CITY.NONE,
         population_number=100,
-        osm_geopandas_json_bbox=load_json_file_to_str(CPH_AMAGER_DANGER_ZONE),
+        osm_geopandas_json_bbox=load_json_file_to_str(CPH_AMAGER_BBOX),
         danger_zones_geopandas_json=load_json_file_to_str(CPH_SMALL_AMAGER_DANGER_ZONE),
         worldpop_filepath="",
     )
