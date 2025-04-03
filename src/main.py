@@ -14,12 +14,13 @@ from controller import (
     gui_close,
     gui_handler,
     run_matsim,
+    write_g_and_dangerzone_data
 )
 from input_data import (
     InputData,
     verify_input,
 )
-from matsim_io import mat_sim_files_exist, write_network, write_plans
+from matsim_io import MATSIM_DATA_DIR, mat_sim_files_exist, write_network, write_plans
 from routes.route import Route, create_route_objects
 from routes.route_utils import path
 
@@ -89,6 +90,11 @@ def main(args: argparse.Namespace) -> None:
         )
         write_network(program_config.G, network_name="Copenhagen")
         write_plans(routes, plan_filename="plans.xml")
+        write_g_and_dangerzone_data(
+            danger_zone=program_config.danger_zones,
+            city_bbox_polygon=program_config.city_bbox,
+            filepath=MATSIM_DATA_DIR / "g_and_dangerzone_data.csv",
+        )
 
     run_matsim()
 
