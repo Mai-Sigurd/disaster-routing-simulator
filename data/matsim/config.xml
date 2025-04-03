@@ -19,7 +19,7 @@
     <module name="controller">
         <param name="outputDirectory" value="./output"/>
         <param name="firstIteration" value="0"/>
-        <param name="lastIteration" value="1"/>
+        <param name="lastIteration" value="0"/>
     </module>
 
     <module name="qsim">
