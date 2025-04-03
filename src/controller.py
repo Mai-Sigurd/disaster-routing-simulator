@@ -67,7 +67,7 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
             danger_zone=conf.danger_zones,
             G=conf.G,
         )
-        conf.origin_points = get_origin_points(conf.danger_zone_population_data)
+
         conf.cars_per_person = 0.24
     if input_data.city == CITY.NONE:
         conf.G = download_osm_graph_with_bbox_string(input_data.osm_geopandas_json_bbox)
@@ -92,6 +92,7 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
                 danger_zone=conf.danger_zones,
                 G=conf.G,
             )
+    conf.origin_points = get_origin_points(conf.danger_zone_population_data)
     return conf
 
 

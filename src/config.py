@@ -55,7 +55,7 @@ def set_small_data_input_data() -> InputData:
     return InputData(
         type=PopulationType.NUMBER,
         city=CITY.NONE,
-        population_number=100,
+        population_number=1000,
         osm_geopandas_json_bbox=load_json_file_to_str(CPH_AMAGER_BBOX),
         danger_zones_geopandas_json=load_json_file_to_str(CPH_SMALL_AMAGER_DANGER_ZONE),
         worldpop_filepath="",
