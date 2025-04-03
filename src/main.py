@@ -13,7 +13,7 @@ from controller import (
 from input_data import (
     verify_input,
 )
-from matsim_io import write_network, write_plans
+from matsim_io import mat_sim_files_exist, write_network, write_plans
 from routes.route import Route, create_route_objects
 from routes.route_utils import path
 
@@ -38,29 +38,37 @@ def start_up(args: argparse.Namespace) -> ProgramConfig:
 
 
 def main(args: argparse.Namespace) -> None:
-    program_config = start_up(args)
-    # TODO add more algos, currently there are two
-    paths: list[path] = program_config.route_algos[0].route_to_safety(
-        program_config.origin_points, program_config.danger_zones, program_config.G
+    mat_sim_only = args.matsim_only and mat_sim_files_exist(
+        "plans.xml.gz", "network.xml.gz"
     )
-    routes: list[Route] = create_route_objects(
-        list_of_paths=paths,
-        population_data=program_config.danger_zone_population_data,
-        start=TWO_MINUTES,
-        end=ONE_HOUR,
-        cars_per_person=program_config.cars_per_person,
-    )
-    logging.info("Routes done")
-    logging.info("Stats ---------------------")
-    logging.info("Amount of routes: %s", len(routes))
-    logging.info("Amount of people: %s", sum([r.num_people_on_route for r in routes]))
-    logging.info(
-        "Amount of nodes that could not reach dangerzone: %s",
-        len(program_config.origin_points) - len(routes),
-    )
-
-    write_network(program_config.G, network_name="Copenhagen")
-    write_plans(routes)
+    if args.matsim_only and not mat_sim_only:
+        logging.info("No MATSim files found, creating the files")
+        args.dev = True
+    if not mat_sim_only:
+        program_config = start_up(args)
+        # TODO add more algos, currently there are two
+        paths: list[path] = program_config.route_algos[0].route_to_safety(
+            program_config.origin_points, program_config.danger_zones, program_config.G
+        )
+        routes: list[Route] = create_route_objects(
+            list_of_paths=paths,
+            population_data=program_config.danger_zone_population_data,
+            start=TWO_MINUTES,
+            end=ONE_HOUR,
+            cars_per_person=program_config.cars_per_person,
+        )
+        logging.info("Routes done")
+        logging.info("Stats ---------------------")
+        logging.info("Amount of routes: %s", len(routes))
+        logging.info(
+            "Amount of people: %s", sum([r.num_people_on_route for r in routes])
+        )
+        logging.info(
+            "Amount of nodes that could not reach dangerzone: %s",
+            len(program_config.origin_points) - len(routes),
+        )
+        write_network(program_config.G, network_name="Copenhagen")
+        write_plans(routes, plan_filename="plans.xml")
 
     run_matsim()
 
@@ -71,6 +79,11 @@ if __name__ == "__main__":
     group.add_argument("-dev", action="store_true", help="Enable dev mode (skips GUI)")
     group.add_argument(
         "-gui-only", action="store_true", help="Run GUI only (without simulation)"
+    )
+    group.add_argument(
+        "-matsim-only",
+        action="store_true",
+        help="Run Matsim only (precomputed routes on Copenhagen)",
     )
     args = parser.parse_args()
 
