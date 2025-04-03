@@ -10,6 +10,7 @@ from controller import (
     run_matsim,
     set_dev_input_data,
 )
+from data_loader.polaris import read_sumo_graph_as_polaris_igraph
 from input_data import (
     verify_input,
 )
@@ -52,6 +53,7 @@ def main(args: argparse.Namespace) -> None:
         cars_per_person=program_config.cars_per_person,
     )
 
+    igraph = read_sumo_graph_as_polaris_igraph("copenhagen.net.xml.gz")
     pairs = [(route.path[0], route.path[-1]) for route in routes]
     r = polaris_paths(pairs, program_config.G, Weight.LENGTH)
 

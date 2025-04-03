@@ -1,14 +1,13 @@
 import gzip
 import logging
 import os
-import pickle
 import shutil
 
 import igraph
 import sumolib
+from routing_lib import from_sumo_to_igraph_network
 
 from data_loader import DATA_DIR
-from routing_lib import from_sumo_to_igraph_network
 
 OSM_DIR = DATA_DIR / "osm_graph"
 
@@ -33,14 +32,8 @@ def read_sumo_graph_as_polaris_igraph(filename: str) -> igraph.Graph:
     road_network = sumolib.net.readNet(decompressed_filepath)
     os.remove(decompressed_filepath)
 
-    logging.info(f"Converting SUMO graph to igraph format")
+    logging.info("Converting SUMO graph to igraph format")
     polaris_graph = from_sumo_to_igraph_network(road_network)
 
     logging.info(f"Loaded SUMO graph: {filename}")
     return polaris_graph
-
-
-if __name__ == "__main__":
-    graph = read_sumo_graph_as_polaris_igraph("copenhagen.net.xml.gz")
-    with open(OSM_DIR / "copenhagen_igraph.pkl", "wb") as f:
-        pickle.dump(graph, f)
