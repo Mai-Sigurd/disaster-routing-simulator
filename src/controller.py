@@ -47,20 +47,6 @@ def run_matsim() -> None:
     subprocess.run(cmd, cwd=SOURCE_DIR / "simulator")
 
 
-def set_dev_input_data() -> InputData:
-    """
-    Set the input data for development.
-    """
-    return InputData(
-        type=PopulationType.GEO_JSON_FILE,
-        city=CITY.CPH,
-        population_number=0,
-        osm_geopandas_json_bbox="",
-        danger_zones_geopandas_json=load_json_file_to_str(CPH_SMALL_AMAGER_DANGER_ZONE),
-        worldpop_filepath="",
-    )
-
-
 def controller_input_data(input_data: InputData) -> ProgramConfig:
     conf = ProgramConfig()
     conf.route_algos = ROUTE_ALGOS
