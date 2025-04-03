@@ -74,6 +74,8 @@ public class PeopleInSafetyXY implements MATSimAppCommand {
         }
         tTraveltime.addColumns(time);
 
+        tTraveltime.sortOn("purpose", "bin");
+
         tTraveltime.write().csv(output.getPath("people_in_safety.csv").toFile());
         return 0;
     }

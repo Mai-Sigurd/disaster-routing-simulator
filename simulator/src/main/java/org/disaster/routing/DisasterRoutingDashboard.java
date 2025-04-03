@@ -73,14 +73,14 @@ public class DisasterRoutingDashboard implements Dashboard {
     
         layout.row("Amount of people in safety").el(Plotly.class, ((viz, data) -> {
 
-				viz.title = "xx";
-				viz.description = "yy";
+				viz.title = "People in safety";
+				viz.description = "The fraction of people who have reached safety at time t";
 
 				Plotly.DataSet ds = viz.addDataset(data.compute(PeopleInSafetyXY.class, "people_in_safety.csv"));
 
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.xAxis(Axis.builder().title("Time from start of simulation (minutes)").build())
-					.yAxis(Axis.builder().title("Percent of people in safety").build())
+					.yAxis(Axis.builder().title("Fraction of people in safety").build())
 					.build();
 
 				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
