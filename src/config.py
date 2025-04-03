@@ -52,9 +52,9 @@ def set_small_data_input_data() -> InputData:
     Set the input data for small data.
     """
     return InputData(
-        type=PopulationType.GEO_JSON_FILE,
+        type=PopulationType.NUMBER,
         city=CITY.CPH,
-        population_number=0,
+        population_number=100,
         osm_geopandas_json_bbox="",
         danger_zones_geopandas_json=load_json_file_to_str(
             CPH_XTRA_SMALL_AMAGER_DANGER_ZONE
