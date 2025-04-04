@@ -23,6 +23,7 @@ from input_data import (
 from matsim_io import MATSIM_DATA_DIR, mat_sim_files_exist, write_network, write_plans
 from routes.route import Route, create_route_objects
 from routes.route_utils import path
+from data_loader.osm import download_osm_graph_from_polygon
 
 logging.basicConfig(
     level=logging.INFO,
@@ -120,7 +121,7 @@ if __name__ == "__main__":
         help="Run Matsim only (precomputed routes on Copenhagen)",
     )
     args = parser.parse_args()
-
+    args.small = True
     signal.signal(signal.SIGTSTP, gui_close)
 
     if args.gui_only:

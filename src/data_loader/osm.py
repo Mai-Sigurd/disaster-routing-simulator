@@ -7,6 +7,7 @@ from shapely.geometry import shape
 from shapely.geometry.polygon import Polygon
 
 from data_loader import DATA_DIR, load_json_file
+import geopandas as gpd
 
 OSM_DIR = DATA_DIR / "osm_graph"
 
@@ -48,6 +49,21 @@ def download_osm_graph_with_bbox_string(
     bbox = geojson_str_to_polygon(geo_json)
     return download_osm_graph_with_bbox(bbox, simplify)
 
+def download_osm_graph_from_polygon(geo_json: str) -> nx.MultiDiGraph:
+    """
+    Loads a GeoJSON string containing a single polygon with exactly 5 coordinates
+    and extracts its bounding box.
+
+    :param geo_json: GeoJSON string.
+    :return: OSM graph containing the road network in the bounding box.
+    """
+    polygon = geojson_str_to_polygon(geo_json)
+    logging.info(f"Downloading OSM graph with bounding polygon: {polygon.bounds}")
+    graph = ox.graph_from_polygon(polygon=polygon, network_type="drive_service", simplify=True, truncate_by_edge=True)
+    logging.info(
+        f"Downloaded OSM graph with {len(graph.nodes)} nodes and {len(graph.edges)} edges"
+    )
+    return graph
 
 def download_osm_graph_with_bbox(
     bbox: Polygon, simplify: bool = True
