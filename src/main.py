@@ -92,7 +92,6 @@ def main(args: argparse.Namespace) -> None:
         write_plans(routes, plan_filename="plans.xml")
         write_g_and_dangerzone_data(
             danger_zone=program_config.danger_zones,
-            city_bbox_polygon=program_config.city_bbox,
             filepath=MATSIM_DATA_DIR / "g_and_dangerzone_data.csv",
         )
 

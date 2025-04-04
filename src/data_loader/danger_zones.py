@@ -48,10 +48,3 @@ def set_danger_zone_crs(danger_zone: gpd.GeoDataFrame, crs: str) -> gpd.GeoDataF
         danger_zone.set_crs(crs, inplace=True)
 
     return danger_zone.to_crs(crs, inplace=True)
-
-
-def write_danger_zone_size(danger_zone: gpd.GeoDataFrame, filepath: str) -> None:
-    total_area = danger_zone.area.sum()
-    total_area_km2 = total_area / 1_000_000
-    with open(filepath, "a") as file:
-        file.write(f"total_area_km2,{total_area_km2}\n")
