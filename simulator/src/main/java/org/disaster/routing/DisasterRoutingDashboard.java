@@ -1,6 +1,7 @@
 package org.disaster.routing;
 
 import org.disaster.routing.analysis.PeopleInSafetyXY;
+import org.disaster.routing.analysis.TrafficAnalysisDisaster;
 import org.disaster.routing.analysis.TripPurposeBy10Min;
 import org.disaster.routing.analysis.TripStatsDisaster;
 import org.matsim.api.core.v01.TransportMode;
@@ -116,7 +117,7 @@ public class DisasterRoutingDashboard implements Dashboard {
 				viz.title = "Network congestion index";
 				viz.description = "by hour";
 
-				Plotly.DataSet ds = viz.addDataset(data.compute(TrafficAnalysis.class, "traffic_stats_by_road_type_and_hour.csv", args));
+				Plotly.DataSet ds = viz.addDataset(data.compute(TrafficAnalysisDisaster.class, "traffic_stats_by_road_type_and_hour.csv", args));
 
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.yAxis(Axis.builder().title("Index").build())
@@ -135,7 +136,7 @@ public class DisasterRoutingDashboard implements Dashboard {
 				viz.title = "Traffic stats per road type";
 				viz.description = "daily";
 
-				viz.dataset = data.compute(TrafficAnalysis.class, "traffic_stats_by_road_type_daily.csv", args);
+				viz.dataset = data.compute(TrafficAnalysisDisaster.class, "traffic_stats_by_road_type_daily.csv", args);
 
 				viz.showAllRows = true;
 				viz.enableFilter = false;
@@ -151,7 +152,7 @@ public class DisasterRoutingDashboard implements Dashboard {
 
 			viz.setShape(data.compute(CreateAvroNetwork.class, "network.avro"), "id");
 
-			viz.addDataset("traffic", data.compute(TrafficAnalysis.class, "traffic_stats_by_link_daily.csv"));
+			viz.addDataset("traffic", data.compute(TrafficAnalysisDisaster.class, "traffic_stats_by_link_daily.csv"));
 
 			viz.display.lineColor.dataset = "traffic";
 			viz.display.lineColor.columnName = "avg_speed";
