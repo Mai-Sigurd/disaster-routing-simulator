@@ -4,7 +4,6 @@ import subprocess
 from types import FrameType
 
 import geopandas as gpd
-from shapely.geometry import Polygon
 
 from analysis.osm_size import write_g_and_danger_zone_data_simwrapper_csv
 from config import (
@@ -121,14 +120,12 @@ def gui_handler(gui_error_message: str = "") -> InputData:
     return input_data
 
 
-def write_g_and_dangerzone_data(
-    danger_zone: gpd.GeoDataFrame, city_bbox_polygon: Polygon, filepath: str
-) -> None:
+def write_g_and_dangerzone_data(danger_zone: gpd.GeoDataFrame, filepath: str) -> None:
     """
     Writes the total area of the danger zone and the total area of the city graph to a CSV file.
     """
     write_g_and_danger_zone_data_simwrapper_csv(
-        danger_zone, city_bbox_polygon, filepath
+        danger_zone=danger_zone, filepath=filepath
     )
 
 
