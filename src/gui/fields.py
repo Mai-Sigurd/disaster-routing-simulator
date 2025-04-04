@@ -4,7 +4,6 @@ import dearpygui.dearpygui as dpg
 
 from gui.constants import (
     DANGER_ZONE,
-    OSM_JSON_BBOX,
     POPULATION,
     POPULATION_NUMBER,
     TIFF_FILE,

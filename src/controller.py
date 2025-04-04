@@ -16,8 +16,7 @@ from config import (
 from data_loader import load_json_file_to_str
 from data_loader.danger_zones import load_danger_zone_from_str
 from data_loader.osm import (
-download_osm_graph_from_polygon,
-
+    download_osm_graph_from_polygon,
 )
 from data_loader.population import (
     danger_zone_population,

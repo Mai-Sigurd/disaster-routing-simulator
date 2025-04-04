@@ -3,7 +3,6 @@ from pathlib import Path
 
 import networkx as nx
 from geopandas import GeoDataFrame
-from shapely.geometry.polygon import Polygon
 
 from data_loader import load_json_file_to_str
 from input_data import CITY, InputData, PopulationType

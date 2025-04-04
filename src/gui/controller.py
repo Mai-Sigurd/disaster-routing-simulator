@@ -11,7 +11,6 @@ from gui.constants import (
     MENU_COPENHAGEN,
     MENU_PICK_AREA,
     MENU_TAG,
-    OSM_JSON_BBOX,
     POPULATION,
     POPULATION_NUMBER,
     TIFF_FILE,
