@@ -8,7 +8,6 @@ import geopandas as gpd
 from analysis.osm_size import write_g_and_danger_zone_data_simwrapper_csv
 from config import (
     CPH_AMAGER_DANGER_ZONE,
-    CPH_G_GRAPHML,
     CPH_POPULATION_DATA,
     ROUTE_ALGOS,
     SOURCE_DIR,
@@ -17,11 +16,8 @@ from config import (
 from data_loader import load_json_file_to_str
 from data_loader.danger_zones import load_danger_zone_from_str
 from data_loader.osm import (
-    download_osm_graph_with_bbox_string,
 download_osm_graph_from_polygon,
-    geojson_str_to_polygon,
-    get_bbox_from_file,
-    load_osm,
+
 )
 from data_loader.population import (
     danger_zone_population,
@@ -64,9 +60,7 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
             input_data.danger_zones_geopandas_json = load_json_file_to_str(
                 CPH_AMAGER_DANGER_ZONE
             )
-        conf.city_bbox = get_bbox_from_file("cph_bbox.geojson")
-        conf.G = load_osm(CPH_G_GRAPHML)
-        # TODO change above to use fetch A amager graphml
+        conf.G = download_osm_graph_from_polygon(input_data.danger_zones_geopandas_json)
         conf.danger_zones = load_danger_zone_from_str(
             input_data.danger_zones_geopandas_json, "EPSG:4326"
         )
@@ -85,7 +79,6 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
             input_data.danger_zones_geopandas_json, "EPSG:4326"
         )
         conf.G = download_osm_graph_from_polygon(input_data.danger_zones_geopandas_json)
-        conf.city_bbox = geojson_str_to_polygon(input_data.osm_geopandas_json_bbox)
         conf.danger_zones = load_danger_zone_from_str(
             input_data.danger_zones_geopandas_json, "EPSG:4326"
         )

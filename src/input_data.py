@@ -28,7 +28,6 @@ class InputData:
     type: PopulationType
     city: CITY
     population_number: int
-    osm_geopandas_json_bbox: str
     danger_zones_geopandas_json: str
     worldpop_filepath: str
 
@@ -36,7 +35,6 @@ class InputData:
         return dedent(f"""
             Simulation input summary:
             - Scenario type: {self.type}
-            - OSM GeoJSON (bbox): {self.osm_geopandas_json_bbox}
             - Danger zones GeoJSON: {self.danger_zones_geopandas_json}
             - Population size: {self.population_number}
             - WorldPop file: {self.worldpop_filepath}
@@ -61,10 +59,6 @@ def open_pickle_file(file_path: str) -> InputData:
 def verify_input(input_data: InputData) -> tuple[bool, str]:
     ## CITY
     if input_data.city == CITY.NONE:
-        if input_data.osm_geopandas_json_bbox == "":
-            return False, "OSM city, geojson empty"
-        if not _is_valid_geojson(input_data.osm_geopandas_json_bbox):
-            return False, "OSM city, Invalid geojson"
         if input_data.danger_zones_geopandas_json == "":
             return False, "OSM dangerzone, geojson empty"
         if not _is_valid_geojson(input_data.danger_zones_geopandas_json):

@@ -32,7 +32,6 @@ class ProgramConfig:
     danger_zone_population_data: GeoDataFrame = None
     danger_zones: GeoDataFrame = None
     G: nx.MultiDiGraph = None
-    city_bbox: Polygon = None
     origin_points: list[str] = field(default_factory=list)
     cars_per_person: float = 1
     route_algos: list[RouteAlgo] = field(default_factory=list)
@@ -46,8 +45,7 @@ def set_dev_input_data() -> InputData:
         type=PopulationType.GEO_JSON_FILE,
         city=CITY.CPH,
         population_number=0,
-        osm_geopandas_json_bbox="",
-        danger_zones_geopandas_json=load_json_file_to_str(CPH_SMALL_AMAGER_DANGER_ZONE),
+        danger_zones_geopandas_json=load_json_file_to_str(CPH_AMAGER_DANGER_ZONE),
         worldpop_filepath="",
     )
 
@@ -60,7 +58,6 @@ def set_small_data_input_data() -> InputData:
         type=PopulationType.NUMBER,
         city=CITY.NONE,
         population_number=1000,
-        osm_geopandas_json_bbox=load_json_file_to_str(CPH_AMAGER_BBOX),
         danger_zones_geopandas_json=load_json_file_to_str(CPH_SMALL_AMAGER_DANGER_ZONE),
         worldpop_filepath="",
     )

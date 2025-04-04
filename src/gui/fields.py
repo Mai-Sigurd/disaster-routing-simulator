@@ -13,14 +13,6 @@ from gui.constants import (
 
 
 def add_input_fields_pick_area(parent: str) -> list[gui_type]:
-    t1 = _add_geo_json_input_field(
-        title="OSM Graph",
-        desc="Go to geojson.io and pick an area, copy the JSON into the below box",
-        desc2="The area should be a bounding box of the city",
-        desc3="",
-        tag=OSM_JSON_BBOX,
-        parent=parent,
-    )
     t2 = _add_danger_zone_input_field(parent=parent, tag=DANGER_ZONE)
 
     t3 = _add_population_input_field(
@@ -34,7 +26,7 @@ def add_input_fields_pick_area(parent: str) -> list[gui_type]:
         ],  # if you change the ordering, remember to change ordering constants in constants.py
         parent=parent,
     )
-    return [t1, t2, t3]
+    return [t2, t3]
 
 
 def add_city_fields(parent: str, city_tag: str, desc3: str = "") -> list[gui_type]:
