@@ -7,7 +7,6 @@ from shapely.geometry import shape
 from shapely.geometry.polygon import Polygon
 
 from data_loader import DATA_DIR, load_json_file
-import geopandas as gpd
 
 OSM_DIR = DATA_DIR / "osm_graph"
 
@@ -32,7 +31,7 @@ def download_osm_graph_with_bbox_file(
     bbox = _geojson_as_polygon(geo_json["features"][0]["geometry"])
     logging.info(f"Loaded bounding box: {bbox_file_name}")
 
-    return download_osm_graph_with_bbox(bbox, simplify)
+    return download_osm_graph(bbox, simplify)
 
 
 def download_osm_graph_with_bbox_string(
@@ -47,7 +46,8 @@ def download_osm_graph_with_bbox_string(
     :return: OSM graph containing the road network in the bounding box.
     """
     bbox = geojson_str_to_polygon(geo_json)
-    return download_osm_graph_with_bbox(bbox, simplify)
+    return download_osm_graph(bbox, simplify)
+
 
 def download_osm_graph_from_polygon(geo_json: str) -> nx.MultiDiGraph:
     """
@@ -59,30 +59,28 @@ def download_osm_graph_from_polygon(geo_json: str) -> nx.MultiDiGraph:
     """
     polygon = geojson_str_to_polygon(geo_json)
     logging.info(f"Downloading OSM graph with bounding polygon: {polygon.bounds}")
-    graph = ox.graph_from_polygon(polygon=polygon, network_type="drive_service", simplify=True, truncate_by_edge=True)
+    graph = ox.graph_from_polygon(
+        polygon=polygon,
+        network_type="drive_service",
+        simplify=True,
+        truncate_by_edge=True,
+    )
     logging.info(
         f"Downloaded OSM graph with {len(graph.nodes)} nodes and {len(graph.edges)} edges"
     )
     return graph
 
-def download_osm_graph_with_bbox(
-    bbox: Polygon, simplify: bool = True
-) -> nx.MultiDiGraph:
+
+def download_osm_graph(polygon: Polygon, simplify: bool = True) -> nx.MultiDiGraph:
     """
-    Download an OSM graph from a bounding box.
-    :param bbox: Bounding box polygon with exactly 5 coordinates, where the first and last are the same.
+    Download the OSM graph within the given polygon.
+    :param polygon: Polygon representing the area of interest.
     :param simplify: Whether to simplify the graph.
     :return: OSM graph containing the road network in the bounding box.
     """
-    coords = list(bbox.exterior.coords)
-    if len(coords) != 5 or coords[0] != coords[-1]:
-        logging.fatal(
-            "Bounding box polygon must have exactly 5 coordinates, forming a closed shape."
-        )
-
-    logging.info(f"Downloading OSM graph with bounding box: {bbox.bounds}")
-    graph = ox.graph_from_bbox(
-        bbox=bbox.bounds,
+    logging.info(f"Downloading OSM graph with bounding polygon: {polygon.bounds}")
+    graph = ox.graph_from_polygon(
+        polygon=polygon,
         network_type="drive_service",
         simplify=simplify,
         truncate_by_edge=True,
