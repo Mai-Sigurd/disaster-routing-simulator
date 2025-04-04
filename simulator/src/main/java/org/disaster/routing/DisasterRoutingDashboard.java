@@ -75,7 +75,7 @@ public class DisasterRoutingDashboard implements Dashboard {
 
         createTripDataRow(layout, "departures", header.tab, "Departures", "departure", "Time from start of simulation (minutes)");
         createTripDataRow(layout, "arrivals", header.tab, "Arrivals", "arrival", "Time from start of simulation (minutes)");
-        createTripDataRow(layout, "traveltype", header.tab, "Traveltime", "traveltime", "Time from departure to arrival (minutes)");
+        createTripDataRow(layout, "traveltype", header.tab, "Travel times", "traveltime", "Time from departure to arrival (minutes)");
     
     
         layout.row("Amount of people in safety").el(Plotly.class, ((viz, data) -> {

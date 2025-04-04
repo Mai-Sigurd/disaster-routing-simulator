@@ -1,3 +1,4 @@
 output
 network.xml.gz
 plans.xml.gz
+*.csv
