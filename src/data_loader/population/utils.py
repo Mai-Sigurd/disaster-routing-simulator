@@ -11,8 +11,8 @@ from networkx.classes import MultiDiGraph
 from shapely.geometry import Point
 from tqdm import tqdm
 
-from data_loader import DATA_DIR
-from data_loader.osm import download_cph
+from data_loader import DATA_DIR, load_json_file_to_str
+from data_loader.osm import download_osm_graph_from_polygon
 
 POPULATION = "pop"
 NODE_ID = "id"
@@ -121,6 +121,6 @@ if __name__ == "__main__":
     save_tiff_population_to_geojson(
         tiff_file_name="dnk_ppp_2020_constrained.tif",
         geo_file_name="CPHpop.geojson",
-        G=download_cph(),
+        G=download_osm_graph_from_polygon(load_json_file_to_str("dangerzone_amager.geojson")),
         maximum_distance_to_node=100,
     )

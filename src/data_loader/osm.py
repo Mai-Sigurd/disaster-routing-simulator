@@ -6,33 +6,9 @@ import osmnx as ox
 from shapely.geometry import shape
 from shapely.geometry.polygon import Polygon
 
-from data_loader import DATA_DIR, load_json_file
+from data_loader import DATA_DIR
 
 OSM_DIR = DATA_DIR / "osm_graph"
-
-
-def download_osm_graph_with_bbox_file(
-    bbox_file_name: str, simplify: bool = True
-) -> nx.MultiDiGraph:
-    """
-    Loads a GeoJSON file containing a single polygon with exactly 5 coordinates
-    and extracts its bounding box.
-
-    :param bbox_file_name: Name of the GeoJSON file (e.g., "bbox.geojson").
-    :param simplify: Whether to simplify the graph.
-    :return: OSM graph containing the road network in the bounding box.
-    """
-    if not bbox_file_name.endswith(".geojson"):
-        raise ValueError(f"Invalid file name for bounding box: {bbox_file_name}")
-
-    logging.info(f"Loading bounding box: {bbox_file_name}")
-    filepath = DATA_DIR / "bbox" / bbox_file_name
-    geo_json = load_json_file(filepath)
-    bbox = _geojson_as_polygon(geo_json["features"][0]["geometry"])
-    logging.info(f"Loaded bounding box: {bbox_file_name}")
-
-    return download_osm_graph(bbox, simplify)
-
 
 def download_osm_graph_from_polygon(geo_json: str) -> nx.MultiDiGraph:
     """
@@ -64,11 +40,6 @@ def download_osm_graph(polygon: Polygon, simplify: bool = True) -> nx.MultiDiGra
         f"Downloaded OSM graph with {len(graph.nodes)} nodes and {len(graph.edges)} edges"
     )
     return graph
-
-
-def download_cph() -> nx.MultiDiGraph:
-    """Download the OSM graph of Copenhagen."""
-    return download_osm_graph_with_bbox_file("cph_bbox.geojson")
 
 
 def save_osm(graph: nx.MultiDiGraph, filename: str) -> None:
