@@ -11,7 +11,6 @@ from gui.constants import (
     MENU_COPENHAGEN,
     MENU_PICK_AREA,
     MENU_TAG,
-    OSM_JSON_BBOX,
     POPULATION,
     POPULATION_NUMBER,
     TIFF_FILE,
@@ -28,7 +27,6 @@ def _save_input_data() -> None:
     city = dpg.get_value(MENU_TAG)
     population_number = dpg.get_value(POPULATION_NUMBER)
     worldpop_filepath = dpg.get_value(TIFF_FILE)
-    osm_geopandas_json = ""
     if dpg.get_value(POPULATION) == TIFF_FILE:
         pop_type = PopulationType.TIFF_FILE
     else:
@@ -40,13 +38,11 @@ def _save_input_data() -> None:
         pop_type = PopulationType.GEO_JSON_FILE
     else:
         city = CITY.NONE
-        osm_geopandas_json = dpg.get_value(OSM_JSON_BBOX)
 
     input_data = InputData(
         type=pop_type,
         city=city,
         population_number=population_number,
-        osm_geopandas_json_bbox=osm_geopandas_json,
         danger_zones_geopandas_json=danger_zones_geopandas_json,
         worldpop_filepath=worldpop_filepath,
     )

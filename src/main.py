@@ -90,12 +90,13 @@ def main(args: argparse.Namespace) -> None:
         )
         write_network(program_config.G, network_name="Copenhagen")
         write_plans(routes, plan_filename="plans.xml")
-        write_g_and_dangerzone_data(
-            danger_zone=program_config.danger_zones,
-            filepath=MATSIM_DATA_DIR / "g_and_dangerzone_data.csv",
-        )
 
     run_matsim()
+    if not mat_sim_only:
+        write_g_and_dangerzone_data(
+            danger_zone=program_config.danger_zones,
+            filepath=MATSIM_DATA_DIR / "OUTPUT" / "dangerzone_data.csv",
+        )
 
 
 if __name__ == "__main__":
@@ -120,7 +121,6 @@ if __name__ == "__main__":
         help="Run Matsim only (precomputed routes on Copenhagen)",
     )
     args = parser.parse_args()
-
     signal.signal(signal.SIGTSTP, gui_close)
 
     if args.gui_only:

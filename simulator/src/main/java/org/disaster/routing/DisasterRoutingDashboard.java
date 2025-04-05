@@ -22,7 +22,7 @@ import tech.tablesaw.plotly.traces.ScatterTrace;
 import java.util.List;
 
 public class DisasterRoutingDashboard implements Dashboard {
-    private final String pythonDataPath = "../../../../../../../data/matsim/";
+
     @Override
     public void configure(Header header, Layout layout) {
         header.title = "Disaster Evacuation Routing Dashboard";
@@ -57,7 +57,7 @@ public class DisasterRoutingDashboard implements Dashboard {
                 })
                 .el(Table.class, (viz, data) -> {
                     viz.title = "OSM Area";
-                    viz.dataset = pythonDataPath + "g_and_dangerzone_data.csv";
+                    viz.dataset = "dangerzone_data.csv";
                     viz.showAllRows = true;
                 })
                 .el(Plotly.class, (viz, data) -> {
