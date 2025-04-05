@@ -33,22 +33,6 @@ def download_osm_graph_with_bbox_file(
 
     return download_osm_graph(bbox, simplify)
 
-
-def download_osm_graph_with_bbox_string(
-    geo_json: str, simplify: bool = True
-) -> nx.MultiDiGraph:
-    """
-    Loads a GeoJSON string containing a single polygon with exactly 5 coordinates
-    and extracts its bounding box.
-
-    :param geo_json: GeoJSON string.
-    :param simplify: Whether to simplify the graph.
-    :return: OSM graph containing the road network in the bounding box.
-    """
-    bbox = geojson_str_to_polygon(geo_json)
-    return download_osm_graph(bbox, simplify)
-
-
 def download_osm_graph_from_polygon(geo_json: str) -> nx.MultiDiGraph:
     """
     Loads a GeoJSON string containing a single polygon with exactly 5 coordinates
