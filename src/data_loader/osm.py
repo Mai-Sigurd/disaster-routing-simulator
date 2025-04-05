@@ -33,6 +33,7 @@ def download_osm_graph_with_bbox_file(
 
     return download_osm_graph(bbox, simplify)
 
+
 def download_osm_graph_from_polygon(geo_json: str) -> nx.MultiDiGraph:
     """
     Loads a GeoJSON string containing a single polygon with exactly 5 coordinates
