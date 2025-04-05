@@ -10,6 +10,7 @@ from data_loader import DATA_DIR
 
 OSM_DIR = DATA_DIR / "osm_graph"
 
+
 def download_osm_graph_from_polygon(geo_json: str) -> nx.MultiDiGraph:
     """
     Loads a GeoJSON string containing a single polygon with exactly 5 coordinates

@@ -121,6 +121,8 @@ if __name__ == "__main__":
     save_tiff_population_to_geojson(
         tiff_file_name="dnk_ppp_2020_constrained.tif",
         geo_file_name="CPHpop.geojson",
-        G=download_osm_graph_from_polygon(load_json_file_to_str("dangerzone_amager.geojson")),
+        G=download_osm_graph_from_polygon(
+            load_json_file_to_str("dangerzone_amager.geojson")
+        ),
         maximum_distance_to_node=100,
     )
