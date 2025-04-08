@@ -62,7 +62,9 @@ if __name__ == "__main__":
         edges = node.getIncoming()
         return edges[-1].getID()
 
-    node_pairs = [(r.path[0], r.path[-1]) for r in routes]
+    node_pairs = [
+        (r.path[0], r.path[-1]) for r in routes for _ in range(r.num_people_on_route)
+    ]
     edge_pairs = [
         (first_outgoing_edge(from_node), last_incoming_edge(to_node))
         for from_node, to_node in node_pairs
