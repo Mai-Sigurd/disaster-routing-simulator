@@ -8,7 +8,6 @@ from pathlib import Path
 from textwrap import dedent
 from typing import cast
 
-
 SRC_DIR = Path(__file__).resolve().parent.parent
 INPUTDATADIR = SRC_DIR / "input_data.pickle"
 
