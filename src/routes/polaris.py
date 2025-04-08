@@ -5,6 +5,7 @@ import networkx as nx
 import sumolib.net.edge
 from meru.multilevel import MultiLevelModel
 from routing_lib import from_sumo_to_igraph_network
+from tqdm import tqdm
 
 from config import ONE_HOUR, TWO_MINUTES
 from controller import controller_input_data, set_dev_input_data
@@ -72,7 +73,7 @@ if __name__ == "__main__":
     model.fit(random_state=42)
 
     result_paths = {}
-    for from_edge, to_edge in edge_pairs:
+    for from_edge, to_edge in tqdm(edge_pairs, desc="Predicting least popular paths"):
         result_paths[(from_edge, to_edge)] = model.predict(from_edge, to_edge)
 
     with open("copenhagen_igraph.pkl", "wb") as f:
