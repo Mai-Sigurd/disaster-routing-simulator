@@ -65,7 +65,7 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
         )
         conf.danger_zone_population_data = danger_zone_population(
             population_type=input_data.type,
-            tiff_file_name="",
+            tiff_file_path="",
             geo_file_name=CPH_POPULATION_DATA,
             population_number=input_data.population_number,
             danger_zone=conf.danger_zones,
@@ -84,7 +84,7 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
         if input_data.type == PopulationType.TIFF_FILE:
             conf.danger_zone_population_data = danger_zone_population(
                 population_type=input_data.type,
-                tiff_file_name=input_data.worldpop_filepath,
+                tiff_file_path=input_data.worldpop_filepath,
                 geo_file_name="tiff_data.json",
                 population_number=0,
                 danger_zone=conf.danger_zones,
@@ -93,7 +93,7 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
         else:  # PopulationType.NUMBER
             conf.danger_zone_population_data = danger_zone_population(
                 population_type=input_data.type,
-                tiff_file_name="",
+                tiff_file_path="",
                 geo_file_name=input_data.danger_zones_geopandas_json,
                 population_number=input_data.population_number,
                 danger_zone=conf.danger_zones,

@@ -8,7 +8,6 @@ from pathlib import Path
 from textwrap import dedent
 from typing import cast
 
-from utils import get_path_relative_to_disaster_dir
 
 SRC_DIR = Path(__file__).resolve().parent.parent
 INPUTDATADIR = SRC_DIR / "input_data.pickle"
@@ -76,7 +75,7 @@ def verify_input(input_data: InputData) -> tuple[bool, str]:
         if input_data.worldpop_filepath == "":
             return False, "Worldpop tiff file path is empty"
         if not os.path.exists(
-            get_path_relative_to_disaster_dir(input_data.worldpop_filepath)
+            input_data.worldpop_filepath
         ):
             return False, "Worldpop tiff file not found"
     elif input_data.type == PopulationType.GEO_JSON_FILE:

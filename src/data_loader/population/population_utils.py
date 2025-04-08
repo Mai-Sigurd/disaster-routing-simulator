@@ -11,7 +11,6 @@ from shapely.geometry import Point
 from tqdm import tqdm
 
 from data_loader import DATA_DIR
-from utils import get_path_relative_to_disaster_dir
 
 POPULATION = "pop"
 NODE_ID = "id"
@@ -56,7 +55,7 @@ def snap_population_to_nodes(
 ) -> gpd.GeoDataFrame:
     """
     Snap population data to the nearest node in the graph.
-    :param df: GeoDataFrame with population data.
+    :param pop_geo_frame: GeoDataFrame with population data.
     :param G: OSM graph.
     :param maximum_distance_to_node: Maximum distance to snap population to a node in meters.
     :return: GeoDataFrame with population data snapped to nodes."""
@@ -91,25 +90,22 @@ def snap_population_to_nodes(
 
 
 def save_tiff_population_to_geojson(
-    tiff_file_name: str,
+    tiff_file_path: str,
     geo_file_name: str,
     G: nx.MultiDiGraph,
     maximum_distance_to_node: int,
 ) -> None:
     """
     Save a TIFF file with population data to a GeoJSON file with population data snapped to nodes.
-    :param tiff_file_name: Name of the TIFF file.
+    :param tiff_file_path: Full filepath to the tif file
     :param geo_file_name: Name of the GeoJSON file that the tiff data should be saved to.
     :param G: OSM graph.
     :param maximum_distance_to_node: Maximum distance to snap population to a node in meters.
     """
-    logging.getLogger().setLevel(logging.INFO)
-
-    POPULATION_DATA_FILE = get_path_relative_to_disaster_dir(tiff_file_name)
-    logging.info("Population data file: %s", POPULATION_DATA_FILE)
+    logging.info("Population data file: %s", tiff_file_path )
 
     snap_population_to_nodes(
-        filter_world_pop_to_graph_area(read_world_pop_data(POPULATION_DATA_FILE), G),
+        filter_world_pop_to_graph_area(read_world_pop_data(tiff_file_path), G),
         G,
         maximum_distance_to_node,
     ).to_file(
