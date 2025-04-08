@@ -102,7 +102,7 @@ def save_tiff_population_to_geojson(
     :param G: OSM graph.
     :param maximum_distance_to_node: Maximum distance to snap population to a node in meters.
     """
-    logging.info("Population data file: %s", tiff_file_path )
+    logging.info("Population data file: %s", tiff_file_path)
 
     snap_population_to_nodes(
         filter_world_pop_to_graph_area(read_world_pop_data(tiff_file_path), G),
