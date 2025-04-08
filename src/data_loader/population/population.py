@@ -4,7 +4,7 @@ import geopandas as gpd
 import networkx as nx
 from shapely.geometry import Point
 
-from data_loader.population.utils import (
+from data_loader.population.population_utils import (
     GEOMETRY,
     NODE_ID,
     POPULATION,
@@ -42,7 +42,9 @@ def population_data_from_tiff(
 ) -> gpd.GeoDataFrame:
     """
     Loads a TIFF file and returns a GeoDataFrame.
-    :param file_name: The name of the TIFF file.
+    :param tiff_file_name: The name of the TIFF file.
+    :param geo_file_name: The name of the GeoJSON file the tiff information should be saved to.
+    :param G: OSM graph.
     :return: A geopandas dataframe with id corresponding to OSM IDS and population, within the dangerzone.
     """
     save_tiff_population_to_geojson(

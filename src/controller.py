@@ -85,7 +85,7 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
             conf.danger_zone_population_data = danger_zone_population(
                 population_type=input_data.type,
                 tiff_file_name=input_data.worldpop_filepath,
-                geo_file_name=input_data.danger_zones_geopandas_json,
+                geo_file_name="tiff_data.json",
                 population_number=0,
                 danger_zone=conf.danger_zones,
                 G=conf.G,
@@ -99,7 +99,9 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
                 danger_zone=conf.danger_zones,
                 G=conf.G,
             )
-    conf.origin_points = get_origin_points(conf.danger_zone_population_data)
+    conf.origin_points = get_origin_points(
+        conf.danger_zone_population_data, dangerzone=conf.danger_zones
+    )
     return conf
 
 

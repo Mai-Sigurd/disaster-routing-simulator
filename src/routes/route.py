@@ -5,7 +5,7 @@ import numpy as np
 from numpy.typing import NDArray
 from tqdm import tqdm
 
-from data_loader.population.utils import NODE_ID, POPULATION
+from data_loader.population.population_utils import NODE_ID, POPULATION
 from routes.route_utils import path
 
 

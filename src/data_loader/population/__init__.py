@@ -37,10 +37,19 @@ def danger_zone_population(
         return distribute_population(danger_zone, pop_geo)
 
 
-def get_origin_points(population_df: gpd.GeoDataFrame) -> list[str]:
+def get_origin_points(
+    population_df: gpd.GeoDataFrame, dangerzone: gpd.GeoDataFrame
+) -> list[str]:
     """
     Returns the origin points for the shortest path algorithm.
     :param population_df: A GeoDataFrame containing the population data.
-    :return: A list of origin points.
+    :param dangerzone: A GeoDataFrame containing the danger zone polygon(s).
+    :return: A list of origin points in the dangerzone
     """
-    return list(population_df["id"])
+    # Get the origin points from the population data
+    origin_points = distribute_population(
+        danger_zone=dangerzone, population=population_df
+    )
+
+    # Convert the origin points to a list of strings
+    return list(origin_points["id"])
