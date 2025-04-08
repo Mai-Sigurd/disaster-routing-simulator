@@ -75,7 +75,13 @@ def population_data_from_number(
     if num_nodes == 0:
         raise ValueError("No nodes found within the danger zone.")
 
-    population_per_node = population_number / num_nodes
+    if population_number < num_nodes:
+        logging.info(
+            "The population number is too small. The population number has now defaulted to 1 person per node."
+        )
+        population_per_node = 1.0
+    else:
+        population_per_node = population_number / num_nodes
 
     result = gpd.GeoDataFrame(
         {

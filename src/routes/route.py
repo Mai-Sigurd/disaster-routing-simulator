@@ -91,8 +91,7 @@ def create_route_objects(
     total_population = _get_total_population(population_data, cars_per_person)
     result = []
     departure_times = _departure_times(total_population, start, end)
-    for p in tqdm(list_of_paths):
-        route_path = p
+    for route_path in tqdm(list_of_paths):
         num_people_on_route = _get_num_people_on_route(
             route_path, population_data, cars_per_person
         )
