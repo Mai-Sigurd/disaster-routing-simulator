@@ -71,6 +71,8 @@ def verify_input(input_data: InputData) -> tuple[bool, str]:
 
     ## POPULATION TYPE
     if input_data.type == PopulationType.TIFF_FILE:
+        if input_data.worldpop_filepath == "":
+            return False, "Worldpop tiff file path is empty"
         if not os.path.exists(input_data.worldpop_filepath):
             return False, "Worldpop tiff file not found"
     elif input_data.type == PopulationType.GEO_JSON_FILE:

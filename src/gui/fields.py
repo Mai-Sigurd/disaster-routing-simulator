@@ -17,7 +17,7 @@ def add_input_fields_pick_area(parent: str) -> list[gui_type]:
     t3 = _add_population_input_field(
         title="Population",
         desc="Choose the population type:",
-        desc2="Either download a worldpop tiff file and input the filepath or input a population number which will be evenly distributed across the dangerzone",
+        desc2="Either download a worldpop tiff file and input the full filepath  \n or input a population number which will be evenly distributed across the danger zone",
         tag=POPULATION,
         types=[
             TIFF_FILE,

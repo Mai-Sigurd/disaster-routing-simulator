@@ -22,6 +22,15 @@ def test_verify(
         danger_zones_geopandas_json=danger_zone,
         worldpop_filepath="",
     )
+    assert verify_input(input_data) == (False, "Worldpop tiff file path is empty")
+
+    input_data = InputData(
+        type=PopulationType.TIFF_FILE,
+        city=CITY.NONE,
+        population_number=0,
+        danger_zones_geopandas_json=danger_zone,
+        worldpop_filepath="filenothere",
+    )
     assert verify_input(input_data) == (False, "Worldpop tiff file not found")
 
     input_data = InputData(
