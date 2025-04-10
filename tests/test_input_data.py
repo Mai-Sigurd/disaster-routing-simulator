@@ -1,6 +1,6 @@
 import pytest
 
-from input_data import CITY, InputData, PopulationType, verify_input
+from input_data import InputData, PopulationType, SimulationType, verify_input
 
 
 def test_verify(
@@ -8,7 +8,7 @@ def test_verify(
 ) -> None:
     input_data = InputData(
         type=PopulationType.GEO_JSON_FILE,
-        city=CITY.CPH,
+        simulationType=SimulationType.CASE_STUDIES,
         population_number=0,
         danger_zones_geopandas_json="",
         worldpop_filepath="",
@@ -17,7 +17,7 @@ def test_verify(
 
     input_data = InputData(
         type=PopulationType.TIFF_FILE,
-        city=CITY.NONE,
+        simulationType=SimulationType.EXPLORE,
         population_number=0,
         danger_zones_geopandas_json=danger_zone,
         worldpop_filepath="",
@@ -26,7 +26,7 @@ def test_verify(
 
     input_data = InputData(
         type=PopulationType.TIFF_FILE,
-        city=CITY.NONE,
+        simulationType=SimulationType.EXPLORE,
         population_number=0,
         danger_zones_geopandas_json=danger_zone,
         worldpop_filepath="filenothere",
@@ -35,7 +35,7 @@ def test_verify(
 
     input_data = InputData(
         type=PopulationType.NUMBER,
-        city=CITY.NONE,
+        simulationType=SimulationType.EXPLORE,
         population_number=0,
         danger_zones_geopandas_json=danger_zone,
         worldpop_filepath="",
@@ -47,7 +47,7 @@ def test_verify(
 
     input_data = InputData(
         type=PopulationType.GEO_JSON_FILE,
-        city=CITY.CPH,
+        simulationType=SimulationType.CASE_STUDIES,
         population_number=0,
         danger_zones_geopandas_json="Invalid input",
         worldpop_filepath="",

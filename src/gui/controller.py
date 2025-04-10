@@ -1,14 +1,15 @@
 import logging
+import webbrowser
 
 import dearpygui.dearpygui as dpg
 
+from config import SIM_WRAPPER_CASE_STUDIES_LINK
 from gui.constants import (
-    CPH_WINDOW,
+    CASE_WINDOW,
     DANGER_ZONE,
-    DANGER_ZONE_CPH,
-    FIELD_WINDOW,
+    EXPLORE_WINDOW,
     FONTDIR,
-    MENU_COPENHAGEN,
+    MENU_CASE,
     MENU_PICK_AREA,
     MENU_TAG,
     POPULATION,
@@ -16,32 +17,30 @@ from gui.constants import (
     TIFF_FILE,
     gui_type,
 )
-from gui.fields import add_city_fields, add_input_fields_pick_area
-from input_data import CITY, INPUTDATADIR, InputData, PopulationType, save_to_pickle
+from gui.fields import add_input_fields_pick_area
+from input_data import (
+    INPUTDATADIR,
+    InputData,
+    PopulationType,
+    SimulationType,
+    save_to_pickle,
+)
 
 
 def _save_input_data() -> None:
     logging.info("Getting input data from GUI")
     danger_zones_geopandas_json = dpg.get_value(DANGER_ZONE)
-    pop_type = PopulationType.GEO_JSON_FILE
-    city = dpg.get_value(MENU_TAG)
     population_number = dpg.get_value(POPULATION_NUMBER)
     worldpop_filepath = dpg.get_value(TIFF_FILE)
+    simulation_type = SimulationType.EXPLORE
     if dpg.get_value(POPULATION) == TIFF_FILE:
         pop_type = PopulationType.TIFF_FILE
     else:
         pop_type = PopulationType.NUMBER
 
-    if city == MENU_COPENHAGEN:
-        city = CITY.CPH
-        danger_zones_geopandas_json = dpg.get_value(DANGER_ZONE_CPH)
-        pop_type = PopulationType.GEO_JSON_FILE
-    else:
-        city = CITY.NONE
-
     input_data = InputData(
-        type=pop_type,
-        city=city,
+        populationType=pop_type,
+        simulationType=simulation_type,
         population_number=population_number,
         danger_zones_geopandas_json=danger_zones_geopandas_json,
         worldpop_filepath=worldpop_filepath,
@@ -49,6 +48,18 @@ def _save_input_data() -> None:
 
     save_to_pickle(input_data, INPUTDATADIR)
     dpg.stop_dearpygui()
+
+def _case_studies() -> None:
+    input_data = InputData(
+        populationType=PopulationType.NUMBER, # Will not be used
+        simulationType=SimulationType.CASE_STUDIES,
+        danger_zones_geopandas_json="", # Will not be used
+        population_number=1, # Will not be used
+    )
+    save_to_pickle(input_data, INPUTDATADIR)
+    webbrowser.open(SIM_WRAPPER_CASE_STUDIES_LINK)
+    dpg.stop_dearpygui()
+
 
 
 def set_fonts_theme(bold_items: list[gui_type], titel: str, e_msg: str) -> None:
@@ -78,7 +89,7 @@ def add_main_window(
     e_msg = dpg.add_text(error_message, parent=tag)
     dpg.add_radio_button(
         tag=MENU_TAG,
-        items=[MENU_PICK_AREA, MENU_COPENHAGEN],
+        items=[MENU_PICK_AREA, MENU_CASE],
         parent=tag,
         horizontal=True,
         callback=change_windows,
@@ -87,33 +98,39 @@ def add_main_window(
     return t1, e_msg
 
 
-def add_city_window(
+
+def add_city_case_window(
     parent: str, tag: str, width: int, height: int, danger_zone_desc: str
 ) -> list[gui_type]:
     dpg.add_child_window(
         label="", tag=tag, show=True, parent=parent, width=width, height=height
     )
-    bold_text = add_city_fields(
-        parent=tag, city_tag=DANGER_ZONE_CPH, desc3=danger_zone_desc
+    dpg.add_button(
+        label="See Case Studies",
+        callback=_case_studies,
+        parent=tag,
     )
-    return bold_text  # type: ignore
+    return []
 
 
-def add_field_window(parent: str, tag: str, width: int, height: int) -> list[gui_type]:
+def add_explore_window(
+    parent: str, tag: str, width: int, height: int
+) -> list[gui_type]:
     dpg.add_child_window(
         label="", tag=tag, show=True, parent=parent, width=width, height=height
     )
     bold_text = add_input_fields_pick_area(parent=tag)
+    add_go_button(parent=tag)
     return bold_text  # type: ignore
 
 
 def change_windows(sender: str, data: str) -> None:
-    if data == MENU_COPENHAGEN:
-        dpg.show_item(CPH_WINDOW)
-        dpg.hide_item(FIELD_WINDOW)
+    if data == MENU_CASE:
+        dpg.show_item(CASE_WINDOW)
+        dpg.hide_item(EXPLORE_WINDOW)
     else:
-        dpg.show_item(FIELD_WINDOW)
-        dpg.hide_item(CPH_WINDOW)
+        dpg.show_item(EXPLORE_WINDOW)
+        dpg.hide_item(CASE_WINDOW)
 
 
 def add_go_button(parent: str) -> None:
