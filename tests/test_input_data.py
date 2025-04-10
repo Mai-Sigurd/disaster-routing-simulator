@@ -10,7 +10,6 @@ def test_verify(
         type=PopulationType.GEO_JSON_FILE,
         city=CITY.CPH,
         population_number=0,
-        osm_geopandas_json_bbox="",
         danger_zones_geopandas_json="",
         worldpop_filepath="",
     )
@@ -20,9 +19,17 @@ def test_verify(
         type=PopulationType.TIFF_FILE,
         city=CITY.NONE,
         population_number=0,
-        osm_geopandas_json_bbox=osm_graph_bbox,
         danger_zones_geopandas_json=danger_zone,
         worldpop_filepath="",
+    )
+    assert verify_input(input_data) == (False, "Worldpop tiff file path is empty")
+
+    input_data = InputData(
+        type=PopulationType.TIFF_FILE,
+        city=CITY.NONE,
+        population_number=0,
+        danger_zones_geopandas_json=danger_zone,
+        worldpop_filepath="filenothere",
     )
     assert verify_input(input_data) == (False, "Worldpop tiff file not found")
 
@@ -30,7 +37,6 @@ def test_verify(
         type=PopulationType.NUMBER,
         city=CITY.NONE,
         population_number=0,
-        osm_geopandas_json_bbox=osm_graph_bbox,
         danger_zones_geopandas_json=danger_zone,
         worldpop_filepath="",
     )
@@ -41,29 +47,8 @@ def test_verify(
 
     input_data = InputData(
         type=PopulationType.GEO_JSON_FILE,
-        city=CITY.NONE,
-        population_number=0,
-        osm_geopandas_json_bbox="",
-        danger_zones_geopandas_json="",
-        worldpop_filepath="",
-    )
-    assert verify_input(input_data) == (False, "OSM city, geojson empty")
-
-    input_data = InputData(
-        type=PopulationType.GEO_JSON_FILE,
-        city=CITY.NONE,
-        population_number=0,
-        osm_geopandas_json_bbox="wrong input",
-        danger_zones_geopandas_json="",
-        worldpop_filepath="",
-    )
-    assert verify_input(input_data) == (False, "OSM city, Invalid geojson")
-
-    input_data = InputData(
-        type=PopulationType.GEO_JSON_FILE,
         city=CITY.CPH,
         population_number=0,
-        osm_geopandas_json_bbox=osm_graph_bbox,
         danger_zones_geopandas_json="Invalid input",
         worldpop_filepath="",
     )

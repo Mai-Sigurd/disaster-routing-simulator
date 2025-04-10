@@ -59,6 +59,20 @@ with Amager set as the danger zone.
 ```bash
 python src/main.py -dev
 ```
+The program also includes a matsim only mode, 
+which skips the GUI and starts the MATSim simulation directly on precomputed CPH routes.
+
+```bash
+python src/main.py -matsim-only
+```
+
+
+The program includes a small developer mode, which skips the GUI and starts the program directly in Copenhagen,
+with a very small part of Amager as the danger zone.
+
+```bash
+python src/main.py -small
+```
 
 The program also includes a GUI-only mode, which runs the graphical interface without starting the simulation.
 Useful for testing the UI separately.

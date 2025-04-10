@@ -18,7 +18,7 @@ from data_loader.population.population import (
     POPULATION_DIR,
     distribute_population,
 )
-from data_loader.population.utils import (
+from data_loader.population.population_utils import (
     filter_world_pop_to_graph_area,
     snap_population_to_nodes,
 )

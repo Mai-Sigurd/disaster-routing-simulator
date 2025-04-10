@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -23,6 +24,7 @@ public class Main {
         }
 
         Config config = ConfigUtils.loadConfig(absolutePath);
+        config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
         File outputDir = new File(configFile.getParent(), config.controller().getOutputDirectory());
         config.controller().setOutputDirectory(outputDir.getAbsolutePath());
@@ -33,7 +35,6 @@ public class Main {
         );
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        new NetworkCleaner().run(scenario.getNetwork());
 
         Controller controller = new Controler(scenario);
         controller.addOverridingModule(new SimWrapperModule());

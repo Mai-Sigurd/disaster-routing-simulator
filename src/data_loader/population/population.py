@@ -4,7 +4,7 @@ import geopandas as gpd
 import networkx as nx
 from shapely.geometry import Point
 
-from data_loader.population.utils import (
+from data_loader.population.population_utils import (
     GEOMETRY,
     NODE_ID,
     POPULATION,
@@ -38,15 +38,17 @@ def distribute_population(
 
 
 def population_data_from_tiff(
-    tiff_file_name: str, geo_file_name: str, G: nx.MultiDiGraph
+    tiff_file_path: str, geo_file_name: str, G: nx.MultiDiGraph
 ) -> gpd.GeoDataFrame:
     """
     Loads a TIFF file and returns a GeoDataFrame.
-    :param file_name: The name of the TIFF file.
+    :param tiff_file_path: The full path to the tiff file.
+    :param geo_file_name: The name of the GeoJSON file the tiff information should be saved to.
+    :param G: OSM graph.
     :return: A geopandas dataframe with id corresponding to OSM IDS and population, within the dangerzone.
     """
     save_tiff_population_to_geojson(
-        tiff_file_name=tiff_file_name,
+        tiff_file_path=tiff_file_path,
         geo_file_name=geo_file_name,
         G=G,
         maximum_distance_to_node=100,
@@ -75,7 +77,13 @@ def population_data_from_number(
     if num_nodes == 0:
         raise ValueError("No nodes found within the danger zone.")
 
-    population_per_node = population_number / num_nodes
+    if population_number < num_nodes:
+        logging.info(
+            "The population number is too small. The population number has now defaulted to 1 person per node."
+        )
+        population_per_node = 1.0
+    else:
+        population_per_node = population_number / num_nodes
 
     result = gpd.GeoDataFrame(
         {

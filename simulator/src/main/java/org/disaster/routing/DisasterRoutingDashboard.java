@@ -1,8 +1,11 @@
 package org.disaster.routing;
 
+import org.disaster.routing.analysis.PeopleInSafetyXY;
 import org.disaster.routing.analysis.TripPurposeBy10Min;
+import org.disaster.routing.analysis.TripStatsDisaster;
 import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.application.analysis.traffic.TrafficAnalysis;
+import org.matsim.application.analysis.traffic.traveltime.TravelTimeComparison;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
@@ -10,16 +13,20 @@ import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.ColorScheme;
 import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.Plotly;
+import tech.tablesaw.plotly.components.Line;
 import org.matsim.simwrapper.viz.Table;
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.BarTrace;
+import tech.tablesaw.plotly.traces.ScatterTrace;
 
 import java.util.List;
 
 public class DisasterRoutingDashboard implements Dashboard {
+
     @Override
     public void configure(Header header, Layout layout) {
         header.title = "Disaster Evacuation Routing Dashboard";
+
 
         layout.row("traffic_volume").el(MapPlot.class, (viz, data) -> {
             viz.title = "Simulated traffic volume";
@@ -45,7 +52,12 @@ public class DisasterRoutingDashboard implements Dashboard {
         layout.row("statistics", header.tab)
                 .el(Table.class, (viz, data) -> {
                     viz.title = "Evacuation Statistics";
-                    viz.dataset = data.compute(TripAnalysis.class, "trip_stats.csv");
+                    viz.dataset = data.compute(TripStatsDisaster.class, "trip_stats_disaster.csv");
+                    viz.showAllRows = true;
+                })
+                .el(Table.class, (viz, data) -> {
+                    viz.title = "OSM Area";
+                    viz.dataset = "dangerzone_data.csv";
                     viz.showAllRows = true;
                 })
                 .el(Plotly.class, (viz, data) -> {
@@ -61,16 +73,40 @@ public class DisasterRoutingDashboard implements Dashboard {
                     );
                 });
 
-        createTripDataRow(layout, "departures", header.tab, "Departures", "departure");
-        createTripDataRow(layout, "arrivals", header.tab, "Arrivals", "arrival");
+        createTripDataRow(layout, "departures", header.tab, "Departures", "departure", "Time from start of simulation (minutes)");
+        createTripDataRow(layout, "arrivals", header.tab, "Arrivals", "arrival", "Time from start of simulation (minutes)");
+        createTripDataRow(layout, "traveltype", header.tab, "Travel times", "traveltime", "Time from departure to arrival (minutes)");
+    
+    
+        layout.row("Amount of people in safety").el(Plotly.class, ((viz, data) -> {
+
+				viz.title = "People in safety";
+				viz.description = "The fraction of people who have reached safety at time t";
+
+				Plotly.DataSet ds = viz.addDataset(data.compute(PeopleInSafetyXY.class, "people_in_safety.csv"));
+
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.xAxis(Axis.builder().title("Time from start of simulation (minutes)").build())
+					.yAxis(Axis.builder().title("Fraction of people in safety").build())
+					.build();
+
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+					.name("People in safety")
+					.mode(ScatterTrace.Mode.LINE)
+					.line(Line.builder().dash(Line.Dash.SOLID).build()).build(), ds.mapping()
+					.x("bin").y("cumulative_traveltime")
+				);
+
+			}));
+    
     }
 
-    private static void createTripDataRow(Layout layout, String dataType, String tab, String chartTitle, String metric) {
+    private static void createTripDataRow(Layout layout, String dataType, String tab, String chartTitle, String metric, String xAxisTitle) {
         layout.row(dataType, tab).el(Plotly.class, (viz, data) -> {
             viz.title = chartTitle;
             viz.description = "by 10-minute intervals";
             viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-                    .xAxis(Axis.builder().title("Time (minutes)").build())
+                    .xAxis(Axis.builder().title(xAxisTitle).build())
                     .yAxis(Axis.builder().title("Trips").build())
                     .barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
                     .build();
