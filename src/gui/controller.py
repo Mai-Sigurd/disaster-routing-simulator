@@ -49,17 +49,17 @@ def _save_input_data() -> None:
     save_to_pickle(input_data, INPUTDATADIR)
     dpg.stop_dearpygui()
 
+
 def _case_studies() -> None:
     input_data = InputData(
-        populationType=PopulationType.NUMBER, # Will not be used
+        populationType=PopulationType.NUMBER,  # Will not be used
         simulationType=SimulationType.CASE_STUDIES,
-        danger_zones_geopandas_json="", # Will not be used
-        population_number=1, # Will not be used
+        danger_zones_geopandas_json="",  # Will not be used
+        population_number=1,  # Will not be used
     )
     save_to_pickle(input_data, INPUTDATADIR)
     webbrowser.open(SIM_WRAPPER_CASE_STUDIES_LINK)
     dpg.stop_dearpygui()
-
 
 
 def set_fonts_theme(bold_items: list[gui_type], titel: str, e_msg: str) -> None:
@@ -98,12 +98,15 @@ def add_main_window(
     return t1, e_msg
 
 
-
 def add_city_case_window(
     parent: str, tag: str, width: int, height: int, danger_zone_desc: str
 ) -> list[gui_type]:
     dpg.add_child_window(
         label="", tag=tag, show=True, parent=parent, width=width, height=height
+    )
+    dpg.add_text(
+        "Case Studies where we have the island Amager in Copenhagen, Denmark as a danger zone, \n and a case study with the city of Ravenna in Italy as a danger zone",
+        parent=tag,
     )
     dpg.add_button(
         label="See Case Studies",

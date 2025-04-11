@@ -120,7 +120,10 @@ def main(args: argparse.Namespace) -> None:
         case _:  ## normal program, no flag set
             input_data = gui_handler()
             print(input_data)
-            start_up(input_data, run_simulater=input_data.simulationType == SimulationType.EXPLORE)
+            start_up(
+                input_data,
+                run_simulater=input_data.simulationType == SimulationType.EXPLORE,
+            )
 
 
 if __name__ == "__main__":
