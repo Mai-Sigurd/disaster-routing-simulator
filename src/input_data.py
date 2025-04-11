@@ -63,6 +63,8 @@ def verify_input(input_data: InputData) -> tuple[bool, str]:
     ## DEPARTURE TIME
     if input_data.departure_end_time_sec < 0:
         return False, "Departure time must be greater than or equal to 0"
+    if input_data.departure_end_time_sec > 60 * 60 * 24:
+        return False, "Departure time must be less than 24 hours"
     ## EXPLORE
     if input_data.simulation_type == SimulationType.EXPLORE:
         if input_data.danger_zones_geopandas_json == "":
