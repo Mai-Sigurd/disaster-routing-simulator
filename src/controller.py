@@ -109,7 +109,8 @@ def gui_handler(gui_error_message: str = "") -> InputData:
         raise SystemExit
     input_is_okay, new_error_message = verify_input(input_data)
     if not input_is_okay:
-        gui_handler(new_error_message)
+        return gui_handler(new_error_message)
+
     logging.info(input_data.pretty_summary())
     return input_data
 
