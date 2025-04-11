@@ -7,14 +7,16 @@ from meru.multilevel import MultiLevelModel
 from routing_lib import from_sumo_to_igraph_network
 from tqdm import tqdm
 
-from config import ONE_HOUR, TWO_MINUTES
-from controller import controller_input_data, set_dev_input_data
+from config import ONE_HOUR, TWO_MINUTES, set_dev_input_data
+from controller import controller_input_data
 from data_loader.sumo import read_sumo_road_network
 from routes.route import create_route_objects
 from routes.route_utils import path, vertex
 
 
 class Weight(Enum):
+    """Enum for the weight attribute used in the MultiLevelModel."""
+
     TRAVEL_TIME = "traveltime"
     LENGTH = "length"
 
