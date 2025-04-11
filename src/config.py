@@ -23,8 +23,9 @@ RAVENNA_DANGER_ZONE = "ravenna.geojson"
 RAVENNA_POPULATION_DATA = "ravennaPopulation.geojson"
 
 
-TWO_MINUTES = 120
 ONE_HOUR = 3600
+cars_per_person_cph = 0.24  # refer to our thesis
+cars_per_person_ravenna = 0.69  # refer to our thesis
 ROUTE_ALGOS = [FastestPath(), ShortestPath()]
 
 SIM_WRAPPER_CASE_STUDIES_LINK = (
@@ -40,6 +41,7 @@ class ProgramConfig:
     origin_points: list[str] = field(default_factory=list)
     cars_per_person: float = 1
     route_algos: list[RouteAlgo] = field(default_factory=list)
+    departure_end_time_sec: int = ONE_HOUR
 
 
 def set_dev_input_data() -> InputData:
@@ -51,7 +53,8 @@ def set_dev_input_data() -> InputData:
         simulation_type=SimulationType.CASE_STUDIES,
         danger_zones_geopandas_json=load_json_file_to_str(CPH_AMAGER_DANGER_ZONE),
         pop_geo_json_filepath=CPH_POPULATION_DATA,
-        cars_per_person=0.24,
+        cars_per_person=cars_per_person_cph,
+        departure_end_time_sec=ONE_HOUR,
     )
 
 
@@ -64,7 +67,8 @@ def set_amager_input_data() -> InputData:
         simulation_type=SimulationType.CASE_STUDIES,
         danger_zones_geopandas_json=load_json_file_to_str(CPH_AMAGER_DANGER_ZONE),
         pop_geo_json_filepath=CPH_POPULATION_DATA,
-        cars_per_person=0.24,
+        cars_per_person=cars_per_person_cph,
+        departure_end_time_sec=ONE_HOUR,
     )
 
 
@@ -77,7 +81,8 @@ def set_ravenna_input_data() -> InputData:
         simulation_type=SimulationType.CASE_STUDIES,
         danger_zones_geopandas_json=load_json_file_to_str(RAVENNA_DANGER_ZONE),
         pop_geo_json_filepath=RAVENNA_POPULATION_DATA,
-        cars_per_person=0.69,
+        cars_per_person=cars_per_person_ravenna,
+        departure_end_time_sec=ONE_HOUR,
     )
 
 
@@ -90,5 +95,6 @@ def set_small_data_input_data() -> InputData:
         simulation_type=SimulationType.EXPLORE,
         population_number=1000,
         danger_zones_geopandas_json=load_json_file_to_str(CPH_SMALL_AMAGER_DANGER_ZONE),
-        cars_per_person=0.24,
+        cars_per_person=1,
+        departure_end_time_sec=ONE_HOUR,
     )

@@ -3,8 +3,6 @@ import logging
 import signal
 
 from config import (
-    ONE_HOUR,
-    TWO_MINUTES,
     ProgramConfig,
     set_amager_input_data,
     set_dev_input_data,
@@ -16,7 +14,7 @@ from controller import (
     gui_close,
     gui_handler,
     run_matsim,
-    write_g_and_dangerzone_data,
+    write_danger_zone_data,
 )
 from input_data import (
     InputData,
@@ -33,35 +31,35 @@ logging.basicConfig(
 )
 
 
-def simulate(program_config: ProgramConfig) -> None:
+def simulate(program_config: ProgramConfig) -> dict[str, int]:
     paths: list[path] = program_config.route_algos[0].route_to_safety(
         program_config.origin_points, program_config.danger_zones, program_config.G
     )
     routes: list[Route] = create_route_objects(
         list_of_paths=paths,
         population_data=program_config.danger_zone_population_data,
-        start=TWO_MINUTES,
-        end=ONE_HOUR,
+        start=0,
+        end=program_config.departure_end_time_sec,
         cars_per_person=program_config.cars_per_person,
     )
     logging.info("Routes done")
-    logging.info("Stats ---------------------")
-    logging.info("Amount of routes: %s", len(routes))
-    logging.info("Amount of people: %s", sum([r.num_people_on_route for r in routes]))
-    logging.info(
-        "Amount of nodes that could not reach dangerzone: %s",
-        len(program_config.origin_points) - len(routes),
-    )
+    stats = {
+        "Amount of routes": len(routes),
+        "Amount of nodes with no route to safety": len(program_config.origin_points)
+        - len(routes),
+    }
     write_network(program_config.G, network_name="Copenhagen")
     write_plans(routes, plan_filename="plans.xml")
+    return stats
 
 
-def save_analysis_files(program_config: ProgramConfig) -> None:
+def save_analysis_files(program_config: ProgramConfig, stats: dict[str, int]) -> None:
     """
     Save the analysis files to the MATSIM_DATA_DIR.
     """
-    write_g_and_dangerzone_data(
-        danger_zone=program_config.danger_zones,
+    write_danger_zone_data(
+        program_conf=program_config,
+        stats=stats,
         filepath=MATSIM_DATA_DIR / "OUTPUT" / "dangerzone_data.csv",
     )
 
@@ -92,9 +90,9 @@ def start_up(input_data: InputData, run_simulator: bool) -> None:
         program_config = controller_input_data(input_data)
         logging.info("Controller input data done")
         logging.info("Route algos done")
-        simulate(program_config)
+        stats = simulate(program_config)
         run_matsim()
-        save_analysis_files(program_config)
+        save_analysis_files(program_config, stats)
     run_simwrapper_serve(input_data.simulation_type)
 
 

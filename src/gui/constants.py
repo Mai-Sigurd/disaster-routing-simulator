@@ -11,6 +11,7 @@ DANGER_ZONE = "DANGER_ZONE"
 POPULATION = "POPULATION"
 TIFF_FILE = "Worldpop tiff file"
 POPULATION_NUMBER = "Population number"
+DEPARTURE_TIME = "Departure Time"
 
 MENU_CASE = "Case studies"
 MENU_PICK_AREA = "Explore"
