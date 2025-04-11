@@ -45,9 +45,7 @@ def simulate(program_config: ProgramConfig) -> dict[str, int]:
     logging.info("Routes done")
     stats = {
         "Amount of routes": len(routes),
-        "Amount of nodes with no route to safety": len(
-            program_config.origin_points
-        )
+        "Amount of nodes with no route to safety": len(program_config.origin_points)
         - len(routes),
     }
     write_network(program_config.G, network_name="Copenhagen")
