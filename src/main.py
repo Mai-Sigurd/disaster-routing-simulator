@@ -83,11 +83,11 @@ def run_simwrapper_serve(simulation_type: SimulationType, path: str = "") -> Non
         pass
 
 
-def start_up(input_data: InputData, run_simulater: bool) -> None:
+def start_up(input_data: InputData, run_simulator: bool) -> None:
     """
     Start up the program.
     """
-    if run_simulater:
+    if run_simulator:
         logging.info("Starting up...")
         program_config = controller_input_data(input_data)
         logging.info("Controller input data done")
@@ -123,10 +123,9 @@ def main(args: argparse.Namespace) -> None:
         start_up(set_ravenna_input_data(), True)
     else:  ## normal program, no flag set
         input_data = gui_handler()
-        print(input_data)
         start_up(
             input_data,
-            run_simulater=input_data.simulationType == SimulationType.EXPLORE,
+            run_simulator=input_data.simulationType == SimulationType.EXPLORE,
         )
 
 
