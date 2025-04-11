@@ -12,7 +12,7 @@ def test_verify(
         population_number=0,
         danger_zones_geopandas_json="",
         worldpop_filepath="",
-        departure_end_time_minute=0,
+        departure_end_time_sec=0,
     )
     assert verify_input(input_data) == (True, "")
 
@@ -22,7 +22,7 @@ def test_verify(
         population_number=0,
         danger_zones_geopandas_json=danger_zone,
         worldpop_filepath="",
-        departure_end_time_minute=1,
+        departure_end_time_sec=1,
     )
     assert verify_input(input_data) == (False, "Worldpop tiff file path is empty")
 
@@ -32,7 +32,7 @@ def test_verify(
         population_number=0,
         danger_zones_geopandas_json=danger_zone,
         worldpop_filepath="filenothere",
-        departure_end_time_minute=1,
+        departure_end_time_sec=1,
     )
     assert verify_input(input_data) == (False, "Worldpop tiff file not found")
 
@@ -42,7 +42,7 @@ def test_verify(
         population_number=0,
         danger_zones_geopandas_json=danger_zone,
         worldpop_filepath="",
-        departure_end_time_minute=1,
+        departure_end_time_sec=1,
     )
     assert verify_input(input_data) == (
         False,
@@ -55,7 +55,7 @@ def test_verify(
         population_number=0,
         danger_zones_geopandas_json="Invalid input",
         worldpop_filepath="",
-        departure_end_time_minute=1,
+        departure_end_time_sec=1,
     )
     assert verify_input(input_data) == (
         False,
@@ -68,7 +68,7 @@ def test_verify(
         population_number=0,
         danger_zones_geopandas_json="",
         worldpop_filepath="",
-        departure_end_time_minute=-1,
+        departure_end_time_sec=-1,
     )
     assert verify_input(input_data) == (
         False,

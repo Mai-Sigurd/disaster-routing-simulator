@@ -3,9 +3,7 @@ import shutil
 import subprocess
 from types import FrameType
 
-import geopandas as gpd
-
-from analysis.osm_size import write_g_and_danger_zone_data_simwrapper_csv
+from analysis.analysis import write_danger_zone_data_simwrapper_csv
 from config import (
     ROUTE_ALGOS,
     SOURCE_DIR,
@@ -97,7 +95,7 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
     conf.origin_points = get_origin_points(
         conf.danger_zone_population_data, dangerzone=conf.danger_zones
     )
-    conf.departure_end_time_minute = input_data.departure_end_time_minute
+    conf.departure_end_time_sec = input_data.departure_end_time_sec
     return conf
 
 
@@ -116,12 +114,14 @@ def gui_handler(gui_error_message: str = "") -> InputData:
     return input_data
 
 
-def write_g_and_dangerzone_data(danger_zone: gpd.GeoDataFrame, filepath: str) -> None:
+def write_danger_zone_data(
+    program_conf: ProgramConfig, stats: dict[str, int], filepath: str
+) -> None:
     """
     Writes the total area of the danger zone and the total area of the city graph to a CSV file.
     """
-    write_g_and_danger_zone_data_simwrapper_csv(
-        danger_zone=danger_zone, filepath=filepath
+    write_danger_zone_data_simwrapper_csv(
+        program_conf=program_conf, stats=stats, filepath=filepath
     )
 
 

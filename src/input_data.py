@@ -28,7 +28,7 @@ class InputData:
     population_type: PopulationType
     simulation_type: SimulationType
     danger_zones_geopandas_json: str
-    departure_end_time_minute: int
+    departure_end_time_sec: int
     population_number: int = 0
     worldpop_filepath: str = ""
     cars_per_person: float = 1.0
@@ -61,7 +61,7 @@ def open_pickle_file(file_path: str) -> InputData:
 
 def verify_input(input_data: InputData) -> tuple[bool, str]:
     ## DEPARTURE TIME
-    if input_data.departure_end_time_minute < 0:
+    if input_data.departure_end_time_sec < 0:
         return False, "Departure time must be greater than or equal to 0"
     ## EXPLORE
     if input_data.simulation_type == SimulationType.EXPLORE:

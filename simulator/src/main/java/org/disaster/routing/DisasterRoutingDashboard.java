@@ -56,7 +56,7 @@ public class DisasterRoutingDashboard implements Dashboard {
                     viz.showAllRows = true;
                 })
                 .el(Table.class, (viz, data) -> {
-                    viz.title = "OSM Area";
+                    viz.title = "Simulation Statistics";
                     viz.dataset = "dangerzone_data.csv";
                     viz.showAllRows = true;
                 })

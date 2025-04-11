@@ -111,5 +111,5 @@ def _add_departure_time_input_field(
 ) -> gui_type:
     t1 = dpg.add_text(title, parent=parent)
     dpg.add_text(desc_dist_end, parent=parent)
-    dpg.add_input_int(tag=tag_dist_end, show=True, parent=parent, default_value=3600)
+    dpg.add_input_int(tag=tag_dist_end, show=True, parent=parent, default_value=60)
     return t1
