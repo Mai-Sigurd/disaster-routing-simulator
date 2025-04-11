@@ -3,8 +3,6 @@ import logging
 import signal
 
 from config import (
-    ONE_HOUR,
-    TWO_MINUTES,
     ProgramConfig,
     set_amager_input_data,
     set_dev_input_data,
@@ -40,8 +38,8 @@ def simulate(program_config: ProgramConfig) -> None:
     routes: list[Route] = create_route_objects(
         list_of_paths=paths,
         population_data=program_config.danger_zone_population_data,
-        start=TWO_MINUTES,
-        end=ONE_HOUR,
+        start=0,
+        end=program_config.departure_end_time_minute,
         cars_per_person=program_config.cars_per_person,
     )
     logging.info("Routes done")

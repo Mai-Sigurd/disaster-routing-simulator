@@ -28,6 +28,7 @@ class InputData:
     population_type: PopulationType
     simulation_type: SimulationType
     danger_zones_geopandas_json: str
+    departure_end_time_minute: int
     population_number: int = 0
     worldpop_filepath: str = ""
     cars_per_person: float = 1.0

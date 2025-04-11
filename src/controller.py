@@ -97,6 +97,7 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
     conf.origin_points = get_origin_points(
         conf.danger_zone_population_data, dangerzone=conf.danger_zones
     )
+    conf.departure_end_time_minute = input_data.departure_end_time_minute
     return conf
 
 
