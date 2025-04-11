@@ -1,40 +1,16 @@
+import logging
+
 import geopandas as gpd
 import networkx as nx
+from shapely.geometry import Point
 
-from data_loader.population.population import (
-    distribute_population,
-    population_data_from_geojson,
-    population_data_from_number,
-    population_data_from_tiff,
+from data_loader.population.population_utils import (
+    GEOMETRY,
+    NODE_ID,
+    POPULATION,
+    POPULATION_DIR,
+    save_tiff_population_to_geojson,
 )
-from input_data import PopulationType
-
-
-def danger_zone_population(
-    population_type: PopulationType,
-    tiff_file_path: str,
-    geo_file_name: str,
-    population_number: int,
-    danger_zone: gpd.GeoDataFrame,
-    G: nx.MultiDiGraph,
-) -> gpd.GeoDataFrame:
-    """
-    Returns the population data for the danger zone.
-    :param population_type: The type of population data.
-    :param tiff_file_path: The full path of the tiff file
-    :param geo_file_name: The name of the GeoJSON file.
-    :param population_number: The population number.
-    :param danger_zone: A GeoDataFrame containing the danger zone polygon(s).
-    :param G: OSM graph.
-    :return: A GeoDataFrame containing the population data for the danger zone.
-    """
-    if population_type == PopulationType.TIFF_FILE:
-        return population_data_from_tiff(tiff_file_path, geo_file_name, G)
-    elif population_type == PopulationType.NUMBER:
-        return population_data_from_number(danger_zone, population_number, G)
-    else:
-        pop_geo = population_data_from_geojson(geo_file_name)
-        return distribute_population(danger_zone, pop_geo)
 
 
 def get_origin_points(
@@ -53,3 +29,89 @@ def get_origin_points(
 
     # Convert the origin points to a list of strings
     return list(origin_points["id"])
+
+
+def population_data_from_geojson(file_name: str) -> gpd.GeoDataFrame:
+    """
+    Loads a GeoJSON file and returns a GeoDataFrame.
+    :param file_name: The name of the population GeoJSON file.
+    :return: A GeoDataFrame containing the data from the GeoJSON file.
+    """
+    try:
+        population = gpd.read_file(POPULATION_DIR / file_name)
+        return population
+
+    except Exception as e:
+        logging.error(f"Error loading GeoJSON file: {e}")
+        raise SystemExit
+
+
+def distribute_population(
+    danger_zone: gpd.GeoDataFrame, population: gpd.GeoDataFrame
+) -> gpd.GeoDataFrame:
+    """
+    Returns the nodes in the danger zone and the number of people at each node.
+    :return: A geopandas dataframe with id corresponding to OSM IDS and population, within the dangerzone.
+    """
+    # List to store nodes in the danger zone and their population
+    return gpd.sjoin(population, danger_zone, how="inner", predicate="intersects")
+
+
+def population_data_from_tiff(
+    tiff_file_path: str, geo_file_name: str, G: nx.MultiDiGraph
+) -> gpd.GeoDataFrame:
+    """
+    Loads a TIFF file and returns a GeoDataFrame.
+    :param tiff_file_path: The full path to the tiff file.
+    :param geo_file_name: The name of the GeoJSON file the tiff information should be saved to.
+    :param G: OSM graph.
+    :return: A geopandas dataframe with id corresponding to OSM IDS and population, within the dangerzone.
+    """
+    save_tiff_population_to_geojson(
+        tiff_file_path=tiff_file_path,
+        geo_file_name=geo_file_name,
+        G=G,
+        maximum_distance_to_node=100,
+    )
+    return population_data_from_geojson(geo_file_name)
+
+
+def population_data_from_number(
+    danger_zone: gpd.GeoDataFrame, population_number: int, G: nx.MultiDiGraph
+) -> gpd.GeoDataFrame:
+    """
+    Creates a dataframe with the population number divided by the number of nodes, where each node has a evenly distributed population.
+    :param danger_zone: A GeoDataFrame containing the danger zone polygon(s).
+    :param population_number: The population number.
+    :return: A geopandas dataframe with id corresponding to OSM IDS and population, within the dangerzone.
+    """
+    nodes = [
+        node
+        for node, data in G.nodes(data=True)
+        if any(
+            polygon.intersects(Point(data["x"], data["y"]))
+            for polygon in danger_zone.geometry
+        )
+    ]
+    num_nodes = len(nodes)
+    if num_nodes == 0:
+        raise ValueError("No nodes found within the danger zone.")
+
+    if population_number < num_nodes:
+        logging.info(
+            "The population number is too small. The population number has now defaulted to 1 person per node."
+        )
+        population_per_node = 1.0
+    else:
+        population_per_node = population_number / num_nodes
+
+    result = gpd.GeoDataFrame(
+        {
+            NODE_ID: nodes,
+            POPULATION: [population_per_node] * num_nodes,
+            GEOMETRY: [Point(G.nodes[node]["x"], G.nodes[node]["y"]) for node in nodes],
+        },
+        geometry=GEOMETRY,
+    )
+
+    return result

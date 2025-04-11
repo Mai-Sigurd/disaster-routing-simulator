@@ -12,9 +12,9 @@ SRC_DIR = Path(__file__).resolve().parent.parent
 INPUTDATADIR = SRC_DIR / "input_data.pickle"
 
 
-class CITY(Enum):
-    NONE = 1
-    CPH = 2
+class SimulationType(Enum):
+    EXPLORE = 1
+    CASE_STUDIES = 2
 
 
 class PopulationType(Enum):
@@ -25,16 +25,18 @@ class PopulationType(Enum):
 
 @dataclass
 class InputData:
-    type: PopulationType
-    city: CITY
-    population_number: int
+    population_type: PopulationType
+    simulation_type: SimulationType
     danger_zones_geopandas_json: str
-    worldpop_filepath: str
+    population_number: int = 0
+    worldpop_filepath: str = ""
+    cars_per_person: float = 1.0
+    pop_geo_json_filepath: str = ""
 
     def pretty_summary(self) -> str:
         return dedent(f"""
             Simulation input summary:
-            - Scenario type: {self.type}
+            - Scenario type: {self.population_type}
             - Danger zones GeoJSON: {self.danger_zones_geopandas_json}
             - Population size: {self.population_number}
             - WorldPop file: {self.worldpop_filepath}
@@ -58,26 +60,26 @@ def open_pickle_file(file_path: str) -> InputData:
 
 def verify_input(input_data: InputData) -> tuple[bool, str]:
     ## CITY
-    if input_data.city == CITY.NONE:
+    if input_data.simulation_type == SimulationType.EXPLORE:
         if input_data.danger_zones_geopandas_json == "":
             return False, "OSM dangerzone, geojson empty"
         if not _is_valid_geojson(input_data.danger_zones_geopandas_json):
             return False, "OSM dangerzone, Invalid geojson"
-    if input_data.city == CITY.CPH:
+    if input_data.simulation_type == SimulationType.CASE_STUDIES:
         if input_data.danger_zones_geopandas_json != "" and not _is_valid_geojson(
             input_data.danger_zones_geopandas_json
         ):
             return False, "CPH city, danger zone is invalid geojson"
 
     ## POPULATION TYPE
-    if input_data.type == PopulationType.TIFF_FILE:
+    if input_data.population_type == PopulationType.TIFF_FILE:
         if input_data.worldpop_filepath == "":
             return False, "Worldpop tiff file path is empty"
         if not os.path.exists(input_data.worldpop_filepath):
             return False, "Worldpop tiff file not found"
-    elif input_data.type == PopulationType.GEO_JSON_FILE:
+    elif input_data.population_type == PopulationType.GEO_JSON_FILE:
         return True, ""
-    elif input_data.type == PopulationType.NUMBER:
+    elif input_data.population_type == PopulationType.NUMBER:
         if input_data.population_number <= 0:
             return False, "Population number must be greater than 0"
     return True, ""
