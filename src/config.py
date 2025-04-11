@@ -24,8 +24,8 @@ RAVENNA_POPULATION_DATA = "ravennaPopulation.geojson"
 
 
 ONE_HOUR = 3600
-cars_per_person_cph= 0.24 # refer to our thesis
-cars_per_person_ravenna = 0.69 # refer to our thesis
+cars_per_person_cph = 0.24  # refer to our thesis
+cars_per_person_ravenna = 0.69  # refer to our thesis
 ROUTE_ALGOS = [FastestPath(), ShortestPath()]
 
 SIM_WRAPPER_CASE_STUDIES_LINK = (

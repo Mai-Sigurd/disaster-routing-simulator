@@ -7,6 +7,7 @@ from config import SIM_WRAPPER_CASE_STUDIES_LINK
 from gui.constants import (
     CASE_WINDOW,
     DANGER_ZONE,
+    DEPARTURE_TIME,
     EXPLORE_WINDOW,
     FONTDIR,
     MENU_CASE,
@@ -16,7 +17,6 @@ from gui.constants import (
     POPULATION_NUMBER,
     TIFF_FILE,
     gui_type,
-    DEPARTURE_TIME,
 )
 from gui.fields import add_input_fields_pick_area
 from input_data import (
@@ -46,7 +46,7 @@ def _save_input_data() -> None:
         population_number=population_number,
         danger_zones_geopandas_json=danger_zones_geopandas_json,
         worldpop_filepath=worldpop_filepath,
-        departure_end_time_minute=departure_end_time_minute
+        departure_end_time_minute=departure_end_time_minute,
     )
 
     save_to_pickle(input_data, INPUTDATADIR)
@@ -59,7 +59,7 @@ def _case_studies() -> None:
         simulation_type=SimulationType.CASE_STUDIES,
         danger_zones_geopandas_json="",  # Will not be used
         population_number=1,  # Will not be used
-        departure_end_time_minute=3600 # Will not be used
+        departure_end_time_minute=3600,  # Will not be used
     )
     save_to_pickle(input_data, INPUTDATADIR)
     webbrowser.open(SIM_WRAPPER_CASE_STUDIES_LINK)
