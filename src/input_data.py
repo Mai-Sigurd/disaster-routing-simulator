@@ -25,8 +25,8 @@ class PopulationType(Enum):
 
 @dataclass
 class InputData:
-    populationType: PopulationType
-    simulationType: SimulationType
+    population_type: PopulationType
+    simulation_type: SimulationType
     danger_zones_geopandas_json: str
     population_number: int = 0
     worldpop_filepath: str = ""
@@ -36,7 +36,7 @@ class InputData:
     def pretty_summary(self) -> str:
         return dedent(f"""
             Simulation input summary:
-            - Scenario type: {self.populationType}
+            - Scenario type: {self.population_type}
             - Danger zones GeoJSON: {self.danger_zones_geopandas_json}
             - Population size: {self.population_number}
             - WorldPop file: {self.worldpop_filepath}
@@ -60,26 +60,26 @@ def open_pickle_file(file_path: str) -> InputData:
 
 def verify_input(input_data: InputData) -> tuple[bool, str]:
     ## CITY
-    if input_data.simulationType == SimulationType.EXPLORE:
+    if input_data.simulation_type == SimulationType.EXPLORE:
         if input_data.danger_zones_geopandas_json == "":
             return False, "OSM dangerzone, geojson empty"
         if not _is_valid_geojson(input_data.danger_zones_geopandas_json):
             return False, "OSM dangerzone, Invalid geojson"
-    if input_data.simulationType == SimulationType.CASE_STUDIES:
+    if input_data.simulation_type == SimulationType.CASE_STUDIES:
         if input_data.danger_zones_geopandas_json != "" and not _is_valid_geojson(
             input_data.danger_zones_geopandas_json
         ):
             return False, "CPH city, danger zone is invalid geojson"
 
     ## POPULATION TYPE
-    if input_data.populationType == PopulationType.TIFF_FILE:
+    if input_data.population_type == PopulationType.TIFF_FILE:
         if input_data.worldpop_filepath == "":
             return False, "Worldpop tiff file path is empty"
         if not os.path.exists(input_data.worldpop_filepath):
             return False, "Worldpop tiff file not found"
-    elif input_data.populationType == PopulationType.GEO_JSON_FILE:
+    elif input_data.population_type == PopulationType.GEO_JSON_FILE:
         return True, ""
-    elif input_data.populationType == PopulationType.NUMBER:
+    elif input_data.population_type == PopulationType.NUMBER:
         if input_data.population_number <= 0:
             return False, "Population number must be greater than 0"
     return True, ""

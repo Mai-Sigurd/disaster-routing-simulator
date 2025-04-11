@@ -39,8 +39,8 @@ def _save_input_data() -> None:
         pop_type = PopulationType.NUMBER
 
     input_data = InputData(
-        populationType=pop_type,
-        simulationType=simulation_type,
+        population_type=pop_type,
+        simulation_type=simulation_type,
         population_number=population_number,
         danger_zones_geopandas_json=danger_zones_geopandas_json,
         worldpop_filepath=worldpop_filepath,
@@ -52,8 +52,8 @@ def _save_input_data() -> None:
 
 def _case_studies() -> None:
     input_data = InputData(
-        populationType=PopulationType.NUMBER,  # Will not be used
-        simulationType=SimulationType.CASE_STUDIES,
+        population_type=PopulationType.NUMBER,  # Will not be used
+        simulation_type=SimulationType.CASE_STUDIES,
         danger_zones_geopandas_json="",  # Will not be used
         population_number=1,  # Will not be used
     )

@@ -47,8 +47,8 @@ def set_dev_input_data() -> InputData:
     Set the input data for development.
     """
     return InputData(
-        populationType=PopulationType.GEO_JSON_FILE,
-        simulationType=SimulationType.CASE_STUDIES,
+        population_type=PopulationType.GEO_JSON_FILE,
+        simulation_type=SimulationType.CASE_STUDIES,
         danger_zones_geopandas_json=load_json_file_to_str(CPH_AMAGER_DANGER_ZONE),
         pop_geo_json_filepath=CPH_POPULATION_DATA,
         cars_per_person=0.24,
@@ -60,8 +60,8 @@ def set_amager_input_data() -> InputData:
     Set the input data for development.
     """
     return InputData(
-        populationType=PopulationType.GEO_JSON_FILE,
-        simulationType=SimulationType.CASE_STUDIES,
+        population_type=PopulationType.GEO_JSON_FILE,
+        simulation_type=SimulationType.CASE_STUDIES,
         danger_zones_geopandas_json=load_json_file_to_str(CPH_AMAGER_DANGER_ZONE),
         pop_geo_json_filepath=CPH_POPULATION_DATA,
         cars_per_person=0.24,
@@ -73,8 +73,8 @@ def set_ravenna_input_data() -> InputData:
     Set the input data for development.
     """
     return InputData(
-        populationType=PopulationType.GEO_JSON_FILE,
-        simulationType=SimulationType.CASE_STUDIES,
+        population_type=PopulationType.GEO_JSON_FILE,
+        simulation_type=SimulationType.CASE_STUDIES,
         danger_zones_geopandas_json=load_json_file_to_str(RAVENNA_DANGER_ZONE),
         pop_geo_json_filepath=RAVENNA_POPULATION_DATA,
         cars_per_person=0.69,
@@ -86,8 +86,8 @@ def set_small_data_input_data() -> InputData:
     Set the input data for small data.
     """
     return InputData(
-        populationType=PopulationType.NUMBER,
-        simulationType=SimulationType.EXPLORE,
+        population_type=PopulationType.NUMBER,
+        simulation_type=SimulationType.EXPLORE,
         population_number=1000,
         danger_zones_geopandas_json=load_json_file_to_str(CPH_SMALL_AMAGER_DANGER_ZONE),
         cars_per_person=0.24,

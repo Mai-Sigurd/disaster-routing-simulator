@@ -95,7 +95,7 @@ def start_up(input_data: InputData, run_simulator: bool) -> None:
         simulate(program_config)
         run_matsim()
         save_analysis_files(program_config)
-    run_simwrapper_serve(input_data.simulationType)
+    run_simwrapper_serve(input_data.simulation_type)
 
 
 def main(args: argparse.Namespace) -> None:
@@ -125,7 +125,7 @@ def main(args: argparse.Namespace) -> None:
         input_data = gui_handler()
         start_up(
             input_data,
-            run_simulator=input_data.simulationType == SimulationType.EXPLORE,
+            run_simulator=input_data.simulation_type == SimulationType.EXPLORE,
         )
 
 

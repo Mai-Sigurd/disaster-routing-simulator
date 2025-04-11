@@ -53,7 +53,7 @@ def run_matsim() -> None:
 def controller_input_data(input_data: InputData) -> ProgramConfig:
     conf = ProgramConfig()
     conf.route_algos = ROUTE_ALGOS
-    match input_data.simulationType:
+    match input_data.simulation_type:
         case SimulationType.CASE_STUDIES:
             if input_data.danger_zones_geopandas_json == "":
                 logging.fatal("Danger zone geojson is empty")
@@ -79,7 +79,7 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
             conf.danger_zones = load_danger_zone_from_str(
                 input_data.danger_zones_geopandas_json, "EPSG:4326"
             )
-            match input_data.populationType:
+            match input_data.population_type:
                 case PopulationType.TIFF_FILE:
                     conf.danger_zone_population_data = population_data_from_tiff(
                         tiff_file_path=input_data.worldpop_filepath,
