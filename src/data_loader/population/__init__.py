@@ -43,7 +43,7 @@ def population_data_from_geojson(file_name: str) -> gpd.GeoDataFrame:
 
     except Exception as e:
         logging.error(f"Error loading GeoJSON file: {e}")
-        exit(0)
+        raise SystemExit
 
 
 def distribute_population(
