@@ -48,7 +48,7 @@ def run_matsim() -> None:
         "-Dexec.mainClass=org.disaster.routing.Main",
         "-Dexec.args=-Xmx6G",
     ]
-    subprocess.run(cmd, cwd=SOURCE_DIR / "simulator", shell=True)
+    subprocess.run(cmd, cwd=SOURCE_DIR / "simulator")
 
 
 def controller_input_data(input_data: InputData) -> ProgramConfig:
