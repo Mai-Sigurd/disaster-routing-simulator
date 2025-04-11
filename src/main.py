@@ -66,16 +66,20 @@ def save_analysis_files(program_config: ProgramConfig) -> None:
     )
 
 
-def run_simwrapper_serve(simulation_type: SimulationType) -> None:
+def run_simwrapper_serve(simulation_type: SimulationType, path: str = "") -> None:
     """
     Run the SimWrapper server.
     """
-    logging.info("Running SimWrapper server...")
-    if simulation_type == SimulationType.CASE_STUDIES:
-        # TODO SimWrapper server code here, simwrapper serve in case studies output folder
-        pass
+    if path == "":
+        logging.info("Running SimWrapper server...")
+        if simulation_type == SimulationType.CASE_STUDIES:
+            # TODO SimWrapper server code here, simwrapper serve in case studies output folder
+            pass
+        else:
+            # TODO SimWrapper server code here, simwrapper serve in explore output folder
+            pass
     else:
-        # TODO SimWrapper server code here, simwrapper serve in explore output folder
+        # TODO SimWrapper server code here, simwrapper serve in path
         pass
 
 
@@ -95,35 +99,35 @@ def start_up(input_data: InputData, run_simulater: bool) -> None:
 
 
 def main(args: argparse.Namespace) -> None:
-    match args:
-        case args.matsim_only:
-            if mat_sim_files_exist("plans.xml.gz", "network.xml.gz"):
-                start_up(None, False)
-            else:
-                logging.fatal(
-                    "Matsim flag set as input but there are No MATSim files found"
-                )
-                raise SystemExit
-        case args.gui_only:
-            print("here????")
-            input_data = gui_handler()
-
-            return
-        case args.dev:
-            start_up(set_dev_input_data(), True)
-        case args.small:
-            start_up(set_small_data_input_data(), True)
-        case args.amager:
-            start_up(set_amager_input_data(), True)
-        case args.ravenna:
-            start_up(set_ravenna_input_data(), True)
-        case _:  ## normal program, no flag set
-            input_data = gui_handler()
-            print(input_data)
-            start_up(
-                input_data,
-                run_simulater=input_data.simulationType == SimulationType.EXPLORE,
+    if args.matsim_only:
+        if mat_sim_files_exist("plans.xml.gz", "network.xml.gz"):
+            run_matsim()
+            run_simwrapper_serve(
+                SimulationType.CASE_STUDIES, path=MATSIM_DATA_DIR / "output"
             )
+        else:
+            logging.fatal(
+                "Matsim flag set as input but there are No MATSim files found"
+            )
+            raise SystemExit
+    elif args.gui_only:
+        input_data = gui_handler()
+        return
+    elif args.dev:
+        start_up(set_dev_input_data(), True)
+    elif args.small:
+        start_up(set_small_data_input_data(), True)
+    elif args.amager:
+        start_up(set_amager_input_data(), True)
+    elif args.ravenna:
+        start_up(set_ravenna_input_data(), True)
+    else:  ## normal program, no flag set
+        input_data = gui_handler()
+        print(input_data)
+        start_up(
+            input_data,
+            run_simulater=input_data.simulationType == SimulationType.EXPLORE,
+        )
 
 
 if __name__ == "__main__":
