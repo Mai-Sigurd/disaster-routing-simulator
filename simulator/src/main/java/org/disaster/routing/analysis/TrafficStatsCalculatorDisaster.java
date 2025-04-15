@@ -93,9 +93,8 @@ public final class TrafficStatsCalculatorDisaster {
 
 	//Calculate congestion across time for all links
 	public List<XYTimeValue> calculateCongestionAcrossTimeAndLinks() {
-
 		List<Time> times = generateTimes(600);
-		List<XYTimeValue> xYTimeValues = new ArrayList<XYTimeValue>();
+		List<XYTimeValue> xYTimeValues = new ArrayList<>();
 
 		for (Map.Entry<Id<Link>, ? extends Link> entry : this.network.getLinks().entrySet()) {
 			Link link = entry.getValue();
@@ -182,15 +181,6 @@ public final class TrafficStatsCalculatorDisaster {
 		return speeds.doubleStream().average().orElse(-1);
 	}
 
-	public class Time {
-		public int start;
-		public int end;
-	
-		public Time(int start, int end) {
-			this.start = start;
-			this.end = end;
-		}
-	}
-
-	record XYTimeValue(double time, double x, double y, double value) { }
+	public record Time(int start, int end) { }
+	public record XYTimeValue(double time, double x, double y, double value) { }
 }
