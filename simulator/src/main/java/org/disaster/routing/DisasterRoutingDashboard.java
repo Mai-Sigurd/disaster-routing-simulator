@@ -15,6 +15,8 @@ import org.matsim.simwrapper.viz.ColorScheme;
 import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.Plotly;
 import org.matsim.simwrapper.viz.Table;
+import org.matsim.simwrapper.viz.XYTime;
+
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.components.Line;
 import tech.tablesaw.plotly.traces.BarTrace;
@@ -178,6 +180,13 @@ public class DisasterRoutingDashboard implements Dashboard {
             viz.display.lineWidth.join = "link_id";
 
             viz.height = 12d;
+        });
+
+        layout.row("map").el(XYTime.class, (viz, data) -> {
+            viz.title = "Congestion";
+            String output = data.compute(TrafficAnalysisDisaster.class, "congestion.xyt.csv");
+            viz.colorRamp = "plasma";
+            viz.file = output;
         });
     }
 }
