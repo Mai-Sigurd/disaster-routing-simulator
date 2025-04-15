@@ -4,7 +4,7 @@ import dearpygui.dearpygui as dpg
 
 from gui.constants import (
     DANGER_ZONE,
-    OSM_JSON_BBOX,
+    DEPARTURE_TIME,
     POPULATION,
     POPULATION_NUMBER,
     TIFF_FILE,
@@ -13,20 +13,17 @@ from gui.constants import (
 
 
 def add_input_fields_pick_area(parent: str) -> list[gui_type]:
-    t1 = _add_geo_json_input_field(
-        title="OSM Graph",
-        desc="Go to geojson.io and pick an area, copy the JSON into the below box",
-        desc2="The area should be a bounding box of the city",
-        desc3="",
-        tag=OSM_JSON_BBOX,
+    t1 = _add_danger_zone_input_field(parent=parent, tag=DANGER_ZONE)
+    t2 = _add_departure_time_input_field(
+        title="Departure Time Distribution",
+        desc_dist_end="Choose the length of the distribution for departure times in minutes",
+        tag_dist_end=DEPARTURE_TIME,
         parent=parent,
     )
-    t2 = _add_danger_zone_input_field(parent=parent, tag=DANGER_ZONE)
-
     t3 = _add_population_input_field(
         title="Population",
         desc="Choose the population type:",
-        desc2="Either download a worldpop tiff file and input the filepath or input a population number which will be evenly distributed across the dangerzone",
+        desc2="Either download a worldpop tiff file and input the full filepath  \n or input a population number which will be evenly distributed across the danger zone",
         tag=POPULATION,
         types=[
             TIFF_FILE,
@@ -108,15 +105,11 @@ def _show_input_field_based_on_radio(sender, app_data, user_data) -> None:  # ty
 
 def _add_departure_time_input_field(
     title: str,
-    desc_chunk: str,
-    desc_interval: str,
-    tag_chunk: str,
-    tag_interval: str,
+    desc_dist_end: str,
+    tag_dist_end: str,
     parent: str,
 ) -> gui_type:
     t1 = dpg.add_text(title, parent=parent)
-    dpg.add_text(desc_chunk, parent=parent)
-    dpg.add_input_int(tag=tag_chunk, show=True, parent=parent, default_value=0)
-    dpg.add_text(desc_interval, parent=parent)
-    dpg.add_input_int(tag=tag_interval, show=True, parent=parent, default_value=0)
+    dpg.add_text(desc_dist_end, parent=parent)
+    dpg.add_input_int(tag=tag_dist_end, show=True, parent=parent, default_value=60)
     return t1

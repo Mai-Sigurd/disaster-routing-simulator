@@ -11,14 +11,12 @@ from _pytest.logging import LogCaptureFixture
 from shapely.geometry import LineString, Point, Polygon
 
 from data_loader.population import (
+    POPULATION_DIR,
+    distribute_population,
     population_data_from_geojson,
     population_data_from_number,
 )
-from data_loader.population.population import (
-    POPULATION_DIR,
-    distribute_population,
-)
-from data_loader.population.utils import (
+from data_loader.population.population_utils import (
     filter_world_pop_to_graph_area,
     snap_population_to_nodes,
 )
