@@ -2,7 +2,11 @@ package org.disaster.routing.analysis;
 
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
+import scala.annotation.cloneable;
+
 import org.matsim.api.core.v01.Id;
+import org.disaster.routing.CSVWriter;
+import org.disaster.routing.CSVWriter.XYTimeValue;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -11,6 +15,9 @@ import org.matsim.core.router.util.TravelTime;
 
 
 import javax.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -72,6 +79,44 @@ public final class TrafficStatsCalculatorDisaster {
 		}
 		return coords;
 	}
+
+	//Divides the day in intervals in seconds with the duration of intervalInSeconds
+	public List<Time> generateTimes(int intervalInSeconds)
+	{
+		List<Time> times = new ArrayList<>();
+
+		int secondsInDay = 24 * 60 * 60; // 86400 seconds in a day
+
+		for (int start = 0; start < secondsInDay; start += intervalInSeconds) {
+			int end = Math.min(start + intervalInSeconds, secondsInDay);
+			times.add(new Time(start, end));
+		}
+
+		return times;
+	}
+
+	//Calculate congestion across time for all links
+	public List<XYTimeValue> calculateCongestionAcrossTimeAndLinks() {
+
+		List<Time> times = generateTimes(600);
+		List<XYTimeValue> xYTimeValues = new ArrayList<XYTimeValue>();
+
+		for (Map.Entry<Id<Link>, ? extends Link> entry : this.network.getLinks().entrySet()) {
+			Link link = entry.getValue();
+
+			for (Time time : times) {
+				double val = getSpeedPerformanceIndex(link, time.start, time.end);
+
+				Coord[] coords = getLinkCoordinates(link, 5);
+
+				for (Coord coord : coords) {
+					xYTimeValues.add(new XYTimeValue(time.start, coord.getX(), coord.getY(), val));
+				}
+			} 	
+		}
+		return xYTimeValues;
+	}
+
 
 	/**
 	 * Calculates the congestion index based on the ratio of actual travel time and free speed travel time.
@@ -139,5 +184,15 @@ public final class TrafficStatsCalculatorDisaster {
 		}
 
 		return speeds.doubleStream().average().orElse(-1);
+	}
+
+	public class Time {
+		public int start;
+		public int end;
+	
+		public Time(int start, int end) {
+			this.start = start;
+			this.end = end;
+		}
 	}
 }
