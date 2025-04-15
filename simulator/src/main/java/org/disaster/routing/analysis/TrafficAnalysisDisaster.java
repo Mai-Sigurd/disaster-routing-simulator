@@ -164,7 +164,23 @@ public class TrafficAnalysisDisaster implements MATSimAppCommand {
 			.sortOn("Road Type")
 			.write().csv(output.getPath("traffic_stats_by_road_type_daily.csv").toFile());
 
-		CSVWriter.writeToCSV(output.getPath("congestion.xyt.csv").toString(), calc.calculateCongestionAcrossTimeAndLinks());	
+		Table congestion = Table.create(
+			DoubleColumn.create("time"),
+			DoubleColumn.create("x"),
+			DoubleColumn.create("y"),
+			DoubleColumn.create("value")
+		);
+
+		for (CSVWriter.XYTimeValue value : calc.calculateCongestionAcrossTimeAndLinks()) {
+			Row row = congestion.appendRow();
+			row.setDouble("time", value.time());
+			row.setDouble("x", value.x());
+			row.setDouble("y", value.y());
+			row.setDouble("value", value.value());
+		}
+
+		congestion.sortOn("time", "x", "y")
+				.write().csv(output.getPath("congestion.xyt.csv").toFile());
 
 		return 0;
 	}
