@@ -57,7 +57,7 @@ def sim_wrapper_serve(output_path: str) -> None:
         "simwrapper",
         "serve",
     ]
-    subprocess.run(cmd, cwd=output_path)
+    subprocess.run(cmd, cwd=output_path, check=True)
 
 
 def controller_input_data(input_data: InputData) -> ProgramConfig:
