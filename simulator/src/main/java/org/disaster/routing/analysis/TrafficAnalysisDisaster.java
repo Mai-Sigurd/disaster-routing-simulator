@@ -1,6 +1,5 @@
 package org.disaster.routing.analysis;
 
-import org.disaster.routing.CSVWriter;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -171,7 +170,7 @@ public class TrafficAnalysisDisaster implements MATSimAppCommand {
 			DoubleColumn.create("value")
 		);
 
-		for (CSVWriter.XYTimeValue value : calc.calculateCongestionAcrossTimeAndLinks()) {
+		for (TrafficStatsCalculatorDisaster.XYTimeValue value : calc.calculateCongestionAcrossTimeAndLinks()) {
 			Row row = congestion.appendRow();
 			row.setDouble("time", value.time());
 			row.setDouble("x", value.x());

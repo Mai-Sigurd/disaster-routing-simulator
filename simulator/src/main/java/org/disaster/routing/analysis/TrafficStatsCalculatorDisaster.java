@@ -4,7 +4,6 @@ import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 
 import org.matsim.api.core.v01.Id;
-import org.disaster.routing.CSVWriter.XYTimeValue;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -192,4 +191,6 @@ public final class TrafficStatsCalculatorDisaster {
 			this.end = end;
 		}
 	}
+
+	record XYTimeValue(double time, double x, double y, double value) { }
 }
