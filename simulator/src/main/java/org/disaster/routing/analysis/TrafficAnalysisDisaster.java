@@ -31,7 +31,7 @@ import static tech.tablesaw.aggregate.AggregateFunctions.sum;
 
 @CommandLine.Command(name = "congestion", description = "Calculates congestion indices and relative travel times.")
 @CommandSpec(requireEvents = true, requireNetwork = true,
-	produces = {"traffic_stats_by_link_daily.csv", "traffic_stats_by_link_and_hour.csv", "traffic_stats_by_road_type_daily.csv", "traffic_stats_by_road_type_and_hour.csv", "congestion_xyt.csv"}
+	produces = {"traffic_stats_by_link_daily.csv", "traffic_stats_by_link_and_hour.csv", "traffic_stats_by_road_type_daily.csv", "traffic_stats_by_road_type_and_hour.csv", "congestion.xyt.csv"}
 )
 public class TrafficAnalysisDisaster implements MATSimAppCommand {
 
@@ -164,7 +164,8 @@ public class TrafficAnalysisDisaster implements MATSimAppCommand {
 			.sortOn("Road Type")
 			.write().csv(output.getPath("traffic_stats_by_road_type_daily.csv").toFile());
 
-		CSVWriter.writeToCSV("congestion_xyt.csv", calc.calculateCongestionAcrossTimeAndLinks());	
+		CSVWriter.writeToCSV(output.getPath("congestion.xyt.csv").toString(), calc.calculateCongestionAcrossTimeAndLinks());	
+
 		return 0;
 	}
 
