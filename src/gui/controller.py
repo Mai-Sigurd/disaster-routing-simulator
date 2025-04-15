@@ -1,9 +1,7 @@
 import logging
-import webbrowser
 
 import dearpygui.dearpygui as dpg
 
-from config import SIM_WRAPPER_CASE_STUDIES_LINK
 from gui.constants import (
     CASE_WINDOW,
     DANGER_ZONE,
@@ -62,7 +60,6 @@ def _case_studies() -> None:
         departure_end_time_sec=3600,  # Will not be used
     )
     save_to_pickle(input_data, INPUTDATADIR)
-    webbrowser.open(SIM_WRAPPER_CASE_STUDIES_LINK)
     dpg.stop_dearpygui()
 
 
@@ -127,6 +124,10 @@ def add_explore_window(
         label="", tag=tag, show=True, parent=parent, width=width, height=height
     )
     bold_text = add_input_fields_pick_area(parent=tag)
+    dpg.add_text(
+        "\n Once the simulation is finished, a web browser will open with the simulation dashboards.",
+        parent=tag,
+    )
     add_go_button(parent=tag)
     return bold_text  # type: ignore
 

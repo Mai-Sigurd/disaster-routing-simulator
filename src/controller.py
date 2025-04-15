@@ -48,6 +48,18 @@ def run_matsim() -> None:
     subprocess.run(cmd, cwd=SOURCE_DIR / "simulator")
 
 
+def sim_wrapper_serve(output_path: str) -> None:
+    """
+    Run the SimWrapper server.
+    """
+
+    cmd = [
+        "simwrapper",
+        "serve",
+    ]
+    subprocess.run(cmd, cwd=output_path, check=True)
+
+
 def controller_input_data(input_data: InputData) -> ProgramConfig:
     conf = ProgramConfig()
     conf.route_algos = ROUTE_ALGOS
