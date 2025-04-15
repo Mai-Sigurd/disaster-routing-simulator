@@ -3,12 +3,15 @@ package org.disaster.routing.analysis;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
 
+
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,6 +58,19 @@ public final class TrafficStatsCalculatorDisaster {
 			);
 
 		return indices.doubleStream().average().orElse(-1);
+	}
+
+	public Coord[] getLinkCoordinates(Link link, int amountOfCoords) {
+		var coords = new Coord[amountOfCoords];
+		//Linear interpolation
+		for (int i = 0; i <= amountOfCoords; i++) {
+			double ratio = (double) i / (amountOfCoords-1);
+			coords[i] = new Coord(
+					link.getFromNode().getCoord().getX() * (1 - ratio) + link.getToNode().getCoord().getX() * ratio,
+					link.getFromNode().getCoord().getY() * (1 - ratio) + link.getToNode().getCoord().getY() * ratio
+			);
+		}
+		return coords;
 	}
 
 	/**
