@@ -28,9 +28,9 @@ cars_per_person_cph = 0.24  # refer to our thesis
 cars_per_person_ravenna = 0.69  # refer to our thesis
 ROUTE_ALGOS = [FastestPath(), ShortestPath()]
 
-SIM_WRAPPER_CASE_STUDIES_LINK = (
-    "https://docs.simwrapper.app/site/local/data/matsim/output/"
-)
+CASE_STUDIES_OUTPUT_FOLDER = "data/matsim/output/"  # TODO change
+EXPLORE_OUTPUT_FOLDER = "data/matsim/output/"  # TODO change
+SIM_WRAPPER_LINK = "https://docs.simwrapper.app/site/local/"
 
 
 @dataclass
