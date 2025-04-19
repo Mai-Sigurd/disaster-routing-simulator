@@ -3,7 +3,6 @@ import subprocess
 from pathlib import Path
 from types import FrameType
 
-from analysis.analysis import write_danger_zone_data_simwrapper_csv
 from config import (
     ROUTE_ALGOS,
     SOURCE_DIR,
@@ -120,17 +119,6 @@ def gui_handler(gui_error_message: str = "") -> InputData:
 
     logging.info(input_data.pretty_summary())
     return input_data
-
-
-def write_danger_zone_data(
-    program_conf: ProgramConfig, stats: dict[str, int], filepath: str
-) -> None:
-    """
-    Writes the total area of the danger zone and the total area of the city graph to a CSV file.
-    """
-    write_danger_zone_data_simwrapper_csv(
-        program_conf=program_conf, stats=stats, filepath=filepath
-    )
 
 
 def gui_close(_signal: int, _frame: FrameType | None) -> None:

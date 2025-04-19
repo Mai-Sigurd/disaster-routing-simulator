@@ -7,6 +7,7 @@ from typing import Optional
 
 from slugify import slugify
 
+from analysis.analysis import write_analysis_data_simwrapper
 from config import (
     CASE_STUDIES_OUTPUT_FOLDER,
     EXPLORE_OUTPUT_FOLDER,
@@ -23,7 +24,6 @@ from controller import (
     gui_handler,
     run_matsim,
     sim_wrapper_serve,
-    write_danger_zone_data,
 )
 from input_data import (
     InputData,
