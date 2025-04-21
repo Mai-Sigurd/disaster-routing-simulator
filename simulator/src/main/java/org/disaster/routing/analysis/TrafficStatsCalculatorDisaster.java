@@ -114,7 +114,6 @@ public final class TrafficStatsCalculatorDisaster {
 				Coord[] coords = getLinkCoordinates(link, amountOfCoords);
 				
 				for (Coord coord : coords) {
-					System.out.println(coord);
 					xYTimeValues.add(new XYTimeValue(time.start, coord.getX(), coord.getY(), val));
 				}
 			} 
