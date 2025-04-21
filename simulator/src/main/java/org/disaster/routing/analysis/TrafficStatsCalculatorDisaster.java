@@ -2,6 +2,7 @@ package org.disaster.routing.analysis;
 
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
+import scala.annotation.meta.companionClass;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Coord;
@@ -101,9 +102,10 @@ public final class TrafficStatsCalculatorDisaster {
 
 			for (Time time : times) {
 				double val = getSpeedPerformanceIndex(link, time.start, time.end);
-
-				Coord[] coords = getLinkCoordinates(link, 5);
-
+				
+				int amountOfCoords = (int) link.getLength() / 20;
+				Coord[] coords = getLinkCoordinates(link, amountOfCoords);
+				
 				for (Coord coord : coords) {
 					xYTimeValues.add(new XYTimeValue(time.start, coord.getX(), coord.getY(), val));
 				}

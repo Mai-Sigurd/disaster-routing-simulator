@@ -182,11 +182,13 @@ public class DisasterRoutingDashboard implements Dashboard {
             viz.height = 12d;
         });
 
-        layout.row("map").el(XYTime.class, (viz, data) -> {
+        layout.row("congestion_map").el(XYTime.class, (viz, data) -> {
             viz.title = "Congestion";
             String output = data.compute(TrafficAnalysisDisaster.class, "congestion.xyt.csv");
-            viz.colorRamp = "plasma";
             viz.file = output;
+            viz.height = 12d;
+            String[] colors = {"#0d0887", "#5c01a6", "#9a179b", "#cb4679", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921", "#d0f921", "#b2f621"};
+            viz.setBreakpoints(colors, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9);
         });
     }
 }
