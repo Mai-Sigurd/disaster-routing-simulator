@@ -107,7 +107,7 @@ public final class TrafficStatsCalculatorDisaster {
 					areAllVals1 = false;
 				}
 				
-				int amountOfCoords = (int) (link.getLength() / 20);
+				int amountOfCoords = (int) (link.getLength() / 50);
 				if(amountOfCoords < 3){
 					amountOfCoords = 3;
 				}
