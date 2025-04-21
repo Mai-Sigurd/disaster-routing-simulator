@@ -97,19 +97,32 @@ public final class TrafficStatsCalculatorDisaster {
 		List<Time> times = generateTimes(600);
 		List<XYTimeValue> xYTimeValues = new ArrayList<>();
 
-		for (Map.Entry<Id<Link>, ? extends Link> entry : this.network.getLinks().entrySet()) {
-			Link link = entry.getValue();
-
-			for (Time time : times) {
+		for (Time time : times) {
+			boolean areAllVals1 = true;
+			for (Map.Entry<Id<Link>, ? extends Link> entry : this.network.getLinks().entrySet()) {
+				Link link = entry.getValue();
+		
 				double val = getSpeedPerformanceIndex(link, time.start, time.end);
+				if(val < 1.0){
+					areAllVals1 = false;
+				}
 				
 				int amountOfCoords = (int) link.getLength() / 20;
+				if(amountOfCoords < 3){
+					amountOfCoords = 3;
+				}
 				Coord[] coords = getLinkCoordinates(link, amountOfCoords);
 				
 				for (Coord coord : coords) {
+					System.out.println(coord);
 					xYTimeValues.add(new XYTimeValue(time.start, coord.getX(), coord.getY(), val));
 				}
-			} 	
+			} 
+			if(areAllVals1){
+				return xYTimeValues;
+			} else{
+				areAllVals1 = true;
+			}
 		}
 		return xYTimeValues;
 	}
