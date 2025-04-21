@@ -21,7 +21,8 @@ from input_data import (
     SimulationType,
 )
 from matsim_io import MATSIM_DATA_DIR, mat_sim_files_exist, write_network, write_plans
-from routes.route import Route, create_route_objects
+from routes.route import create_route_objects
+from routes.route_algo import RouteAlgo
 from routes.route_utils import path
 
 logging.basicConfig(
@@ -31,8 +32,10 @@ logging.basicConfig(
 )
 
 
-def simulate(program_config: ProgramConfig) -> dict[str, int]:
-    paths: list[path] = program_config.route_algos[0].route_to_safety(
+def compute_and_save_matsim_paths(
+    program_config: ProgramConfig, algorithm: RouteAlgo
+) -> dict[str, int]:
+    paths: list[path] = algorithm.route_to_safety(
         program_config.origin_points, program_config.danger_zones, program_config.G
     )
     routes: list[Route] = create_route_objects(
@@ -53,14 +56,18 @@ def simulate(program_config: ProgramConfig) -> dict[str, int]:
     return stats
 
 
-def save_analysis_files(program_config: ProgramConfig, stats: dict[str, int]) -> None:
+def save_analysis_files(
+    program_config: ProgramConfig,
+    stats: dict[str, int],
+    output_dir_name: str = "output",
+) -> None:
     """
     Save the analysis files to the MATSIM_DATA_DIR.
     """
     write_danger_zone_data(
         program_conf=program_config,
         stats=stats,
-        filepath=MATSIM_DATA_DIR / "OUTPUT" / "dangerzone_data.csv",
+        filepath=MATSIM_DATA_DIR / output_dir_name / "dangerzone_data.csv",
     )
 
 
@@ -90,9 +97,11 @@ def start_up(input_data: InputData, run_simulator: bool) -> None:
         program_config = controller_input_data(input_data)
         logging.info("Controller input data done")
         logging.info("Route algos done")
-        stats = simulate(program_config)
-        run_matsim()
-        save_analysis_files(program_config, stats)
+        for algorithm in program_config.route_algos:
+            stats = compute_and_save_matsim_paths(program_config, algorithm)
+            output_dir_name = f"{algorithm.name}_output"
+            run_matsim(output_dir_name)
+            save_analysis_files(program_config, stats, output_dir_name)
     run_simwrapper_serve(input_data.simulation_type)
 
 

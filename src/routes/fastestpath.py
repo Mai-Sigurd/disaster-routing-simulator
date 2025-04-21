@@ -19,6 +19,9 @@ from utils import kmh_to_ms
 
 @zope.interface.implementer(RouteAlgo)
 class FastestPath:
+    def __init__(self) -> None:
+        self.name = "fastest"
+
     def route_to_safety(
         self,
         origin_points: list[vertex],

@@ -5,7 +5,11 @@ import zope.interface
 from routes.route_utils import path, vertex
 
 
-class RouteAlgo(zope.interface.Interface):  # type: ignore
+class RouteAlgo(zope.interface.Interface):  # type: ignore[misc]
+    name = zope.interface.Attribute(
+        "Name of the routing algorithm. Used to name the MATSim output directory."
+    )
+
     def route_to_safety(
         self,
         origin_points: list[vertex],

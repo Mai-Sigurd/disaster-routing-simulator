@@ -18,6 +18,9 @@ from routes.route_utils import (
 
 @zope.interface.implementer(RouteAlgo)
 class ShortestPath:
+    def __init__(self) -> None:
+        self.name = "shortest"
+
     # based on: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/
     def route_to_safety(
         self,
