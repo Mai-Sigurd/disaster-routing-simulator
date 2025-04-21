@@ -23,7 +23,6 @@ from input_data import (
 from matsim_io import MATSIM_DATA_DIR, mat_sim_files_exist, write_network, write_plans
 from routes.route import create_route_objects
 from routes.route_algo import RouteAlgo
-from routes.route_utils import path
 
 logging.basicConfig(
     level=logging.INFO,
@@ -35,24 +34,35 @@ logging.basicConfig(
 def compute_and_save_matsim_paths(
     program_config: ProgramConfig, algorithm: RouteAlgo
 ) -> dict[str, int]:
-    paths: list[path] = algorithm.route_to_safety(
+    """
+    Compute the paths out of the danger zone to safety using the given algorithm and
+        save the graph and paths to MATSim input files.
+    :param program_config: The program configuration, including the graph, origin points, and danger zones.
+    :param algorithm: The algorithm to use for routing.
+    :return: A dictionary of statistics about the routes, including the number of routes and the number of
+        nodes with no route to safety.
+    """
+    paths = algorithm.route_to_safety(
         program_config.origin_points, program_config.danger_zones, program_config.G
     )
-    routes: list[Route] = create_route_objects(
+    routes = create_route_objects(
         list_of_paths=paths,
         population_data=program_config.danger_zone_population_data,
         start=0,
         end=program_config.departure_end_time_sec,
         cars_per_person=program_config.cars_per_person,
     )
+
     logging.info("Routes done")
     stats = {
         "Amount of routes": len(routes),
         "Amount of nodes with no route to safety": len(program_config.origin_points)
         - len(routes),
     }
-    write_network(program_config.G, network_name="Copenhagen")
-    write_plans(routes, plan_filename="plans.xml")
+
+    write_network(program_config.G)
+    write_plans(routes)
+
     return stats
 
 
