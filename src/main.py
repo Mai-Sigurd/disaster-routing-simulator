@@ -21,6 +21,7 @@ from input_data import (
     SimulationType,
 )
 from matsim_io import MATSIM_DATA_DIR, mat_sim_files_exist, write_network, write_plans
+from matsim_io.scripts import move_dashboards
 from routes.route import create_route_objects
 from routes.route_algo import RouteAlgo
 
@@ -105,13 +106,18 @@ def start_up(input_data: InputData, run_simulator: bool) -> None:
     if run_simulator:
         logging.info("Starting up...")
         program_config = controller_input_data(input_data)
-        logging.info("Controller input data done")
-        logging.info("Route algos done")
+        logging.info("Input data loaded")
+        output_dirs = []
+
         for algorithm in program_config.route_algos:
             stats = compute_and_save_matsim_paths(program_config, algorithm)
             output_dir_name = f"{algorithm.name}_output"
             run_matsim(output_dir_name)
             save_analysis_files(program_config, stats, output_dir_name)
+            output_dirs.append(output_dir_name)
+
+        move_dashboards(output_dirs)
+
     run_simwrapper_serve(input_data.simulation_type)
 
 
