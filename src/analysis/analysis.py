@@ -22,7 +22,7 @@ def write_danger_zone_data_simwrapper_csv(
 
     with open(filepath, "w") as file:
         file.write("Info, Value\n")
-        file.write(f"Danger zone Area km^2,{danger_zone_area_km2}\n")
+        file.write(f"Danger Zone Area (km²),{danger_zone_area_km2}\n")
         file.write(
             f"Departure distribution length in minutes, {program_conf.departure_end_time_sec / 60}\n"
         )

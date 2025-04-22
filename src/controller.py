@@ -1,6 +1,6 @@
 import logging
-import shutil
 import subprocess
+from pathlib import Path
 from types import FrameType
 
 from analysis.analysis import write_danger_zone_data_simwrapper_csv
@@ -28,27 +28,23 @@ from input_data import (
     open_pickle_file,
     verify_input,
 )
-from matsim_io import MATSIM_DATA_DIR
 
 
-def run_matsim() -> None:
+def run_matsim(output_dir_name: str = "output") -> None:
     """
     Run the MATSim executable with the config.xml file in the MATSIM_DATA_DIR.
+    :param output_dir_name: The name of the output directory in the "matsim" data directory.
     """
-    matsim_output_dir = MATSIM_DATA_DIR / "output"
-    if matsim_output_dir.exists() and matsim_output_dir.is_dir():
-        shutil.rmtree(matsim_output_dir)
-
     cmd = [
         "mvn",
         "exec:java",
         "-Dexec.mainClass=org.disaster.routing.Main",
-        "-Dexec.args=-Xmx6G",
+        f'-Dexec.args="{output_dir_name}"',
     ]
-    subprocess.run(cmd, cwd=SOURCE_DIR / "simulator")
+    subprocess.run(cmd, cwd=SOURCE_DIR / "simulator", check=True)
 
 
-def sim_wrapper_serve(output_path: str) -> None:
+def sim_wrapper_serve(output_path: Path) -> None:
     """
     Run the SimWrapper server.
     """
