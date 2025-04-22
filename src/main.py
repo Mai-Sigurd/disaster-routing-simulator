@@ -2,6 +2,8 @@ import argparse
 import logging
 import signal
 import webbrowser
+from pathlib import Path
+from typing import Optional
 
 from slugify import slugify
 
@@ -28,7 +30,7 @@ from input_data import (
     SimulationType,
 )
 from matsim_io import MATSIM_DATA_DIR, mat_sim_files_exist, write_network, write_plans
-from matsim_io.scripts import move_dashboards
+from matsim_io.scripts import move_dashboard
 from routes.route import create_route_objects
 from routes.route_algo import RouteAlgo
 
@@ -89,13 +91,15 @@ def save_analysis_files(
     )
 
 
-def run_simwrapper_serve(simulation_type: SimulationType, path: str = "") -> None:
+def run_simwrapper_serve(
+    simulation_type: SimulationType, path: Optional[Path] = None
+) -> None:
     """
     Run the SimWrapper server.
     """
     webbrowser.open(SIM_WRAPPER_LINK)
     logging.info("SimWrapper link: %s", SIM_WRAPPER_LINK)
-    if path == "":
+    if path is None:
         logging.info("Running SimWrapper server...")
         if simulation_type == SimulationType.CASE_STUDIES:
             sim_wrapper_serve(CASE_STUDIES_OUTPUT_FOLDER)
@@ -115,16 +119,13 @@ def start_up(input_data: InputData, run_simulator: bool) -> None:
         logging.info("Starting up...")
         program_config = controller_input_data(input_data)
         logging.info("Input data loaded")
-        output_dirs_and_titles = []
 
         for algorithm in program_config.route_algos:
             stats = compute_and_save_matsim_paths(program_config, algorithm)
             output_dir_name = slugify(f"{algorithm.title}-output")
             run_matsim(output_dir_name)
             save_analysis_files(program_config, stats, output_dir_name)
-            output_dirs_and_titles.append((output_dir_name, algorithm.title))
-
-        move_dashboards(output_dirs_and_titles)
+            move_dashboard(output_dir_name, algorithm.title)
 
     run_simwrapper_serve(input_data.simulation_type)
 
@@ -132,10 +133,9 @@ def start_up(input_data: InputData, run_simulator: bool) -> None:
 def main(args: argparse.Namespace) -> None:
     if args.matsim_only:
         if mat_sim_files_exist("plans.xml.gz", "network.xml.gz"):
-            run_matsim()
-            run_simwrapper_serve(
-                SimulationType.CASE_STUDIES, path=MATSIM_DATA_DIR / "output"
-            )
+            run_matsim("output")
+            move_dashboard("output")
+            run_simwrapper_serve(SimulationType.CASE_STUDIES, path=MATSIM_DATA_DIR)
         else:
             logging.fatal(
                 "Matsim flag set as input but there are No MATSim files found"

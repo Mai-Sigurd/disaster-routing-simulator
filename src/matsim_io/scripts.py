@@ -1,32 +1,39 @@
 import logging
 from pathlib import Path
+from typing import Optional
 
 import yaml
 
 from matsim_io import MATSIM_DATA_DIR
 
+dashboard_count = 1
 
-def move_dashboards(output_dirs: list[tuple[str, str]]) -> None:
+
+def move_dashboard(output_dir: str, dashboard_title: Optional[str] = None) -> None:
     """
-    Move every dashboard-2.yaml file in the given directories up to the MATSim data directory.
-    :param output_dirs: List of tuples of MATSim subdirectories and SimWrapper titles.
+    Moves the dashboard-2.yaml file in the given MATSim subdirectory up to the MATSim data directory.
+    :param output_dir: Name of the output directory in the MATSim data directory.
+    :param dashboard_title: Title for the dashboard. If None, the title will not be updated.
     """
+    global dashboard_count
 
-    for i, (output_dir, title) in enumerate(output_dirs, start=1):
-        output_path = MATSIM_DATA_DIR / output_dir
-        if not output_path.is_dir():
-            logging.error(f"Directory {output_path} does not exist.")
-            continue
+    output_path = MATSIM_DATA_DIR / output_dir
+    if not output_path.is_dir():
+        logging.error(f"Directory {output_path} does not exist.")
+        return
 
-        dashboard_path = output_path / "dashboard-2.yaml"
-        if not dashboard_path.is_file():
-            logging.error(f"Dashboard {dashboard_path} does not exist.")
-            continue
+    dashboard_path = output_path / "dashboard-2.yaml"
+    if not dashboard_path.is_file():
+        logging.error(f"Dashboard {dashboard_path} does not exist.")
+        return
 
-        dest_path = MATSIM_DATA_DIR / f"dashboard-{i}.yaml"
-        dashboard_path.rename(dest_path)
-        _rewrite_dashboard_dataset_paths(dest_path, output_dir)
-        _update_dashboard_title(dest_path, title)
+    dest_path = MATSIM_DATA_DIR / f"dashboard-{dashboard_count}.yaml"
+    dashboard_path.rename(dest_path)
+    dashboard_count += 1
+
+    _rewrite_dashboard_dataset_paths(dest_path, output_dir)
+    if dashboard_title:
+        _update_dashboard_title(dest_path, dashboard_title)
 
 
 def _rewrite_dashboard_dataset_paths(dashboard: Path, output_dir: str) -> None:
