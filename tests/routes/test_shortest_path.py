@@ -23,6 +23,7 @@ G.add_edge("B", "C", length=1)
 G.add_edge("C", "D", length=2)
 G.add_edge("C", "E", length=1)
 G.add_edge("E", "D", length=2)
+G.add_edge("B", "D", length=5)
 
 # Define a danger zone polygon
 danger_zone = gpd.GeoDataFrame(geometry=[Polygon([(1, 4), (1, 1), (4, 1), (4, 4)])])
@@ -34,7 +35,7 @@ sp = ShortestPath()
 
 def test_route_to_safety() -> None:
     routes = sp.route_to_safety(["A"], danger_zone, G)
-    assert routes == [["A", "B", "C", "D"]]
+    assert routes["A"] == [["A", "B", "C", "D"]]
 
 
 def test_route_to_safety_two_origin_points() -> None:
@@ -62,7 +63,7 @@ G1.add_edge("B", "C", length=1)
 
 def test_route_to_safety_endpoint_is_completely_free_from_danger() -> None:
     routes = sp.route_to_safety(["A"], danger_zone, G1)
-    assert routes == [["A", "B", "C"]]
+    assert routes["A"] == [["A", "B", "C"]]
 
 
 # Create a directed graph
