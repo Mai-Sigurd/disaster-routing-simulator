@@ -85,7 +85,7 @@ def save_analysis_files(
     write_danger_zone_data(
         program_conf=program_config,
         stats=stats,
-        filepath=MATSIM_DATA_DIR / output_dir_name / "dangerzone_data.csv",
+        filepath=MATSIM_DATA_DIR / output_dir_name / "analysis" / "dangerzone_data.csv",
     )
 
 
