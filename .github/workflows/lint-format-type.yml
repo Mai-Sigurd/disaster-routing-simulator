@@ -22,8 +22,10 @@ jobs:
         with:
           python-version: 3.11
 
-      - name: Install Ruff
-        run: pip install ruff mypy
+      - name: Install Dependencies
+        run: |
+          pip install ruff mypy
+          mypy --install-types
 
       - name: Run Ruff Formatter (Check Formatting)
         run: ruff format --check src/
