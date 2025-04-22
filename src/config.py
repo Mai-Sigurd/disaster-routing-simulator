@@ -11,7 +11,10 @@ from routes.route_algo import RouteAlgo
 from routes.shortest_path import ShortestPath
 
 SOURCE_DIR = Path(__file__).parent.parent
-
+DATA_DIR = SOURCE_DIR / "data"
+EXPLORE_OUTPUT_FOLDER = DATA_DIR / "matsim"
+# TODO: Change this to a different folder for case studies
+CASE_STUDIES_OUTPUT_FOLDER = EXPLORE_OUTPUT_FOLDER
 
 CPH_G_GRAPHML = "copenhagen.graphml"
 CPH_XTRA_SMALL_AMAGER_DANGER_ZONE = "dangerzone_lillebitteamager.geojson"
@@ -22,14 +25,11 @@ CPH_AMAGER_BBOX = "bbox_amager.geojson"
 RAVENNA_DANGER_ZONE = "ravenna.geojson"
 RAVENNA_POPULATION_DATA = "ravennaPopulation.geojson"
 
-
 ONE_HOUR = 3600
 cars_per_person_cph = 0.24  # refer to our thesis
 cars_per_person_ravenna = 0.69  # refer to our thesis
 ROUTE_ALGOS = [FastestPath(), ShortestPath()]
 
-CASE_STUDIES_OUTPUT_FOLDER = "data/matsim/output/"  # TODO change
-EXPLORE_OUTPUT_FOLDER = "data/matsim/output/"  # TODO change
 SIM_WRAPPER_LINK = "https://docs.simwrapper.app/site/local/"
 
 

@@ -1,5 +1,6 @@
 import logging
 import subprocess
+from pathlib import Path
 from types import FrameType
 
 from analysis.analysis import write_danger_zone_data_simwrapper_csv
@@ -43,7 +44,7 @@ def run_matsim(output_dir_name: str = "output") -> None:
     subprocess.run(cmd, cwd=SOURCE_DIR / "simulator", check=True)
 
 
-def sim_wrapper_serve(output_path: str) -> None:
+def sim_wrapper_serve(output_path: Path) -> None:
     """
     Run the SimWrapper server.
     """
