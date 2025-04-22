@@ -20,10 +20,13 @@ import picocli.CommandLine;
 import tech.tablesaw.api.*;
 import tech.tablesaw.columns.Column;
 import tech.tablesaw.selection.Selection;
+import tech.tablesaw.table.TableSlice;
+import tech.tablesaw.table.TableSliceGroup;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static tech.tablesaw.aggregate.AggregateFunctions.mean;
 import static tech.tablesaw.aggregate.AggregateFunctions.sum;
@@ -178,7 +181,66 @@ public class TrafficAnalysisDisaster implements MATSimAppCommand {
 			row.setDouble("value", value.value());
 		}
 
-		congestion.sortOn("time", "x", "y")
+		List<String> timeStrValues = congestion.doubleColumn("time")
+		.asList()
+		.stream()
+		.map(time -> String.format("%.0f", time))
+		.collect(Collectors.toList());
+
+		List<String> xStrValues = congestion.doubleColumn("x")
+			.asList()
+			.stream()
+			.map(x -> String.format("%.15f", x))
+			.collect(Collectors.toList());
+
+		List<String> yStrValues = congestion.doubleColumn("y")
+			.asList()
+			.stream()
+			.map(y -> String.format("%.15f", y))
+			.collect(Collectors.toList());
+
+		// Create StringColumns
+		StringColumn timeStr = StringColumn.create("time_str", timeStrValues);
+		StringColumn xStr = StringColumn.create("x_str", xStrValues);
+		StringColumn yStr = StringColumn.create("y_str", yStrValues);
+
+		// Add them to the table
+		congestion.addColumns(timeStr, xStr, yStr);
+
+		Table filteredCongestion = Table.create(
+			DoubleColumn.create("time"),
+			DoubleColumn.create("x"),
+			DoubleColumn.create("y"),
+			DoubleColumn.create("value")
+		);
+		TableSliceGroup group = congestion.splitOn("x_Str", "y_Str", "time_Str");
+
+		for (TableSlice slice : group.getSlices()) {
+			double minValue = 1.0;
+			double time = 0.0;
+			double x = 0.0;
+			double y = 0.0;
+
+			var iterator = slice.iterator();
+			while (iterator.hasNext()) {
+				Row row = iterator.next();
+				time = row.getDouble("time");
+				x = row.getDouble("x");
+				y = row.getDouble("y");
+				double value = row.getDouble("value");
+			
+				if(value < minValue){
+					minValue = value;
+				}
+			}
+			Row filteredRow = filteredCongestion.appendRow();
+			filteredRow.setDouble("time", time);
+			filteredRow.setDouble("x", x);
+			filteredRow.setDouble("y", y);
+			filteredRow.setDouble("value", minValue);
+		}
+
+		filteredCongestion.sortOn("time", "x", "y")
 				.write().csv(output.getPath("congestion.xyt.csv").toFile());
 
 		return 0;
