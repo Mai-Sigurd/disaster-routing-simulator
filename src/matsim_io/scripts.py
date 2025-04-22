@@ -1,6 +1,8 @@
 import logging
 from pathlib import Path
 
+import yaml
+
 from matsim_io import MATSIM_DATA_DIR
 
 
@@ -38,3 +40,14 @@ def _rewrite_dashboard_dataset_paths(dashboard: Path, output_dir: str) -> None:
         for line in original.splitlines(keepends=True)
     )
     dashboard.write_text(rewritten, encoding="utf-8")
+
+
+def _update_dashboard_title(dashboard: Path, title: str) -> None:
+    """
+    Update the title of the given dashboard file.
+    :param dashboard: Path to the dashboard file.
+    :param title: New title for the dashboard.
+    """
+    data = yaml.safe_load(dashboard.read_text(encoding="utf-8"))
+    data["header"]["title"] = title
+    dashboard.write_text(yaml.dump(data, sort_keys=False), encoding="utf-8")
