@@ -104,26 +104,21 @@ public class DisasterRoutingDashboard implements Dashboard {
                     );
                 });
         layout.row("population")
-                .el(MapPlot.class, (viz, data) -> {
+                .el(MapPlot.class, (viz, _) -> {
                     viz.title = "Population";
-                    viz.center = data.context().getCenter();
-                    viz.zoom = data.context().mapZoomLevel;
+//                    viz.center = data.context().getCenter();
+//                    viz.zoom = data.context().mapZoomLevel;
                     viz.height = 7.5;
                     viz.width = 2.0;
 
-                    viz.setShape("population_data.geojson", "id");
-//                    viz.addDataset("Population", "population_data.geojson");
-//                    viz.display.fill.dataset = "Population";
-//                    viz.display.fill.join = "id";
+                    viz.setShape("population_data.geojson", "osm_id");
+                    viz.addDataset("population_data", "population_data.csv");
 
-                    viz.display.lineColor.columnName = "pop";
-                    viz.display.lineColor.setColorRamp(ColorScheme.RdYlBu, 5, true);
-                    viz.display.lineColor.scaleFactor = 2.0;
-                    viz.display.lineColor.join = "id";
-                    viz.display.lineWidth.columnName = "pop";
-                    viz.display.lineWidth.scaleFactor = 2.0;
-                    viz.display.lineWidth.join = "id";
-                    viz.display.lineWidth.setColorRamp(ColorScheme.RdYlBu, 5, true);
+                    viz.display.fill.dataset = "population_data";
+                    viz.display.fill.columnName = "population";
+                    viz.display.fill.join = "osm_id";
+                    //viz.display.fill.scaleFactor = 2.0;
+                    viz.display.fill.setColorRamp(ColorScheme.Viridis, 5, true);
                 });
 
         createTripDataRow(layout, "departures", header.tab, "Departures", "departure", "Time from start of simulation (minutes)");
