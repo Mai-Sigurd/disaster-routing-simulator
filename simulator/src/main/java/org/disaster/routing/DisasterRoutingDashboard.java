@@ -187,6 +187,7 @@ public class DisasterRoutingDashboard implements Dashboard {
             String output = data.compute(TrafficAnalysisDisaster.class, "congestion.xyt.csv");
             viz.file = output;
             viz.height = 12d;
+            viz.radius = 10;
         });
     }
 }
