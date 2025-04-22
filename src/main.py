@@ -1,8 +1,12 @@
 import argparse
 import logging
 import signal
+import webbrowser
 
 from config import (
+    CASE_STUDIES_OUTPUT_FOLDER,
+    EXPLORE_OUTPUT_FOLDER,
+    SIM_WRAPPER_LINK,
     ProgramConfig,
     set_amager_input_data,
     set_dev_input_data,
@@ -14,6 +18,7 @@ from controller import (
     gui_close,
     gui_handler,
     run_matsim,
+    sim_wrapper_serve,
     write_danger_zone_data,
 )
 from input_data import (
@@ -69,17 +74,18 @@ def run_simwrapper_serve(simulation_type: SimulationType, path: str = "") -> Non
     """
     Run the SimWrapper server.
     """
+    webbrowser.open(SIM_WRAPPER_LINK)
+    logging.info("SimWrapper link: %s", SIM_WRAPPER_LINK)
     if path == "":
         logging.info("Running SimWrapper server...")
         if simulation_type == SimulationType.CASE_STUDIES:
-            # TODO SimWrapper server code here, simwrapper serve in case studies output folder
-            pass
+            sim_wrapper_serve(CASE_STUDIES_OUTPUT_FOLDER)
         else:
-            # TODO SimWrapper server code here, simwrapper serve in explore output folder
-            pass
+            sim_wrapper_serve(EXPLORE_OUTPUT_FOLDER)
     else:
-        # TODO SimWrapper server code here, simwrapper serve in path
-        pass
+        sim_wrapper_serve(path)
+
+    logging.info("SimWrapper server done")
 
 
 def start_up(input_data: InputData, run_simulator: bool) -> None:
