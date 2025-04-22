@@ -48,7 +48,15 @@ def _add_population_file_to_output(
     program_conf: ProgramConfig, output_dir: str
 ) -> None:
     pop_data = program_conf.danger_zone_population_data
+    pop_data = pop_data.rename(columns={"id": "osm_id"})
+    # TODO try remove index if exist, or make osmid index. Or try and remove population from geodf
     pop_data.to_file(
         os.path.join(output_dir, "population_data.geojson"), driver="GeoJSON"
     )
-    #
+    id_pop_csv_file_path = os.path.join(output_dir, "population_data.csv")
+    with open(id_pop_csv_file_path, "w") as file:
+        file.write("osm_id;population\n")
+        for index, feat in pop_data.iterrows():
+            population = feat['pop']
+            feat_id = feat["osm_id"]
+            file.write(f"{feat_id};{population}\n")
