@@ -65,11 +65,11 @@ public final class TrafficStatsCalculatorDisaster {
 	}
 
 	public Coord[] getLinkCoordinates(Link link, int amountOfCoords) {
-		var coords = new Coord[amountOfCoords];
+		var coords = new Coord[amountOfCoords-2];
 		// Linear interpolation
-		for (int i = 0; i < amountOfCoords; i++) {
+		for (int i = 1; i < amountOfCoords-1; i++) {
 			double ratio = (double) i / (amountOfCoords-1);
-			coords[i] = new Coord(
+			coords[i-1] = new Coord(
 					link.getFromNode().getCoord().getX() * (1 - ratio) + link.getToNode().getCoord().getX() * ratio,
 					link.getFromNode().getCoord().getY() * (1 - ratio) + link.getToNode().getCoord().getY() * ratio
 			);
@@ -108,11 +108,14 @@ public final class TrafficStatsCalculatorDisaster {
 				}
 				
 				int amountOfCoords = (int) (link.getLength() / 50);
-				if(amountOfCoords < 3){
-					amountOfCoords = 3;
+				if(amountOfCoords < 5){
+					amountOfCoords = 5;
 				}
 				Coord[] coords = getLinkCoordinates(link, amountOfCoords);
-				
+				for (Coord coord : coords) {
+					System.out.println(coords.length);
+					System.out.println(coord);
+				}
 				for (Coord coord : coords) {
 					xYTimeValues.add(new XYTimeValue(time.start, coord.getX(), coord.getY(), val));
 				}
