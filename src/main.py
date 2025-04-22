@@ -2,6 +2,8 @@ import argparse
 import logging
 import signal
 
+from slugify import slugify
+
 from config import (
     ProgramConfig,
     set_amager_input_data,
@@ -107,16 +109,16 @@ def start_up(input_data: InputData, run_simulator: bool) -> None:
         logging.info("Starting up...")
         program_config = controller_input_data(input_data)
         logging.info("Input data loaded")
-        output_dirs = []
+        output_dirs_and_titles = []
 
         for algorithm in program_config.route_algos:
             stats = compute_and_save_matsim_paths(program_config, algorithm)
-            output_dir_name = f"{algorithm.name}_output"
+            output_dir_name = slugify(f"{algorithm.title}-output")
             run_matsim(output_dir_name)
             save_analysis_files(program_config, stats, output_dir_name)
-            output_dirs.append(output_dir_name)
+            output_dirs_and_titles.append((output_dir_name, algorithm.title))
 
-        move_dashboards(output_dirs)
+        move_dashboards(output_dirs_and_titles)
 
     run_simwrapper_serve(input_data.simulation_type)
 

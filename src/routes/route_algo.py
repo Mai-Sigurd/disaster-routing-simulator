@@ -6,8 +6,8 @@ from routes.route_utils import path, vertex
 
 
 class RouteAlgo(zope.interface.Interface):  # type: ignore[misc]
-    name = zope.interface.Attribute(
-        "Name of the routing algorithm. Used to name the MATSim output directory."
+    title = zope.interface.Attribute(
+        "Title of the routing algorithm used in the SimWrapper dashboard and the MATSim output directory."
     )
 
     def route_to_safety(

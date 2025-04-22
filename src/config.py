@@ -6,9 +6,9 @@ from geopandas import GeoDataFrame
 
 from data_loader import load_json_file_to_str
 from input_data import InputData, PopulationType, SimulationType
-from routes.fastestpath import FastestPath
+from routes.fastest_path import FastestPath
 from routes.route_algo import RouteAlgo
-from routes.shortestpath import ShortestPath
+from routes.shortest_path import ShortestPath
 
 SOURCE_DIR = Path(__file__).parent.parent
 
