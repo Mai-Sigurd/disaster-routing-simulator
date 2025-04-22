@@ -67,7 +67,7 @@ public final class TrafficStatsCalculatorDisaster {
 	public Coord[] getLinkCoordinates(Link link, int amountOfCoords) {
 		var coords = new Coord[amountOfCoords];
 		// Linear interpolation
-		for (int i = 1; i < amountOfCoords-1; i++) {
+		for (int i = 1; i < amountOfCoords+1; i++) {
 			double ratio = (double) i / (amountOfCoords+1);
 			coords[i-1] = new Coord(
 					link.getFromNode().getCoord().getX() * (1 - ratio) + link.getToNode().getCoord().getX() * ratio,
