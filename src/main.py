@@ -21,6 +21,7 @@ from input_data import (
     SimulationType,
 )
 from matsim_io import MATSIM_DATA_DIR, mat_sim_files_exist, write_network, write_plans
+from matsim_io.scripts import append_breakpoints_to_congestion_map
 from routes.route import Route, create_route_objects
 from routes.route_utils import path
 
@@ -93,6 +94,8 @@ def start_up(input_data: InputData, run_simulator: bool) -> None:
         stats = simulate(program_config)
         run_matsim()
         save_analysis_files(program_config, stats)
+
+    append_breakpoints_to_congestion_map()
     run_simwrapper_serve(input_data.simulation_type)
 
 
