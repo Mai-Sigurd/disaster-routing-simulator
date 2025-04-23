@@ -142,7 +142,7 @@ def _validate_and_format_filename(network_filename: str, gzip_compress: bool) ->
             f"Invalid file name: {network_filename}. Expected .xml or .xml.gz file."
         )
     if gzip_compress and not network_filename.endswith(".gz"):
-        return network_filename + ".gz"
+        return f"{network_filename}.gz"
     return network_filename
 
 

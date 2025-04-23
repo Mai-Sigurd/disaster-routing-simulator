@@ -14,11 +14,14 @@ from routes.route_utils import (
     update_priority,
     vertex,
 )
+from utils import kmh_to_ms
 
 
 @zope.interface.implementer(RouteAlgo)
-class ShortestPath:
-    # based on: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/
+class FastestPath:
+    def __init__(self) -> None:
+        self.title = "Dijkstra - Fastest Path"
+
     def route_to_safety(
         self,
         origin_points: list[vertex],
@@ -36,27 +39,33 @@ class ShortestPath:
         has_path_been_calculated = dict((node, False) for node in origin_points)
         routes = []
 
-        logging.info("Routing shortest path to safety for all origin points")
+        logging.info("Routing fastest path to safety for all origin points")
 
         for origin in tqdm(origin_points):
             if has_path_been_calculated[origin]:
                 continue  # path has already been calculated in another iteration
-            if len(list(G.neighbors(origin))) == 0:
-                logging.info(f"Node {origin} has no neighbors")
-                continue  # Skip if the origin node doesn't have neighbors
+
+            try:
+                if len(list(G.neighbors(origin))) == 0:
+                    logging.info(f"Node {origin} has no neighbors")
+                    continue  # Skip if the origin node doesn't have neighbors
+            except nx.NetworkXError:
+                logging.error(f"Origin node {origin} is not in the graph")
+                continue
+
             sptSet = dict((node, False) for node in list(G.nodes))
             dist: list[tuple[float, str]] = [(float("inf"), node) for node in G.nodes]
             node_priority = {node: float("inf") for node in G.nodes}
             hq.heapify(dist)
             predecessor: dict[str, str | None] = {
                 node: None for node in G.nodes
-            }  # To track shortest path
+            }  # To track fastest path
 
             update_priority(dist, node_priority, origin, 0)
             while dist:
                 priority, smallest_node = hq.heappop(
                     dist
-                )  # popping the node with the current smallest dist to origin
+                )  # popping the node with the current fastest path to origin
                 if priority == float("inf"):
                     logging.info(
                         f"Node {origin} cannot reach any nodes outside the dangerzone"
@@ -70,8 +79,30 @@ class ShortestPath:
                         for _, neighbour, edge_data in G.edges(
                             smallest_node, data=True
                         ):  # looping through all adjacent vertices
-                            weight = edge_data.get("length", float("inf"))
-                            # Default weight to inf, weight of edge between smallest_node and neighbour
+                            length = edge_data.get(
+                                "length", float("inf")
+                            )  # Default weight to inf, weight of edge between smallest_node and neighbour
+
+                            maxspeed = edge_data.get(
+                                "maxspeed", 50
+                            )  # speed limit km/h, default 50
+                            maxspeed = (
+                                maxspeed[0] if isinstance(maxspeed, list) else maxspeed
+                            )  # take the first speed limit in case there are more
+                            try:
+                                maxspeed = kmh_to_ms(
+                                    float(maxspeed)
+                                )  # converting km/h to m/s
+                            except ValueError:
+                                logging.error(
+                                    f"Maxspeed with value {maxspeed} cannot be parsed as an int"
+                                )
+                                maxspeed = kmh_to_ms(
+                                    50
+                                )  # default to 50 if parsing fails
+
+                            weight = length / maxspeed
+
                             new_distance = priority + weight
 
                             if new_distance < node_priority[neighbour]:
