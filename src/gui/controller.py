@@ -106,8 +106,14 @@ def add_city_case_window(
         label="", tag=tag, show=True, parent=parent, width=width, height=height
     )
     dpg.add_text(
-        "Case Studies: \n\nCase study 1: danger zone is the island of Amager in Copenhagen, Denmark. \nFew exits and therefore chance of congestion. \n\nCase study 2: danger zone is the city of Ravenna in Italy. \nRecently experienced intense, devastating downpour.\n",
+        "Case Studies:\n\n"
+        "Case Study 1: Copenhagen, Denmark\n"
+        "The danger zone encompasses Amager, which has limited evacuation routes, "
+        "creating a high risk of congestion during emergencies.\n\n"
+        "Case Study 2: Ravenna, Italy\n"
+        "This coastal city experienced devastating flooding in May 2023 due to extreme rainfall..",
         parent=tag,
+        wrap=0,
     )
     dpg.add_button(
         label="See Case Studies",
