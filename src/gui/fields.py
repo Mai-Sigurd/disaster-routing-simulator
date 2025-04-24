@@ -4,6 +4,7 @@ import dearpygui.dearpygui as dpg
 
 from gui.constants import (
     DANGER_ZONE,
+    DEPARTURE_TIME,
     POPULATION,
     POPULATION_NUMBER,
     TIFF_FILE,
@@ -12,12 +13,18 @@ from gui.constants import (
 
 
 def add_input_fields_pick_area(parent: str) -> list[gui_type]:
-    t2 = _add_danger_zone_input_field(parent=parent, tag=DANGER_ZONE)
-
+    t1 = _add_danger_zone_input_field(parent=parent, tag=DANGER_ZONE)
+    t2 = _add_departure_time_input_field(
+        title="Departure Time Distribution",
+        desc_dist_end="Choose the length of the distribution of departure times in minutes.",
+        desc_dist_2="The distribution of departure times is the number of minutes from the first person departures,\nuntil the last person departures.",
+        tag_dist_end=DEPARTURE_TIME,
+        parent=parent,
+    )
     t3 = _add_population_input_field(
         title="Population",
         desc="Choose the population type:",
-        desc2="Either download a worldpop tiff file and input the full filepath  \n or input a population number which will be evenly distributed across the danger zone",
+        desc2="Either download a worldpop tiff file and input the full filepath,  \nor input a population number which will be evenly distributed across the danger zone.",
         tag=POPULATION,
         types=[
             TIFF_FILE,
@@ -25,7 +32,7 @@ def add_input_fields_pick_area(parent: str) -> list[gui_type]:
         ],  # if you change the ordering, remember to change ordering constants in constants.py
         parent=parent,
     )
-    return [t2, t3]
+    return [t1, t2, t3]
 
 
 def add_city_fields(parent: str, city_tag: str, desc3: str = "") -> list[gui_type]:
@@ -36,8 +43,7 @@ def add_city_fields(parent: str, city_tag: str, desc3: str = "") -> list[gui_typ
 def _add_danger_zone_input_field(parent: str, tag: str, desc3: str = "") -> gui_type:
     t2 = _add_geo_json_input_field(
         title="Danger Zone",
-        desc="Go to geojson.io and pick a dangerzone, copy the JSON into the below box",
-        desc2="The area should be a polygon of the dangerzone, withing the OSM Graph",
+        desc="Go to geojson.io and pick a polygon as dangerzone. Copy and insert the JSON into the below box.",
         desc3=desc3,
         tag=tag,
         parent=parent,
@@ -46,11 +52,10 @@ def _add_danger_zone_input_field(parent: str, tag: str, desc3: str = "") -> gui_
 
 
 def _add_geo_json_input_field(
-    title: str, desc: str, desc2: str, desc3: str, tag: str, parent: str
+    title: str, desc: str, desc3: str, tag: str, parent: str
 ) -> gui_type:
     t1 = dpg.add_text(title, parent=parent)
     dpg.add_text(desc, parent=parent)
-    dpg.add_text(desc2, parent=parent)
     if desc3:
         dpg.add_text(desc3, parent=parent)
     dpg.add_button(
@@ -99,15 +104,13 @@ def _show_input_field_based_on_radio(sender, app_data, user_data) -> None:  # ty
 
 def _add_departure_time_input_field(
     title: str,
-    desc_chunk: str,
-    desc_interval: str,
-    tag_chunk: str,
-    tag_interval: str,
+    desc_dist_end: str,
+    desc_dist_2: str,
+    tag_dist_end: str,
     parent: str,
 ) -> gui_type:
     t1 = dpg.add_text(title, parent=parent)
-    dpg.add_text(desc_chunk, parent=parent)
-    dpg.add_input_int(tag=tag_chunk, show=True, parent=parent, default_value=0)
-    dpg.add_text(desc_interval, parent=parent)
-    dpg.add_input_int(tag=tag_interval, show=True, parent=parent, default_value=0)
+    dpg.add_text(desc_dist_end, parent=parent)
+    dpg.add_text(desc_dist_2, parent=parent)
+    dpg.add_input_int(tag=tag_dist_end, show=True, parent=parent, default_value=60)
     return t1
