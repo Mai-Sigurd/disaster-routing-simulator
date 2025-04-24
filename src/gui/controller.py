@@ -106,7 +106,7 @@ def add_city_case_window(
         label="", tag=tag, show=True, parent=parent, width=width, height=height
     )
     dpg.add_text(
-        "Case Studies where we have the island Amager in Copenhagen, Denmark as a danger zone, \n and a case study with the city of Ravenna in Italy as a danger zone",
+        "Case Studies: \n\nCase study 1: danger zone is the island of Amager in Copenhagen, Denmark. \nFew exits and therefore chance of congestion. \n\nCase study 2: danger zone is the city of Ravenna in Italy. \nRecently experienced intense, devastating downpour.\n",
         parent=tag,
     )
     dpg.add_button(
@@ -125,7 +125,7 @@ def add_explore_window(
     )
     bold_text = add_input_fields_pick_area(parent=tag)
     dpg.add_text(
-        "\n Once the simulation is finished, a web browser will open with the simulation dashboards.",
+        "\n Once the simulation is finished, a web browser showing the simulation dashboards will open.",
         parent=tag,
     )
     add_go_button(parent=tag)
