@@ -30,7 +30,7 @@ from input_data import (
     SimulationType,
 )
 from matsim_io import MATSIM_DATA_DIR, mat_sim_files_exist, write_network, write_plans
-from matsim_io.scripts import append_breakpoints_to_congestion_map, move_dashboard
+from matsim_io.dashboards import append_breakpoints_to_congestion_map, move_dashboard
 from routes.route import create_route_objects
 from routes.route_algo import RouteAlgo
 
