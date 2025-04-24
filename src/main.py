@@ -30,7 +30,7 @@ from input_data import (
     SimulationType,
 )
 from matsim_io import MATSIM_DATA_DIR, mat_sim_files_exist, write_network, write_plans
-from matsim_io.scripts import move_dashboard
+from matsim_io.scripts import append_breakpoints_to_congestion_map, move_dashboard
 from routes.route import create_route_objects
 from routes.route_algo import RouteAlgo
 
@@ -125,6 +125,7 @@ def start_up(input_data: InputData, run_simulator: bool) -> None:
             output_dir_name = slugify(f"{algorithm.title}-output")
             run_matsim(output_dir_name)
             save_analysis_files(program_config, stats, output_dir_name)
+            append_breakpoints_to_congestion_map(output_dir_name)
             move_dashboard(output_dir_name, algorithm.title)
 
     run_simwrapper_serve(input_data.simulation_type)

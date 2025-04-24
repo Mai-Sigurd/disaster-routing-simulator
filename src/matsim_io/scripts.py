@@ -59,3 +59,14 @@ def _update_dashboard_title(dashboard: Path, title: str) -> None:
     data = yaml.safe_load(dashboard.read_text(encoding="utf-8"))
     data["header"]["title"] = title
     dashboard.write_text(yaml.dump(data, sort_keys=False), encoding="utf-8")
+
+
+def append_breakpoints_to_congestion_map(output_dir: str) -> None:
+    """
+    Append breakpoints to the congestion map.
+    """
+    file_path = MATSIM_DATA_DIR / output_dir / "dashboard-2.yaml"
+    data = yaml.safe_load(file_path.read_text(encoding="utf-8"))
+    xytime_plot = data["layout"]["congestion_map"][0]
+    xytime_plot["breakpoints"] = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    file_path.write_text(yaml.dump(data, sort_keys=False), encoding="utf-8")
