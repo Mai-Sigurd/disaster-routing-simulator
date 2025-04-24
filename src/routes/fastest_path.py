@@ -27,6 +27,7 @@ class FastestPath:
         origin_points: list[vertex],
         danger_zone: gpd.GeoDataFrame,
         G: nx.MultiDiGraph,
+        diversifying_routes: int = 3,
     ) -> list[path]:
         """
         Routes a list of origin points to the nearest safe location.
@@ -34,6 +35,7 @@ class FastestPath:
         :param origin_points: A list of vertices given as str IDs
         :param danger_zone: A GeoDataFrame containing the danger zone polygon(s).
         :param G: A graph corresponding to the road network
+        :param diversifying_routes: The number of routes to find for each origin point
         :return: A list of routes where each route corresponds to the origin point at the same index.
         """
         has_path_been_calculated = dict((node, False) for node in origin_points)

@@ -1,11 +1,11 @@
 import heapq as hq
 import logging
+from typing import Dict
 
 import geopandas as gpd
 import networkx as nx
 import zope.interface
 from tqdm import tqdm
-from typing import Dict
 
 from routes.route_algo import RouteAlgo
 from routes.route_utils import (
@@ -28,6 +28,7 @@ class ShortestPath:
         origin_points: list[vertex],
         danger_zone: gpd.GeoDataFrame,
         G: nx.MultiDiGraph,
+        diversifying_routes: int = 3,
     ) -> Dict[vertex, list[path]]:
         """
         Routes a list of origin points to the nearest safe location.
@@ -35,16 +36,16 @@ class ShortestPath:
         :param origin_points: A list of vertices given as str IDs
         :param danger_zone: A GeoDataFrame containing the danger zone polygon(s).
         :param G: A graph corresponding to the road network
+        :param diversifying_routes: The number of routes to find for each origin point
         :return: A dictionary from an origin point to a list of 1 or more paths
         """
-        has_path_been_calculated = dict((node, False) for node in origin_points)
-        routes: dict [vertex, list[path]] = {}
+        # has_path_been_calculated = dict((node, False) for node in origin_points)
+        routes: dict[vertex, list[path]] = {}
 
         logging.info("Routing shortest path to safety for all origin points")
 
         for origin in tqdm(origin_points):
             amount_of_routes = 0
-            ## remove this has path been calculated TODO
             # if has_path_been_calculated[origin]:
             #     continue  # path has already been calculated in another iteration
             if len(list(G.neighbors(origin))) == 0:
@@ -80,7 +81,7 @@ class ShortestPath:
                             # Default weight to inf, weight of edge between smallest_node and neighbour
                             new_distance = priority + weight
 
-                            if is_in_dangerzone(smallest_node, danger_zone, G):  # if is in danger zone  dont add neighboors TODO
+                            if is_in_dangerzone(smallest_node, danger_zone, G):
                                 if new_distance < node_priority[neighbour]:
                                     update_priority(
                                         dist, node_priority, neighbour, new_distance
@@ -97,7 +98,10 @@ class ShortestPath:
                         logging.error(
                             "The first node in the route is not the origin node"
                         )
-                    routes[final_route[0]]=[final_route]
+                    if final_route[0] in routes:
+                        routes[final_route[0]].append(final_route)
+                    else:
+                        routes[final_route[0]] = [final_route]
                     # remove the has path been calculated
                     # has_path_been_calculated[origin] = True
                     # for i in range(
@@ -111,7 +115,6 @@ class ShortestPath:
                     #             final_route[i:]
                     #         )  # we take the route from i and forward
                     #         has_path_been_calculated[final_route[i]] = True
-                    ## only break when we have three TODO
-                    if amount_of_routes >= 3:
+                    if amount_of_routes >= diversifying_routes:
                         break  # there is no need to find other routes for this origin point
         return routes
