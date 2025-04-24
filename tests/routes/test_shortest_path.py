@@ -5,7 +5,7 @@ import networkx as nx
 from _pytest.logging import LogCaptureFixture
 from shapely.geometry import Polygon
 
-from routes.shortestpath import ShortestPath
+from routes.shortest_path import ShortestPath
 
 # Create a directed graph
 G = nx.MultiDiGraph()
