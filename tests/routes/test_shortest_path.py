@@ -40,7 +40,6 @@ sp = ShortestPath()
 
 def test_route_to_safety() -> None:
     routes = sp.route_to_safety(["A"], danger_zone, G)
-    print(routes)
     assert (["A", "B", "C", "D"]) in routes["A"]
     assert (["A", "B", "F"]) in routes["A"]
     assert (["A", "B1", "G"]) in routes["A"]

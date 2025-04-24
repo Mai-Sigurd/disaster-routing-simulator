@@ -1,5 +1,6 @@
 import heapq as hq
 import logging
+from typing import Dict
 
 import geopandas as gpd
 import networkx as nx
@@ -8,9 +9,9 @@ from tqdm import tqdm
 
 from routes.route_algo import RouteAlgo
 from routes.route_utils import (
+    get_final_route,
     is_in_dangerzone,
     path,
-    reconstruct_route,
     update_priority,
     vertex,
 )
@@ -27,8 +28,8 @@ class FastestPath:
         origin_points: list[vertex],
         danger_zone: gpd.GeoDataFrame,
         G: nx.MultiDiGraph,
-        diversifying_routes: int = 3,
-    ) -> list[path]:
+        diversifying_routes: int = 1,
+    ) -> Dict[vertex, list[path]]:
         """
         Routes a list of origin points to the nearest safe location.
 
@@ -38,14 +39,15 @@ class FastestPath:
         :param diversifying_routes: The number of routes to find for each origin point
         :return: A list of routes where each route corresponds to the origin point at the same index.
         """
-        has_path_been_calculated = dict((node, False) for node in origin_points)
-        routes = []
+        # has_path_been_calculated = dict((node, False) for node in origin_points)
+        routes: dict[vertex, list[path]] = {}
 
         logging.info("Routing fastest path to safety for all origin points")
 
         for origin in tqdm(origin_points):
-            if has_path_been_calculated[origin]:
-                continue  # path has already been calculated in another iteration
+            amount_of_routes = 0
+            # if has_path_been_calculated[origin]:
+            # continue  # path has already been calculated in another iteration
 
             try:
                 if len(list(G.neighbors(origin))) == 0:
@@ -106,34 +108,27 @@ class FastestPath:
                             weight = length / maxspeed
 
                             new_distance = priority + weight
-
-                            if new_distance < node_priority[neighbour]:
-                                update_priority(
-                                    dist, node_priority, neighbour, new_distance
-                                )
-                                predecessor[neighbour] = smallest_node
+                            if is_in_dangerzone(smallest_node, danger_zone, G):
+                                if new_distance < node_priority[neighbour]:
+                                    update_priority(
+                                        dist, node_priority, neighbour, new_distance
+                                    )
+                                    predecessor[neighbour] = smallest_node
 
                 if not is_in_dangerzone(
                     smallest_node, danger_zone, G
-                ):  # We have found shortest route to node outside dangerzone
-                    final_route = reconstruct_route(predecessor, smallest_node)
-                    if final_route[0] != origin:
-                        logging.error(
-                            "The first node in the route is not the origin node"
-                        )
-                    routes.append(final_route)
-                    has_path_been_calculated[origin] = True
-                    for i in range(
-                        len(final_route) - 1
-                    ):  # -1 since the last node is outside the dangerzone and therefore does not need a path
-                        if (
-                            final_route[i] in has_path_been_calculated
-                            and not has_path_been_calculated[final_route[i]]
-                        ):
-                            routes.append(
-                                final_route[i:]
-                            )  # we take the route from i and forward
-                            has_path_been_calculated[final_route[i]] = True
+                ):  # We have found the fastest route to node outside danger zone
+                    final_route, amount_of_routes = get_final_route(
+                        amount_of_routes=amount_of_routes,
+                        predecessor=predecessor,
+                        smallest_node=smallest_node,
+                        origin=origin,
+                    )
 
-                    break  # there is no need to find other routes for this origin point
+                    if final_route[0] in routes:
+                        routes[final_route[0]].append(final_route)
+                    else:
+                        routes[final_route[0]] = [final_route]
+                    if amount_of_routes >= diversifying_routes:
+                        break  # there is no need to find other routes for this origin point
         return routes

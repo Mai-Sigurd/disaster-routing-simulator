@@ -17,7 +17,7 @@ class RouteAlgo(zope.interface.Interface):  # type: ignore[misc]
         origin_points: list[vertex],
         danger_zone: gpd.GeoDataFrame,
         G: nx.MultiDiGraph,
-        diversifying_routes: int = 3,
+        diversifying_routes: int = 1,
     ) -> Dict[vertex, list[path]]:
         """
         Finds a list of paths from origin points to a safe location.

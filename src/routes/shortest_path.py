@@ -9,9 +9,9 @@ from tqdm import tqdm
 
 from routes.route_algo import RouteAlgo
 from routes.route_utils import (
+    get_final_route,
     is_in_dangerzone,
     path,
-    reconstruct_route,
     update_priority,
     vertex,
 )
@@ -28,7 +28,7 @@ class ShortestPath:
         origin_points: list[vertex],
         danger_zone: gpd.GeoDataFrame,
         G: nx.MultiDiGraph,
-        diversifying_routes: int = 3,
+        diversifying_routes: int = 1,
     ) -> Dict[vertex, list[path]]:
         """
         Routes a list of origin points to the nearest safe location.
@@ -91,30 +91,16 @@ class ShortestPath:
                 if not is_in_dangerzone(
                     smallest_node, danger_zone, G
                 ):  # We have found the shortest route to node outside danger zone
-                    amount_of_routes += 1
-                    final_route = reconstruct_route(predecessor, smallest_node)
-                    print(final_route)
-                    if final_route[0] != origin:
-                        logging.error(
-                            "The first node in the route is not the origin node"
-                        )
+                    final_route, amount_of_routes = get_final_route(
+                        amount_of_routes=amount_of_routes,
+                        predecessor=predecessor,
+                        smallest_node=smallest_node,
+                        origin=origin,
+                    )
                     if final_route[0] in routes:
                         routes[final_route[0]].append(final_route)
                     else:
                         routes[final_route[0]] = [final_route]
-                    # remove the has path been calculated
-                    # has_path_been_calculated[origin] = True
-                    # for i in range(
-                    #     len(final_route) - 1
-                    # ):  # -1 since the last node is outside the danger zone and therefore does not need a path
-                    #     if (
-                    #         final_route[i] in has_path_been_calculated
-                    #         and not has_path_been_calculated[final_route[i]]
-                    #     ):
-                    #         routes.append(
-                    #             final_route[i:]
-                    #         )  # we take the route from i and forward
-                    #         has_path_been_calculated[final_route[i]] = True
                     if amount_of_routes >= diversifying_routes:
                         break  # there is no need to find other routes for this origin point
         return routes
