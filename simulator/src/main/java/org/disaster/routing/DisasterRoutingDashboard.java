@@ -158,8 +158,6 @@ public class DisasterRoutingDashboard implements Dashboard {
                     viz.enableFilter = false;
                 }));
 
-        // TODO: Could be done per mode, by using the tab feature
-
         layout.row("map").el(MapPlot.class, (viz, data) -> {
             viz.title = "Traffic statistics";
             viz.center = data.context().getCenter();
