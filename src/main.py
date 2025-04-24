@@ -53,7 +53,10 @@ def compute_and_save_matsim_paths(
         nodes with no route to safety.
     """
     origin_to_paths = algorithm.route_to_safety(
-        program_config.origin_points, program_config.danger_zones, program_config.G
+        program_config.origin_points,
+        program_config.danger_zones,
+        program_config.G,
+        diversifying_routes=program_config.diversifying_routes,
     )
     routes = create_route_objects(
         origin_to_paths=origin_to_paths,

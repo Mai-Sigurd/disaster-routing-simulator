@@ -33,6 +33,7 @@ class InputData:
     worldpop_filepath: str = ""
     cars_per_person: float = 1.0
     pop_geo_json_filepath: str = ""
+    diversifying_routes: int = 1
 
     def pretty_summary(self) -> str:
         return dedent(f"""

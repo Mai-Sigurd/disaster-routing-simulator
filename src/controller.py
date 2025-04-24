@@ -104,6 +104,7 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
         conf.danger_zone_population_data, dangerzone=conf.danger_zones
     )
     conf.departure_end_time_sec = input_data.departure_end_time_sec
+    conf.diversifying_routes = input_data.diversifying_routes
     return conf
 
 
