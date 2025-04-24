@@ -12,6 +12,8 @@ vertex = str
 path = list[vertex]
 """A list of coordinates representing a route"""
 
+RouteDict = dict[vertex, list[path]]
+
 
 def reconstruct_route(predecessor: dict[str, str | None], end: str) -> list[str]:
     path = []

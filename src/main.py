@@ -52,11 +52,11 @@ def compute_and_save_matsim_paths(
     :return: A dictionary of statistics about the routes, including the number of routes and the number of
         nodes with no route to safety.
     """
-    paths = algorithm.route_to_safety(
+    origin_to_paths = algorithm.route_to_safety(
         program_config.origin_points, program_config.danger_zones, program_config.G
     )
     routes = create_route_objects(
-        list_of_paths=paths,
+        origin_to_paths=origin_to_paths,
         population_data=program_config.danger_zone_population_data,
         start=0,
         end=program_config.departure_end_time_sec,
@@ -185,6 +185,6 @@ if __name__ == "__main__":
         help="Run Matsim only (precomputed routes on Copenhagen)",
     )
     args = parser.parse_args()
-
+    args.small = True
     signal.signal(signal.SIGTSTP, gui_close)
     main(args)

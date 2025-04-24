@@ -63,7 +63,7 @@ class FastestPath:
             hq.heapify(dist)
             predecessor: dict[str, str | None] = {
                 node: None for node in G.nodes
-            }  # To track fastest path
+            }  # To track the fastest path
 
             update_priority(dist, node_priority, origin, 0)
             while dist:

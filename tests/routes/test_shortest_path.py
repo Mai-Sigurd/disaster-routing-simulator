@@ -39,7 +39,7 @@ sp = ShortestPath()
 
 
 def test_route_to_safety() -> None:
-    routes = sp.route_to_safety(["A"], danger_zone, G)
+    routes = sp.route_to_safety(["A"], danger_zone, G, 3)
     assert (["A", "B", "C", "D"]) in routes["A"]
     assert (["A", "B", "F"]) in routes["A"]
     assert (["A", "B1", "G"]) in routes["A"]
@@ -47,7 +47,7 @@ def test_route_to_safety() -> None:
 
 
 def test_route_to_safety_two_origin_points() -> None:
-    routes = sp.route_to_safety(["A", "B"], danger_zone, G)
+    routes = sp.route_to_safety(["A", "B"], danger_zone, G, 3)
     assert (["A", "B", "C", "D"]) in routes["A"]
     assert (["A", "B", "F"]) in routes["A"]
     assert (["A", "B1", "G"]) in routes["A"]
@@ -58,7 +58,7 @@ def test_route_to_safety_two_origin_points() -> None:
 
 
 def test_route_to_safety_three_origin_points() -> None:
-    routes = sp.route_to_safety(["A", "B", "C"], danger_zone, G)
+    routes = sp.route_to_safety(["A", "B", "C"], danger_zone, G, 3)
     assert (["A", "B", "C", "D"]) in routes["A"]
     assert (["A", "B", "F"]) in routes["A"]
     assert (["A", "B1", "G"]) in routes["A"]
