@@ -149,8 +149,7 @@ public class DisasterRoutingDashboard implements Dashboard {
                     );
                 })
                 .el(Table.class, ((viz, data) -> {
-                    viz.title = "Traffic stats per road type";
-                    viz.description = "daily";
+                    viz.title = "Traffic stats for all roads";
 
                     viz.dataset = data.compute(TrafficAnalysisDisaster.class, "traffic_stats_by_road_type_daily.csv", args);
 
