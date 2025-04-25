@@ -125,7 +125,8 @@ def create_route_objects(
     return result
 
 
-def population_diversify_route_math(num_people_on_route: int, paths: list[path], departure_times: NDArray[np.int_]
+def population_diversify_route_math(
+    num_people_on_route: int, paths: list[path], departure_times: NDArray[np.int_]
 ) -> Tuple[list[Route], NDArray[np.int_]]:
     """
     Diversifies the routes for a given number of people on a route.
