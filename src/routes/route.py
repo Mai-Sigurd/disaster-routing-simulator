@@ -114,7 +114,7 @@ def create_route_objects(
                 f"Origin point {origin_point} has no routes to safety. Skipping."
             )
             continue
-        elif number_of_diverse_routes == 1 or num_people_on_route < len(paths):
+        elif number_of_diverse_routes == 1:
             route_path = paths[0]
             route_object, departure_times = _create_route_object(
                 departure_times=departure_times,
@@ -122,6 +122,15 @@ def create_route_objects(
                 num_people_on_route=num_people_on_route,
             )
             result.append(route_object)
+        elif num_people_on_route < len(paths):
+            for i in range (num_people_on_route):
+                route_path = paths[i]
+                route_object, departure_times = _create_route_object(
+                    departure_times=departure_times,
+                    path=route_path,
+                    num_people_on_route=num_people_on_route,
+                )
+                result.append(route_object)
         else:
             routes, departure_times = population_diversify_route_math(
                 num_people_on_route=num_people_on_route,
