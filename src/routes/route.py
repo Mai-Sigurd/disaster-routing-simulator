@@ -123,7 +123,7 @@ def create_route_objects(
             )
             result.append(route_object)
         elif num_people_on_route < len(paths):
-            for i in range (num_people_on_route):
+            for i in range(num_people_on_route):
                 route_path = paths[i]
                 route_object, departure_times = _create_route_object(
                     departure_times=departure_times,
