@@ -88,5 +88,14 @@ def test_create_route_object_full(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_population_diversify_route_math() -> None:
-    pass
-    # TODO
+    paths = [["1", "2"], ["2", "3"], ["3", "4"]]
+    num_people_on_route = 10
+    departure_times = route._get_normal_dist_departure_time_list(15, 0, 10)
+    result, departure_times = route.population_diversify_route_math(
+        num_people_on_route, paths, departure_times
+    )
+    assert len(departure_times) == 5
+    assert len(result) == 3
+    assert result[0].num_people_on_route == 4
+    assert result[1].num_people_on_route == 3
+    assert result[2].num_people_on_route == 3
