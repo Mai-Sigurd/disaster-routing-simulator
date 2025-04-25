@@ -188,6 +188,5 @@ if __name__ == "__main__":
         help="Run Matsim only (precomputed routes on Copenhagen)",
     )
     args = parser.parse_args()
-    args.small = True
     signal.signal(signal.SIGTSTP, gui_close)
     main(args)

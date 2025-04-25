@@ -114,7 +114,9 @@ class FastestPath:
                                         dist, node_priority, neighbour, new_distance
                                     )
                                     predecessor[neighbour] = smallest_node
-
+                else:
+                    # This node has already been processed with a better path
+                    continue
                 if not is_in_dangerzone(
                     smallest_node, danger_zone, G
                 ):  # We have found the fastest route to node outside danger zone

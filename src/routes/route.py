@@ -35,7 +35,9 @@ class Route:
         self.departure_times.extend(departures)
 
 
-def _departure_times(total_population: int, start: int, end: int) -> NDArray[np.int_]:
+def _get_normal_dist_departure_time_list(
+    total_population: int, start: int, end: int
+) -> NDArray[np.int_]:
     """
     Introduces different departure times for the persons taking the given route, spread on a normal distribution
     between the given start and end times.
@@ -100,7 +102,7 @@ def create_route_objects(
     """
     total_population = _get_total_population(population_data, cars_per_person)
     result = []
-    departure_times = _departure_times(total_population, start, end)
+    departure_times = _get_normal_dist_departure_time_list(total_population, start, end)
     for origin_point in tqdm(origin_to_paths.keys()):
         paths = origin_to_paths[origin_point]
         num_people_on_route = _get_num_people_on_route(
@@ -121,7 +123,12 @@ def create_route_objects(
             )
             result.append(route_object)
         else:
-            continue
+            routes, departure_times = population_diversify_route_math(
+                num_people_on_route=num_people_on_route,
+                paths=paths,
+                departure_times=departure_times,
+            )
+            result.extend(routes)
     return result
 
 
@@ -142,7 +149,8 @@ def population_diversify_route_math(
             departure_times=departure_times, path=p, num_people_on_route=num
         )
         result.append(route)
-
+    selected_remainder, departure_times = np.split(departure_times, [remainder])
+    result[0].add_remainder(remainder=remainder, departures=list(selected_remainder))
     return result, departure_times
 
 

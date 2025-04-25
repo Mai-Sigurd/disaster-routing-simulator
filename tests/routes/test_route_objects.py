@@ -85,3 +85,8 @@ def test_create_route_object_full(monkeypatch: pytest.MonkeyPatch) -> None:
     assert len(create_route_objects) == 2
     assert create_route_objects[0].num_people_on_route == 3
     assert create_route_objects[1].num_people_on_route == 2
+
+
+def test_population_diversify_route_math() -> None:
+    pass
+    # TODO
