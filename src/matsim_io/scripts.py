@@ -1,9 +1,11 @@
 import logging
 from pathlib import Path
 from typing import Optional
+import geopandas as gpd
 
 import yaml
 
+from data_loader.population import POPULATION
 from matsim_io import MATSIM_DATA_DIR
 
 dashboard_count = 1
@@ -72,10 +74,12 @@ def append_breakpoints_to_congestion_map(output_dir: str) -> None:
     file_path.write_text(yaml.dump(data, sort_keys=False), encoding="utf-8")
 
 
-def change_population_visuals_map(output_dir: str) -> None:
+def change_population_visuals_map(output_dir: str, danger_zone_population: gpd.GeoDataFrame) -> None:
     """
     Change the population visuals map in the dashboard file.
     """
+    max_population = round(danger_zone_population[POPULATION].max())
+
     file_path = MATSIM_DATA_DIR / output_dir / "dashboard-2.yaml"
     data = yaml.safe_load(file_path.read_text(encoding="utf-8"))
     population_map = data["layout"]["population"][0]
@@ -92,7 +96,14 @@ def change_population_visuals_map(output_dir: str) -> None:
             "colorRamp": {
                 "ramp": "Viridis",
                 "steps": 5,
+                "breakpoints": f"{int(max_population * 0.2)}, {int(max_population * 0.4)}, {int(max_population * 0.6)}, {int(max_population * 0.8)}"
             },
+        },
+        "radius": {
+            "dataset": "population_data.geojson",
+            "columnName": "population",
+            "scaleFactor": 3,
+            "join": "",
         }
     }
     population_map["backgroundLayers"] = {}
