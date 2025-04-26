@@ -1,8 +1,8 @@
 import logging
 from pathlib import Path
 from typing import Optional
-import geopandas as gpd
 
+import geopandas as gpd
 import yaml
 
 from data_loader.population import POPULATION
@@ -74,7 +74,9 @@ def append_breakpoints_to_congestion_map(output_dir: str) -> None:
     file_path.write_text(yaml.dump(data, sort_keys=False), encoding="utf-8")
 
 
-def change_population_visuals_map(output_dir: str, danger_zone_population: gpd.GeoDataFrame) -> None:
+def change_population_visuals_map(
+    output_dir: str, danger_zone_population: gpd.GeoDataFrame
+) -> None:
     """
     Change the population visuals map in the dashboard file.
     """
@@ -96,7 +98,7 @@ def change_population_visuals_map(output_dir: str, danger_zone_population: gpd.G
             "colorRamp": {
                 "ramp": "Viridis",
                 "steps": 5,
-                "breakpoints": f"{int(max_population * 0.2)}, {int(max_population * 0.4)}, {int(max_population * 0.6)}, {int(max_population * 0.8)}"
+                "breakpoints": f"{int(max_population * 0.2)}, {int(max_population * 0.4)}, {int(max_population * 0.6)}, {int(max_population * 0.8)}",
             },
         },
         "radius": {
@@ -104,7 +106,7 @@ def change_population_visuals_map(output_dir: str, danger_zone_population: gpd.G
             "columnName": "population",
             "scaleFactor": 3,
             "join": "",
-        }
+        },
     }
     population_map["backgroundLayers"] = {}
     file_path.write_text(yaml.dump(data, sort_keys=False), encoding="utf-8")
