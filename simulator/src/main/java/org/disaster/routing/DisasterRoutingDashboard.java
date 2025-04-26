@@ -105,20 +105,8 @@ public class DisasterRoutingDashboard implements Dashboard {
                 });
         layout.row("population")
                 .el(MapPlot.class, (viz, _) -> {
+                    // Is overwritten in python project
                     viz.title = "Population";
-//                    viz.center = data.context().getCenter();
-//                    viz.zoom = data.context().mapZoomLevel;
-                    viz.height = 7.5;
-                    viz.width = 2.0;
-
-                    viz.setShape("population_data.geojson", "osm_id");
-                    viz.addDataset("population_data", "population_data.csv");
-
-                    viz.display.fill.dataset = "population_data";
-                    viz.display.fill.columnName = "population";
-                    viz.display.fill.join = "osm_id";
-                    //viz.display.fill.scaleFactor = 2.0;
-                    viz.display.fill.setColorRamp(ColorScheme.Viridis, 5, true);
                 });
 
         createTripDataRow(layout, "departures", header.tab, "Departures", "departure", "Time from start of simulation (minutes)");

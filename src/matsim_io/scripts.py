@@ -70,3 +70,30 @@ def append_breakpoints_to_congestion_map(output_dir: str) -> None:
     xytime_plot = data["layout"]["congestion_map"][0]
     xytime_plot["breakpoints"] = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
     file_path.write_text(yaml.dump(data, sort_keys=False), encoding="utf-8")
+
+
+def change_population_visuals_map(output_dir: str) -> None:
+    """
+    Change the population visuals map in the dashboard file.
+    """
+    file_path = MATSIM_DATA_DIR / output_dir / "dashboard-2.yaml"
+    data = yaml.safe_load(file_path.read_text(encoding="utf-8"))
+    population_map = data["layout"]["population"][0]
+    population_map["shapes"] = {
+        "file": "/analysis/population_data.geojson",
+        "join": "osm_id",
+    }
+    population_map["datasets"] = {}
+    population_map["display"] = {
+        "fill": {
+            "dataset": "population_data.geojson",
+            "columnName": "population",
+            "join": "",
+            "colorRamp": {
+                "ramp": "Viridis",
+                "steps": 5,
+            },
+        }
+    }
+    population_map["backgroundLayers"] = {}
+    file_path.write_text(yaml.dump(data, sort_keys=False), encoding="utf-8")
