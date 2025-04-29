@@ -1,6 +1,6 @@
 import heapq as hq
 import logging
-from typing import Dict, Tuple
+from typing import Callable, Dict, Tuple
 
 import geopandas as gpd
 import networkx as nx
@@ -57,7 +57,11 @@ class ShortestPath:
                 logging.error(f"Origin node {origin} is not in the graph")
                 continue
             start, final_routes = _shortest_path_origin_point(
-                origin, G, danger_zone, diversifying_routes
+                origin=origin,
+                G=G,
+                danger_zone=danger_zone,
+                diversifying_routes=diversifying_routes,
+                weight_func=_shortest_path_weight_func,
             )
             routes, has_path_been_calculated = handle_final_routes(
                 routes=routes,
@@ -74,6 +78,7 @@ def _shortest_path_origin_point(
     G: nx.MultiDiGraph,
     danger_zone: gpd.GeoDataFrame,
     diversifying_routes: int,
+    weight_func: Callable,  # type: ignore
 ) -> Tuple[vertex, list[path]]:
     final_routes: list[path] = []
     sptSet = dict((node, False) for node in list(G.nodes))
@@ -100,9 +105,7 @@ def _shortest_path_origin_point(
                 for _, neighbour, edge_data in G.edges(
                     smallest_node, data=True
                 ):  # looping through all adjacent vertices
-                    weight = edge_data.get("length", float("inf"))
-                    # Default weight to inf, weight of edge between smallest_node and neighbour
-                    new_distance = priority + weight
+                    new_distance = weight_func(priority=priority, edge_data=edge_data)
 
                     if is_in_dangerzone(smallest_node, danger_zone, G):
                         if new_distance < node_priority[neighbour]:
@@ -130,3 +133,15 @@ def _shortest_path_origin_point(
                 )  # there is no need to find other routes for this origin point
     # If we have not found any routes, return the origin point as the only route
     return origin, final_routes
+
+
+def _shortest_path_weight_func(priority: float, edge_data) -> float:  # type: ignore
+    """
+    Calculates the weight of an edge in the shortest path algorithm.
+    :param priority: The current priority of the node.
+    :param edge_data: The data associated with the edge.
+    """
+    weight = edge_data.get("length", float("inf"))
+    # Default weight to inf, weight of edge between smallest_node and neighbour
+    new_distance: float = priority + weight
+    return new_distance

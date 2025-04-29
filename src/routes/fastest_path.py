@@ -1,6 +1,5 @@
-import heapq as hq
 import logging
-from typing import Dict, Tuple
+from typing import Dict
 
 import geopandas as gpd
 import networkx as nx
@@ -9,13 +8,11 @@ from tqdm import tqdm
 
 from routes.route_algo import RouteAlgo
 from routes.route_utils import (
-    get_final_route,
     handle_final_routes,
-    is_in_dangerzone,
     path,
-    update_priority,
     vertex,
 )
+from routes.shortest_path import _shortest_path_origin_point
 from utils import kmh_to_ms
 
 
@@ -56,8 +53,12 @@ class FastestPath:
             except nx.NetworkXError:
                 logging.error(f"Origin node {origin} is not in the graph")
                 continue
-            start, final_routes = _fastest_path_origin_point(
-                origin, G, danger_zone, diversifying_routes
+            start, final_routes = _shortest_path_origin_point(
+                origin=origin,
+                G=G,
+                danger_zone=danger_zone,
+                diversifying_routes=diversifying_routes,
+                weight_func=_fastest_path_weight_function,
             )
             routes, has_path_been_calculated = handle_final_routes(
                 routes=routes,
@@ -69,81 +70,22 @@ class FastestPath:
         return routes
 
 
-def _fastest_path_origin_point(
-    origin: str,
-    G: nx.MultiDiGraph,
-    danger_zone: gpd.GeoDataFrame,
-    diversifying_routes: int,
-) -> Tuple[vertex, list[path]]:
-    final_routes: list[path] = []
-    sptSet = dict((node, False) for node in list(G.nodes))
-    dist: list[tuple[float, str]] = [(float("inf"), node) for node in G.nodes]
-    node_priority = {node: float("inf") for node in G.nodes}
-    hq.heapify(dist)
-    predecessor: dict[str, str | None] = {
-        node: None for node in G.nodes
-    }  # To track the fastest path
+def _fastest_path_weight_function(priority: float, edge_data) -> float:  # type:ignore
+    length = edge_data.get(
+        "length", float("inf")
+    )  # Default weight to inf, weight of edge between smallest_node and neighbour
 
-    update_priority(dist, node_priority, origin, 0)
-    while dist:
-        priority, smallest_node = hq.heappop(
-            dist
-        )  # popping the node with the current fastest path to origin
-        if priority == float("inf"):
-            logging.info(f"Node {origin} cannot reach any nodes outside the dangerzone")
-            break
-        if (
-            priority == node_priority[smallest_node]
-        ):  # Only use values that are not outdated
-            if not sptSet[smallest_node]:
-                sptSet[smallest_node] = True
-                for _, neighbour, edge_data in G.edges(
-                    smallest_node, data=True
-                ):  # looping through all adjacent vertices
-                    length = edge_data.get(
-                        "length", float("inf")
-                    )  # Default weight to inf, weight of edge between smallest_node and neighbour
+    max_speed = edge_data.get("maxspeed", 50)  # speed limit km/h, default 50
+    max_speed = (
+        max_speed[0] if isinstance(max_speed, list) else max_speed
+    )  # take the first speed limit in case there are more
+    try:
+        max_speed = kmh_to_ms(float(max_speed))  # converting km/h to m/s
+    except ValueError:
+        logging.error(f"Max speed with value {max_speed} cannot be parsed as an int")
+        max_speed = kmh_to_ms(50)  # default to 50 if parsing fails
 
-                    maxspeed = edge_data.get(
-                        "maxspeed", 50
-                    )  # speed limit km/h, default 50
-                    maxspeed = (
-                        maxspeed[0] if isinstance(maxspeed, list) else maxspeed
-                    )  # take the first speed limit in case there are more
-                    try:
-                        maxspeed = kmh_to_ms(float(maxspeed))  # converting km/h to m/s
-                    except ValueError:
-                        logging.error(
-                            f"Maxspeed with value {maxspeed} cannot be parsed as an int"
-                        )
-                        maxspeed = kmh_to_ms(50)  # default to 50 if parsing fails
+    weight = length / max_speed
 
-                    weight = length / maxspeed
-
-                    new_distance = priority + weight
-                    if is_in_dangerzone(smallest_node, danger_zone, G):
-                        if new_distance < node_priority[neighbour]:
-                            update_priority(
-                                dist, node_priority, neighbour, new_distance
-                            )
-                            predecessor[neighbour] = smallest_node
-        else:
-            # This node has already been processed with a better path
-            continue
-        if not is_in_dangerzone(
-            smallest_node, danger_zone, G
-        ):  # We have found the fastest route to node outside danger zone
-            final_route = get_final_route(
-                predecessor=predecessor,
-                smallest_node=smallest_node,
-                origin=origin,
-            )
-            final_routes.append(final_route)
-
-            if len(final_routes) >= diversifying_routes:
-                return (
-                    origin,
-                    final_routes,
-                )  # there is no need to find other routes for this origin point
-    # If we have not found any routes, return the origin point as the only route
-    return origin, final_routes
+    new_distance: float = priority + weight
+    return new_distance
