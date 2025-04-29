@@ -1,4 +1,6 @@
 import heapq as hq
+import logging
+from typing import Tuple
 
 import geopandas as gpd
 import networkx as nx
@@ -9,6 +11,8 @@ vertex = str
 
 path = list[vertex]
 """A list of coordinates representing a route"""
+
+RouteDict = dict[vertex, list[path]]
 
 
 def reconstruct_route(predecessor: dict[str, str | None], end: str) -> list[str]:
@@ -40,3 +44,25 @@ def update_priority(
     if new_priority < node_priority[node]:  # Only update if the new priority is better
         hq.heappush(heap, (new_priority, node))  # Push the new priority
         node_priority[node] = new_priority
+
+
+def get_final_route(
+    amount_of_routes: int,
+    predecessor: dict[str, str | None],
+    smallest_node: str,
+    origin: str,
+) -> Tuple[list[str], int]:
+    """
+    Returns the final route from the origin to the destination.
+
+    :param amount_of_routes: The number of routes found.
+    :param predecessor: A dictionary containing the predecessor of each node.
+    :param smallest_node: The current node being processed.
+    :param origin: The origin node.
+    :return: The final route as a list of nodes.
+    """
+    amount_of_routes += 1
+    result = reconstruct_route(predecessor, smallest_node)
+    if result[0] != origin:
+        logging.error("The first node in the route is not the origin node")
+    return result, amount_of_routes
