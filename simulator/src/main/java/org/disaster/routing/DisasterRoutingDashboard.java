@@ -106,7 +106,7 @@ public class DisasterRoutingDashboard implements Dashboard {
         layout.row("population")
                 .el(MapPlot.class, (viz, _) -> {
                     // Is overwritten in python project
-                    viz.title = "Population";
+                    viz.title = "Population density"";
                 });
 
         createTripDataRow(layout, "departures", header.tab, "Departures", "departure", "Time from start of simulation (minutes)");
