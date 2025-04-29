@@ -4,15 +4,9 @@ from typing import Dict
 import geopandas as gpd
 import networkx as nx
 import zope.interface
-from tqdm import tqdm
 
 from routes.route_algo import RouteAlgo
-from routes.route_utils import (
-    handle_final_routes,
-    path,
-    vertex,
-)
-from routes.shortest_path import _shortest_path_origin_point
+from routes.route_utils import path, route_to_safety_with_weight_func, vertex
 from utils import kmh_to_ms
 
 
@@ -37,36 +31,13 @@ class FastestPath:
         :param diversifying_routes: The number of routes to find for each origin point
         :return: A list of routes where each route corresponds to the origin point at the same index.
         """
-        should_reuse_paths = diversifying_routes == 1
-        has_path_been_calculated = dict((node, False) for node in origin_points)
-        routes: dict[vertex, list[path]] = {}
-
-        logging.info("Routing fastest path to safety for all origin points")
-
-        for origin in tqdm(origin_points):
-            if has_path_been_calculated[origin] and should_reuse_paths:
-                continue  # path has already been calculated in another iteration
-            try:
-                if len(list(G.neighbors(origin))) == 0:
-                    logging.info(f"Node {origin} has no neighbors")
-                    continue  # Skip if the origin node doesn't have neighbors
-            except nx.NetworkXError:
-                logging.error(f"Origin node {origin} is not in the graph")
-                continue
-            start, final_routes = _shortest_path_origin_point(
-                origin=origin,
-                G=G,
-                danger_zone=danger_zone,
-                diversifying_routes=diversifying_routes,
-                weight_func=_fastest_path_weight_function,
-            )
-            routes, has_path_been_calculated = handle_final_routes(
-                routes=routes,
-                has_path_been_calculated=has_path_been_calculated,
-                origin=origin,
-                final_routes=final_routes,
-                should_reuse_paths=should_reuse_paths,
-            )
+        routes: Dict[vertex, list[path]] = route_to_safety_with_weight_func(
+            origin_points=origin_points,
+            danger_zone=danger_zone,
+            G=G,
+            weight_func=_fastest_path_weight_function,
+            diversifying_routes=diversifying_routes,
+        )
         return routes
 
 
