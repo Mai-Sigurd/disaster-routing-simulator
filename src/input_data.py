@@ -33,6 +33,7 @@ class InputData:
     worldpop_filepath: str = ""
     cars_per_person: float = 1.0
     pop_geo_json_filepath: str = ""
+    diversifying_routes: int = 1
 
     def pretty_summary(self) -> str:
         return dedent(f"""
@@ -77,6 +78,9 @@ def verify_input(input_data: InputData) -> tuple[bool, str]:
         ):
             return False, "CPH city, danger zone is invalid geojson"
 
+    ## DIVERSIFYING ROUTES
+    if input_data.diversifying_routes < 1:
+        return False, "Diversifying routes must be greater than or equal to 1"
     ## POPULATION TYPE
     if input_data.population_type == PopulationType.TIFF_FILE:
         if input_data.worldpop_filepath == "":

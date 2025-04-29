@@ -13,16 +13,22 @@ G = nx.MultiDiGraph()
 # Add nodes
 G.add_node("A", x=2, y=2)
 G.add_node("B", x=3, y=2)
+G.add_node("B1", x=2, y=3)
 G.add_node("C", x=3, y=3)
 G.add_node("D", x=5, y=5)
 G.add_node("E", x=4, y=4)
+G.add_node("F", x=6, y=6)
+G.add_node("G", x=7, y=7)
 
 # Add edges with weights
 G.add_edge("A", "B", length=1, maxspeed=50)
+G.add_edge("A", "B1", length=1, maxspeed=50)
 G.add_edge("B", "C", length=1, maxspeed=50)
 G.add_edge("C", "D", length=2, maxspeed=50)
 G.add_edge("C", "E", length=1, maxspeed=50)
 G.add_edge("E", "D", length=2, maxspeed=50)
+G.add_edge("B", "F", length=10, maxspeed=50)
+G.add_edge("B1", "G", length=7, maxspeed=50)
 
 # Define a danger zone polygon
 danger_zone = gpd.GeoDataFrame(geometry=[Polygon([(1, 4), (1, 1), (4, 1), (4, 4)])])
@@ -33,18 +39,45 @@ fp = FastestPath()
 
 
 def test_fastest_path() -> None:
-    routes = fp.route_to_safety(["A"], danger_zone, G)
-    assert routes == [["A", "B", "C", "D"]]
+    routes = fp.route_to_safety(["A"], danger_zone, G, 3)
+    assert (["A", "B", "C", "D"]) in routes["A"]
+    assert (["A", "B", "F"]) in routes["A"]
+    assert (["A", "B1", "G"]) in routes["A"]
+    assert len(routes["A"]) == 3
 
 
 def test_fastest_path_two_origin_points() -> None:
-    routes = fp.route_to_safety(["A", "B"], danger_zone, G)
-    assert routes == [["A", "B", "C", "D"], ["B", "C", "D"]]
+    routes = fp.route_to_safety(["A", "B"], danger_zone, G, 3)
+    assert (["A", "B", "C", "D"]) in routes["A"]
+    assert (["A", "B", "F"]) in routes["A"]
+    assert (["A", "B1", "G"]) in routes["A"]
+    assert (["B", "C", "D"]) in routes["B"]
+    assert (["B", "F"]) in routes["B"]
+    assert len(routes["A"]) == 3
+    assert len(routes["B"]) == 2
 
 
 def test_fastest_path_three_origin_points() -> None:
-    routes = fp.route_to_safety(["A", "B", "C"], danger_zone, G)
-    assert routes == [["A", "B", "C", "D"], ["B", "C", "D"], ["C", "D"]]
+    routes = fp.route_to_safety(["A", "B", "C"], danger_zone, G, 3)
+    assert (["A", "B", "C", "D"]) in routes["A"]
+    assert (["A", "B", "F"]) in routes["A"]
+    assert (["A", "B1", "G"]) in routes["A"]
+    assert (["B", "C", "D"]) in routes["B"]
+    assert (["B", "F"]) in routes["B"]
+    assert (["C", "D"]) in routes["C"]
+    assert len(routes["A"]) == 3
+    assert len(routes["B"]) == 2
+    assert len(routes["C"]) == 1
+
+
+def test_fastest_path_three_origin_points_div_routes_1() -> None:
+    routes = fp.route_to_safety(["A", "B", "C"], danger_zone, G, 1)
+    assert (["A", "B", "C", "D"]) in routes["A"]
+    assert (["B", "C", "D"]) in routes["B"]
+    assert (["C", "D"]) in routes["C"]
+    assert len(routes["A"]) == 1
+    assert len(routes["B"]) == 1
+    assert len(routes["C"]) == 1
 
 
 # Create a directed graph
@@ -62,8 +95,8 @@ G1.add_edge("A", "C", length=2, maxspeed=50)
 
 
 def test_fastest_path_takes_fastest_route() -> None:
-    routes = fp.route_to_safety(["A"], danger_zone, G1)
-    assert routes == [["A", "B", "C"]]
+    routes = fp.route_to_safety(["A"], danger_zone, G1, 1)
+    assert routes["A"] == [["A", "B", "C"]]
 
 
 # Create a directed graph
@@ -80,8 +113,8 @@ G2.add_edge("A", "C", length=5, maxspeed=99)
 
 
 def test_fastest_path_takes_fastest_route2() -> None:
-    routes = fp.route_to_safety(["A"], danger_zone, G2)
-    assert routes == [["A", "B"]]
+    routes = fp.route_to_safety(["A"], danger_zone, G2, 1)
+    assert routes["A"] == [["A", "B"]]
 
 
 # Create a directed graph
@@ -99,7 +132,7 @@ def test_fastest_path_all_nodes_are_in_dangerzone_logging(
     caplog: LogCaptureFixture,
 ) -> None:
     with caplog.at_level(logging.INFO):
-        fp.route_to_safety(["A"], danger_zone, G3)
+        fp.route_to_safety(["A"], danger_zone, G3, 1)
     assert "Node A cannot reach any nodes outside the dangerzone" in caplog.text
 
 
@@ -119,5 +152,5 @@ def test_fastest_path_origin_has_no_neighbours_logging(
     caplog: LogCaptureFixture,
 ) -> None:
     with caplog.at_level(logging.INFO):
-        fp.route_to_safety(["A"], danger_zone, G4)
+        fp.route_to_safety(["A"], danger_zone, G4, 1)
     assert "Node A has no neighbors" in caplog.text
