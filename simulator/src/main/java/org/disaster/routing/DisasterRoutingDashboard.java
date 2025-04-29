@@ -72,6 +72,7 @@ public class DisasterRoutingDashboard implements Dashboard {
                 })
                 .el(Plotly.class, (viz, data) -> {
                     viz.title = "Trip distance distribution";
+                    viz.description = "x: meters, y: proportion";
                     viz.colorRamp = ColorScheme.Viridis;
 
                     viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("Simulated").build(),
@@ -85,7 +86,7 @@ public class DisasterRoutingDashboard implements Dashboard {
         layout.row("population")
                 .el(MapPlot.class, (viz, _) -> {
                     // Is overwritten in python project
-                    viz.title = "Population density"";
+                    viz.title = "Population density";
                 });
 
         createTripDataRow(layout, "departures", header.tab, "Departures", "departure", "Time from start of simulation (minutes)");
@@ -95,7 +96,7 @@ public class DisasterRoutingDashboard implements Dashboard {
 
         layout.row("Amount of people in safety").el(Plotly.class, ((viz, data) -> {
             viz.title = "People in safety";
-            viz.description = "The fraction of people who have reached safety at time t";
+            viz.description = "Proportion of people who have reached safety";
 
             Plotly.DataSet ds = viz.addDataset(data.compute(PeopleInSafetyXY.class, "people_in_safety.csv"));
 
@@ -131,15 +132,7 @@ public class DisasterRoutingDashboard implements Dashboard {
                             .y("congestion_index")
                             .name("road_type", ColorScheme.Spectral)
                     );
-                })
-                .el(Table.class, ((viz, data) -> {
-                    viz.title = "Traffic stats for all roads";
-
-                    viz.dataset = data.compute(TrafficAnalysisDisaster.class, "traffic_stats_by_road_type_daily.csv", args);
-
-                    viz.showAllRows = true;
-                    viz.enableFilter = false;
-                }));
+                });
 
         layout.row("map").el(MapPlot.class, (viz, data) -> {
             viz.title = "Simulated traffic volume";
@@ -151,12 +144,12 @@ public class DisasterRoutingDashboard implements Dashboard {
             viz.addDataset("traffic", data.compute(TrafficAnalysisDisaster.class, "traffic_stats_by_link_daily.csv"));
 
             viz.display.lineColor.dataset = "traffic";
-            viz.display.lineColor.columnName = "avg_speed";
+            viz.display.lineColor.columnName = "Avg. speed limit";
             viz.display.lineColor.join = "link_id";
             viz.display.lineColor.setColorRamp(ColorScheme.RdYlBu, 5, false);
 
             viz.display.lineWidth.dataset = "traffic";
-            viz.display.lineWidth.columnName = "simulated_traffic_volume";
+            viz.display.lineWidth.columnName = "Simulated traffic volume";
             viz.display.lineWidth.scaleFactor = 10d;
             viz.display.lineWidth.join = "link_id";
 
