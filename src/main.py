@@ -7,6 +7,7 @@ from typing import Optional
 
 from slugify import slugify
 
+from analysis.analysis import write_analysis_data_simwrapper
 from config import (
     CASE_STUDIES_OUTPUT_FOLDER,
     EXPLORE_OUTPUT_FOLDER,
@@ -23,7 +24,6 @@ from controller import (
     gui_handler,
     run_matsim,
     sim_wrapper_serve,
-    write_danger_zone_data,
 )
 from input_data import (
     InputData,
@@ -32,6 +32,7 @@ from input_data import (
 from matsim_io import MATSIM_DATA_DIR, mat_sim_files_exist, write_network, write_plans
 from matsim_io.dashboards import (
     append_breakpoints_to_congestion_map,
+    change_population_visuals_map,
     create_comparison_dashboard,
     move_dashboard,
 )
@@ -56,11 +57,14 @@ def compute_and_save_matsim_paths(
     :return: A dictionary of statistics about the routes, including the number of routes and the number of
         nodes with no route to safety.
     """
-    paths = algorithm.route_to_safety(
-        program_config.origin_points, program_config.danger_zones, program_config.G
+    origin_to_paths = algorithm.route_to_safety(
+        program_config.origin_points,
+        program_config.danger_zones,
+        program_config.G,
+        diversifying_routes=program_config.diversifying_routes,
     )
     routes = create_route_objects(
-        list_of_paths=paths,
+        origin_to_paths=origin_to_paths,
         population_data=program_config.danger_zone_population_data,
         start=0,
         end=program_config.departure_end_time_sec,
@@ -88,10 +92,10 @@ def save_analysis_files(
     """
     Save the analysis files to the MATSIM_DATA_DIR.
     """
-    write_danger_zone_data(
+    write_analysis_data_simwrapper(
         program_conf=program_config,
         stats=stats,
-        filepath=MATSIM_DATA_DIR / output_dir_name / "analysis" / "dangerzone_data.csv",
+        output_dir=MATSIM_DATA_DIR / output_dir_name / "analysis",
     )
 
 
@@ -131,6 +135,9 @@ def start_up(input_data: InputData, run_simulator: bool) -> None:
             run_matsim(output_dir_name)
             save_analysis_files(program_config, stats, output_dir_name)
             append_breakpoints_to_congestion_map(output_dir_name)
+            change_population_visuals_map(
+                output_dir_name, program_config.danger_zone_population_data
+            )
             move_dashboard(output_dir_name, algorithm.title)
             output_dirs.append(output_dir_name)
 
@@ -193,6 +200,5 @@ if __name__ == "__main__":
         help="Run Matsim only (precomputed routes on Copenhagen)",
     )
     args = parser.parse_args()
-
     signal.signal(signal.SIGTSTP, gui_close)
     main(args)

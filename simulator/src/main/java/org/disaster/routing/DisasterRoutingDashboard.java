@@ -59,27 +59,6 @@ public class DisasterRoutingDashboard implements Dashboard {
     public void configure(Header header, Layout layout) {
         header.title = "Disaster Evacuation Routing Dashboard";
 
-        layout.row("traffic_volume").el(MapPlot.class, (viz, data) -> {
-            viz.title = "Simulated traffic volume";
-            viz.center = data.context().getCenter();
-            viz.zoom = data.context().mapZoomLevel;
-            viz.height = 7.5;
-            viz.width = 2.0;
-
-            viz.setShape(data.compute(CreateAvroNetwork.class, "network.avro", "--with-properties"), "linkId");
-            viz.addDataset("traffic", data.compute(TrafficAnalysis.class, "traffic_stats_by_link_daily.csv"));
-
-            viz.display.lineColor.dataset = "traffic";
-            viz.display.lineColor.columnName = "simulated_traffic_volume";
-            viz.display.lineColor.join = "link_id";
-            viz.display.lineColor.setColorRamp(ColorScheme.RdYlBu, 5, true);
-
-            viz.display.lineWidth.dataset = "traffic";
-            viz.display.lineWidth.columnName = "simulated_traffic_volume";
-            viz.display.lineWidth.scaleFactor = 20000d;
-            viz.display.lineWidth.join = "link_id";
-        });
-
         layout.row("statistics", header.tab)
                 .el(Table.class, (viz, data) -> {
                     viz.title = "Evacuation Statistics";
@@ -88,7 +67,7 @@ public class DisasterRoutingDashboard implements Dashboard {
                 })
                 .el(Table.class, (viz, data) -> {
                     viz.title = "Simulation Statistics";
-                    viz.dataset = "analysis/dangerzone_data.csv";
+                    viz.dataset = "analysis/danger_zone_data.csv";
                     viz.showAllRows = true;
                 })
                 .el(Plotly.class, (viz, data) -> {
@@ -102,6 +81,11 @@ public class DisasterRoutingDashboard implements Dashboard {
                                     .x("dist_group")
                                     .y("share")
                     );
+                });
+        layout.row("population")
+                .el(MapPlot.class, (viz, _) -> {
+                    // Is overwritten in python project
+                    viz.title = "Population density"";
                 });
 
         createTripDataRow(layout, "departures", header.tab, "Departures", "departure", "Time from start of simulation (minutes)");
@@ -149,8 +133,7 @@ public class DisasterRoutingDashboard implements Dashboard {
                     );
                 })
                 .el(Table.class, ((viz, data) -> {
-                    viz.title = "Traffic stats per road type";
-                    viz.description = "daily";
+                    viz.title = "Traffic stats for all roads";
 
                     viz.dataset = data.compute(TrafficAnalysisDisaster.class, "traffic_stats_by_road_type_daily.csv", args);
 
@@ -159,7 +142,7 @@ public class DisasterRoutingDashboard implements Dashboard {
                 }));
 
         layout.row("map").el(MapPlot.class, (viz, data) -> {
-            viz.title = "Traffic statistics";
+            viz.title = "Simulated traffic volume";
             viz.center = data.context().getCenter();
             viz.zoom = data.context().mapZoomLevel;
 
@@ -174,7 +157,7 @@ public class DisasterRoutingDashboard implements Dashboard {
 
             viz.display.lineWidth.dataset = "traffic";
             viz.display.lineWidth.columnName = "simulated_traffic_volume";
-            viz.display.lineWidth.scaleFactor = 20000d;
+            viz.display.lineWidth.scaleFactor = 10d;
             viz.display.lineWidth.join = "link_id";
 
             viz.height = 12d;
