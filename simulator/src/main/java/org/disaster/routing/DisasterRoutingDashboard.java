@@ -67,7 +67,7 @@ public class DisasterRoutingDashboard implements Dashboard {
                 })
                 .el(Table.class, (viz, data) -> {
                     viz.title = "Simulation Statistics";
-                    viz.dataset = "analysis/dangerzone_data.csv";
+                    viz.dataset = "analysis/danger_zone_data.csv";
                     viz.showAllRows = true;
                 })
                 .el(Plotly.class, (viz, data) -> {
@@ -81,6 +81,11 @@ public class DisasterRoutingDashboard implements Dashboard {
                                     .x("dist_group")
                                     .y("share")
                     );
+                });
+        layout.row("population")
+                .el(MapPlot.class, (viz, _) -> {
+                    // Is overwritten in python project
+                    viz.title = "Population density"";
                 });
 
         createTripDataRow(layout, "departures", header.tab, "Departures", "departure", "Time from start of simulation (minutes)");
