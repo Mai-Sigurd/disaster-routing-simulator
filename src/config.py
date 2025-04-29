@@ -43,6 +43,7 @@ class ProgramConfig:
     route_algos: list[RouteAlgo] = field(default_factory=list)
     departure_end_time_sec: int = ONE_HOUR
     diversifying_routes: int = 1
+    population_type: PopulationType = PopulationType.TIFF_FILE
 
 
 def set_dev_input_data() -> InputData:

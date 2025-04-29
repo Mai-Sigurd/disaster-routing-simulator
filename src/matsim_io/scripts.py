@@ -6,6 +6,7 @@ import geopandas as gpd
 import yaml
 
 from data_loader.population import POPULATION
+from input_data import PopulationType
 from matsim_io import MATSIM_DATA_DIR
 
 dashboard_count = 1
@@ -75,7 +76,9 @@ def append_breakpoints_to_congestion_map(output_dir: str) -> None:
 
 
 def change_population_visuals_map(
-    output_dir: str, danger_zone_population: gpd.GeoDataFrame
+    output_dir: str,
+    danger_zone_population: gpd.GeoDataFrame,
+    population_type: PopulationType,
 ) -> None:
     """
     Change the population visuals map in the dashboard file.
@@ -90,6 +93,13 @@ def change_population_visuals_map(
         "join": "osm_id",
     }
     population_map["datasets"] = {}
+    if population_type == PopulationType.NUMBER:
+        breakpoints = ""
+        steps = 1
+    else:
+        steps = 5
+        breakpoints = f"{int(max_population * 0.2)}, {int(max_population * 0.4)}, {int(max_population * 0.6)}, {int(max_population * 0.8)}"
+
     population_map["display"] = {
         "fill": {
             "dataset": "population_data.geojson",
@@ -97,8 +107,8 @@ def change_population_visuals_map(
             "join": "",
             "colorRamp": {
                 "ramp": "Viridis",
-                "steps": 5,
-                "breakpoints": f"{int(max_population * 0.2)}, {int(max_population * 0.4)}, {int(max_population * 0.6)}, {int(max_population * 0.8)}",
+                "steps": steps,
+                "breakpoints": breakpoints,
             },
         },
         "radius": {
