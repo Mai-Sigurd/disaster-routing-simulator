@@ -31,6 +31,7 @@ from input_data import (
 )
 from matsim_io import MATSIM_DATA_DIR, mat_sim_files_exist, write_network, write_plans
 from matsim_io.dashboards import (
+    SimulationResult,
     append_breakpoints_to_congestion_map,
     change_population_visuals_map,
     create_comparison_dashboard,
@@ -128,22 +129,41 @@ def start_up(input_data: InputData, run_simulator: bool) -> None:
         program_config = controller_input_data(input_data)
         logging.info("Input data loaded")
 
-        output_dirs = []
-        for algorithm in program_config.route_algos:
-            stats = compute_and_save_matsim_paths(program_config, algorithm)
-            output_dir_name = slugify(f"{algorithm.title}-output")
-            run_matsim(output_dir_name)
-            save_analysis_files(program_config, stats, output_dir_name)
-            append_breakpoints_to_congestion_map(output_dir_name)
-            change_population_visuals_map(
-                output_dir_name, program_config.danger_zone_population_data
+        results = [
+            SimulationResult(
+                run_simulation(program_config, algorithm),
+                algorithm.title,
             )
-            move_dashboard(output_dir_name, algorithm.title)
-            output_dirs.append(output_dir_name)
-
-        create_comparison_dashboard(output_dirs)
+            for algorithm in program_config.route_algos
+        ]
+        create_comparison_dashboard(results)
 
     run_simwrapper_serve(input_data.simulation_type)
+
+
+def run_simulation(conf: ProgramConfig, algorithm: RouteAlgo) -> str:
+    """
+    Run the simulation with the given configuration and algorithm.
+    :param conf: The program configuration, including the graph, origin points, and danger zones.
+    :param algorithm: The algorithm to use for routing.
+    :return: The name of the output directory where the simulation results are saved.
+    """
+    logging.info(f"Starting simulation with algorithm: {algorithm.title}")
+    output_dir = slugify(f"{algorithm.title}-output")
+
+    logging.info("Computing paths to safety...")
+    stats = compute_and_save_matsim_paths(conf, algorithm)
+
+    logging.info("Simulating path towards safety in MATSim...")
+    run_matsim(output_dir)
+
+    logging.info("Creating SimWrapper dashboard...")
+    save_analysis_files(conf, stats, output_dir)
+    append_breakpoints_to_congestion_map(output_dir)
+    change_population_visuals_map(output_dir, conf.danger_zone_population_data)
+    move_dashboard(output_dir, algorithm.title)
+
+    return output_dir
 
 
 def main(args: argparse.Namespace) -> None:

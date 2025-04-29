@@ -1,10 +1,12 @@
 import logging
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
 import geopandas as gpd
 import pandas as pd
 import yaml
+from slugify import slugify
 
 from data_loader.population import POPULATION
 from matsim_io import MATSIM_DATA_DIR
@@ -114,23 +116,29 @@ def change_population_visuals_map(
     file_path.write_text(yaml.dump(data, sort_keys=False), encoding="utf-8")
 
 
-def create_comparison_dashboard(_: list[str]) -> None:
-    dataset_path = MATSIM_DATA_DIR / "analysis" / "people_in_safety.csv"
-    combine_csv_datasets(
-        inputs=[
-            (
-                MATSIM_DATA_DIR
-                / "dijkstra-fastest-path-output/analysis/analysis/people_in_safety.csv",
-                "fastest",
-            ),
-            (
-                MATSIM_DATA_DIR
-                / "dijkstra-shortest-path-output/analysis/analysis/people_in_safety.csv",
-                "shortest",
-            ),
-        ],
-        output_file=dataset_path,
-    )
+@dataclass
+class SimulationResult:
+    output_dir: str
+    title: str
+
+    @property
+    def label(self) -> str:
+        """Slugified title for use in file names and URLs."""
+        return slugify(self.title)
+
+    @property
+    def output_path(self) -> Path:
+        """Path to the output directory."""
+        return MATSIM_DATA_DIR / self.output_dir
+
+    @property
+    def people_in_safety_csv_path(self) -> Path:
+        """Path to the "people_in_safety" analysis file."""
+        return self.output_path / "analysis" / "analysis" / "people_in_safety.csv"
+
+
+def create_comparison_dashboard(results: list[SimulationResult]) -> None:
+    people_in_safety_csv_file = combine_csv_datasets(results)
 
     dashboard = {
         "header": {
@@ -144,13 +152,13 @@ def create_comparison_dashboard(_: list[str]) -> None:
                     "title": "People in Safety",
                     "description": "Fraction of people in safety over time.",
                     "datasets": {
-                        "dataset": "analysis/people_in_safety.csv",
+                        "dataset": people_in_safety_csv_file,
                     },
                     "traces": [
                         {
                             "type": "scatter",
                             "x": "$dataset.bin",
-                            "y": f"$dataset.cumulative_traveltime_{label}",
+                            "y": f"$dataset.cumulative_traveltime_{result.label}",
                             "name": "People in safety",
                             "original_name": "People in safety",
                             "mode": "lines",
@@ -169,7 +177,7 @@ def create_comparison_dashboard(_: list[str]) -> None:
                                 },
                             },
                         }
-                        for label in ["fastest", "shortest"]
+                        for result in results
                     ],
                     "layout": {
                         "xaxis": {
@@ -192,28 +200,26 @@ def create_comparison_dashboard(_: list[str]) -> None:
     dashboard_path.write_text(yaml.dump(dashboard, sort_keys=False), encoding="utf-8")
 
 
-def combine_csv_datasets(
-    inputs: list[tuple[Path, str]], output_file: str
-) -> pd.DataFrame:
+def combine_csv_datasets(results: list[SimulationResult]) -> str:
     """
     Combine multiple CSV datasets into a single CSV file.
-    :param inputs: List of tuples containing the file paths and labels.
-    :param output_file: Path to the output CSV file.
-    :return: DataFrame containing the combined data.
+    :param results: List of SimulationResult objects containing the paths to the CSV files.
+    :return: Path to the combined CSV file, relative to the MATSim data directory.
     """
-    dfs = []
-    for file_path, label in inputs:
-        dfs.append(
-            pd.read_csv(file_path)[["bin", "cumulative_traveltime"]].rename(
-                columns={"cumulative_traveltime": f"cumulative_traveltime_{label}"}
-            )
+    dfs = [
+        pd.read_csv(result.people_in_safety_csv_path)[
+            ["bin", "cumulative_traveltime"]
+        ].rename(
+            columns={"cumulative_traveltime": f"cumulative_traveltime_{result.label}"}
         )
+        for result in results
+    ]
 
     merged_df = dfs[0]
     for df in dfs[1:]:
         merged_df = pd.merge(merged_df, df, on="bin", how="outer")
-
     merged_df.sort_values("bin", inplace=True)
-    merged_df.to_csv(output_file, index=False)
 
-    return merged_df
+    output_file = "analysis/people_in_safety.csv"
+    merged_df.to_csv(MATSIM_DATA_DIR / output_file, index=False)
+    return output_file
