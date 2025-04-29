@@ -10,6 +10,7 @@ from tqdm import tqdm
 from routes.route_algo import RouteAlgo
 from routes.route_utils import (
     get_final_route,
+    handle_final_routes,
     is_in_dangerzone,
     path,
     update_priority,
@@ -58,23 +59,13 @@ class FastestPath:
             start, final_routes = _fastest_path_origin_point(
                 origin, G, danger_zone, diversifying_routes
             )
-
-            routes[origin] = final_routes
-
-            if should_reuse_paths and len(final_routes) > 1:
-                # Only one route
-                final_route = final_routes[0]
-                has_path_been_calculated[origin] = True
-                for i in range(
-                    len(final_route) - 1
-                ):  # -1 since the last node is outside the danger zone and therefore does not need a path
-                    if (
-                        final_route[i] in has_path_been_calculated
-                        and not has_path_been_calculated[final_route[i]]
-                    ):
-                        routes[final_route[i]] = [final_route[i:]]
-                        # we take the route from i and forward
-                        has_path_been_calculated[final_route[i]] = True
+            routes, has_path_been_calculated = handle_final_routes(
+                routes=routes,
+                has_path_been_calculated=has_path_been_calculated,
+                origin=origin,
+                final_routes=final_routes,
+                should_reuse_paths=should_reuse_paths,
+            )
         return routes
 
 
