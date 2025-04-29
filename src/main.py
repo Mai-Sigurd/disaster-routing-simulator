@@ -134,7 +134,9 @@ def start_up(input_data: InputData, run_simulator: bool) -> None:
             save_analysis_files(program_config, stats, output_dir_name)
             append_breakpoints_to_congestion_map(output_dir_name)
             change_population_visuals_map(
-                output_dir_name, program_config.danger_zone_population_data
+                output_dir_name,
+                program_config.danger_zone_population_data,
+                program_config.population_type,
             )
             move_dashboard(output_dir_name, algorithm.title)
 

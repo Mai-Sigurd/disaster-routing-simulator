@@ -73,6 +73,7 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
                 input_data.pop_geo_json_filepath
             )
             conf.cars_per_person = input_data.cars_per_person
+            conf.population_type = PopulationType.GEO_JSON_FILE
 
         case SimulationType.EXPLORE:
             conf.danger_zones = load_danger_zone_from_str(
@@ -91,12 +92,14 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
                         geo_file_name=input_data.worldpop_filepath + "to_json.json",
                         G=conf.G,
                     )
+                    conf.population_type = PopulationType.TIFF_FILE
                 case PopulationType.NUMBER:
                     conf.danger_zone_population_data = population_data_from_number(
                         danger_zone=conf.danger_zones,
                         population_number=input_data.population_number,
                         G=conf.G,
                     )
+                    conf.population_type = PopulationType.NUMBER
                 case PopulationType.GEO_JSON_FILE:
                     raise ValueError("Geojson file cannot be given in explore case")
     conf.origin_points = get_origin_points(
