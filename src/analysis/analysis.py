@@ -20,11 +20,19 @@ def write_danger_zone_data_simwrapper_csv(
     )
     danger_zone_area_km2 = danger_zone_area_m2 / 1_000_000
 
+    lengths = [
+        data["length"] / 1000.0
+        for _, _, _, data in program_conf.G.edges(keys=True, data=True)
+        if "length" in data
+    ]
+    total_lane_km = sum(lengths)
+
     with open(filepath, "w") as file:
         file.write("Info, Value\n")
-        file.write(f"Danger Zone Area (km²),{danger_zone_area_km2}\n")
+        file.write(f"Danger Zone Area (km²),{round(danger_zone_area_km2, 2)}\n")
         file.write(
-            f"Departure distribution length in minutes, {program_conf.departure_end_time_sec / 60}\n"
+            f"Departure time window length [minutes], {program_conf.departure_end_time_sec / 60}\n"
         )
+        file.write(f"Total lane km, {round(total_lane_km, 2)}\n")
         for key, value in stats.items():
             file.write(f"{key}, {value}\n")
