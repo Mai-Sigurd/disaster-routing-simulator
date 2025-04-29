@@ -78,6 +78,9 @@ def verify_input(input_data: InputData) -> tuple[bool, str]:
         ):
             return False, "CPH city, danger zone is invalid geojson"
 
+    ## DIVERSIFYING ROUTES
+    if input_data.diversifying_routes < 1:
+        return False, "Diversifying routes must be greater than or equal to 1"
     ## POPULATION TYPE
     if input_data.population_type == PopulationType.TIFF_FILE:
         if input_data.worldpop_filepath == "":

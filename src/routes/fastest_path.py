@@ -39,15 +39,16 @@ class FastestPath:
         :param diversifying_routes: The number of routes to find for each origin point
         :return: A list of routes where each route corresponds to the origin point at the same index.
         """
-        # has_path_been_calculated = dict((node, False) for node in origin_points)
+        should_reuse_paths = diversifying_routes == 1
+        has_path_been_calculated = dict((node, False) for node in origin_points)
         routes: dict[vertex, list[path]] = {}
 
         logging.info("Routing fastest path to safety for all origin points")
 
         for origin in tqdm(origin_points):
             amount_of_routes = 0
-            # if has_path_been_calculated[origin]:
-            # continue  # path has already been calculated in another iteration
+            if has_path_been_calculated[origin] and should_reuse_paths:
+                continue  # path has already been calculated in another iteration
 
             try:
                 if len(list(G.neighbors(origin))) == 0:
@@ -131,6 +132,19 @@ class FastestPath:
                         routes[final_route[0]].append(final_route)
                     else:
                         routes[final_route[0]] = [final_route]
+
+                    if should_reuse_paths:
+                        has_path_been_calculated[origin] = True
+                        for i in range(
+                            len(final_route) - 1
+                        ):  # -1 since the last node is outside the danger zone and therefore does not need a path
+                            if (
+                                final_route[i] in has_path_been_calculated
+                                and not has_path_been_calculated[final_route[i]]
+                            ):
+                                routes[final_route[i]] = [final_route[i:]]
+                                # we take the route from i and forward
+                                has_path_been_calculated[final_route[i]] = True
                     if amount_of_routes >= diversifying_routes:
                         break  # there is no need to find other routes for this origin point
         return routes

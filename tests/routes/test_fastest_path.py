@@ -70,6 +70,16 @@ def test_fastest_path_three_origin_points() -> None:
     assert len(routes["C"]) == 1
 
 
+def test_fastest_path_three_origin_points_div_routes_1() -> None:
+    routes = fp.route_to_safety(["A", "B", "C"], danger_zone, G, 1)
+    assert (["A", "B", "C", "D"]) in routes["A"]
+    assert (["B", "C", "D"]) in routes["B"]
+    assert (["C", "D"]) in routes["C"]
+    assert len(routes["A"]) == 1
+    assert len(routes["B"]) == 1
+    assert len(routes["C"]) == 1
+
+
 # Create a directed graph
 G1 = nx.MultiDiGraph()
 

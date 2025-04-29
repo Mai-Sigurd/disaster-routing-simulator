@@ -86,7 +86,7 @@ def set_ravenna_input_data() -> InputData:
         pop_geo_json_filepath=RAVENNA_POPULATION_DATA,
         cars_per_person=cars_per_person_ravenna,
         departure_end_time_sec=ONE_HOUR,
-        diversifying_routes=3,
+        diversifying_routes=1,
     )
 
 
