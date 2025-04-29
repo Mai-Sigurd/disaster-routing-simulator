@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from pyproj import Geod
 
@@ -6,7 +7,7 @@ from config import ProgramConfig
 
 
 def write_analysis_data_simwrapper(
-    program_conf: ProgramConfig, stats: dict[str, int], output_dir: str
+    program_conf: ProgramConfig, stats: dict[str, int], output_dir: Path
 ) -> None:
     """
     Write analysis data to the output directory.
@@ -23,7 +24,7 @@ def write_analysis_data_simwrapper(
 
 
 def _add_danger_zone_statistics(
-    program_conf: ProgramConfig, stats: dict[str, int], output_dir: str
+    program_conf: ProgramConfig, stats: dict[str, int], output_dir: Path
 ) -> None:
     geod = Geod(ellps="WGS84")
 
@@ -45,7 +46,7 @@ def _add_danger_zone_statistics(
 
 
 def _add_population_file_to_output(
-    program_conf: ProgramConfig, output_dir: str
+    program_conf: ProgramConfig, output_dir: Path
 ) -> None:
     pop_data = program_conf.danger_zone_population_data
     pop_data = pop_data.rename(columns={"id": "osm_id"})
