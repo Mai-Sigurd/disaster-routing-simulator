@@ -1,3 +1,4 @@
+import logging
 from typing import Dict
 
 import geopandas as gpd
@@ -30,6 +31,7 @@ class ShortestPath:
         :param diversifying_routes: The number of routes to find for each origin point
         :return: A dictionary from an origin point to a list of 1 or more paths
         """
+        logging.info("Routing shortest path to safety for all origin points")
         routes: Dict[vertex, list[path]] = route_to_safety_with_weight_func(
             origin_points=origin_points,
             danger_zone=danger_zone,

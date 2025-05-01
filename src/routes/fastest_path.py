@@ -31,6 +31,9 @@ class FastestPath:
         :param diversifying_routes: The number of routes to find for each origin point
         :return: A list of routes where each route corresponds to the origin point at the same index.
         """
+
+        logging.info("Routing fastest path to safety for all origin points")
+
         routes: Dict[vertex, list[path]] = route_to_safety_with_weight_func(
             origin_points=origin_points,
             danger_zone=danger_zone,

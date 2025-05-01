@@ -5,6 +5,7 @@ from typing import Callable, Dict, Tuple
 import geopandas as gpd
 import networkx as nx
 from shapely.geometry import Point
+from tqdm import tqdm
 
 vertex = str
 """A tuple containing the latitude and longitude of a point"""
@@ -36,10 +37,7 @@ def route_to_safety_with_weight_func(
     should_reuse_paths = diversifying_routes == 1
     has_path_been_calculated = dict((node, False) for node in origin_points)
     routes: dict[vertex, list[path]] = {}
-
-    logging.info("Routing fastest path to safety for all origin points")
-
-    for origin in origin_points:
+    for origin in tqdm(origin_points):
         if has_path_been_calculated[origin] and should_reuse_paths:
             continue  # path has already been calculated in another iteration
         try:

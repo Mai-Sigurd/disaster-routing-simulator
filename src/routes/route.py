@@ -4,7 +4,6 @@ from typing import Tuple
 import geopandas as gpd
 import numpy as np
 from numpy.typing import NDArray
-from tqdm import tqdm
 
 from data_loader.population.population_utils import NODE_ID, POPULATION
 from routes.route_utils import path
@@ -103,7 +102,7 @@ def create_route_objects(
     total_population = _get_total_population(population_data, cars_per_person)
     result = []
     departure_times = _get_normal_dist_departure_time_list(total_population, start, end)
-    for origin_point in tqdm(origin_to_paths.keys()):
+    for origin_point in origin_to_paths.keys():
         paths = origin_to_paths[origin_point]
         num_people_on_route = _get_num_people_on_route(
             origin_point, population_data, cars_per_person
