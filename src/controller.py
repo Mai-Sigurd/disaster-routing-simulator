@@ -3,7 +3,6 @@ import subprocess
 from pathlib import Path
 from types import FrameType
 
-from analysis.analysis import write_danger_zone_data_simwrapper_csv
 from config import (
     ROUTE_ALGOS,
     SOURCE_DIR,
@@ -74,6 +73,7 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
                 input_data.pop_geo_json_filepath
             )
             conf.cars_per_person = input_data.cars_per_person
+            conf.population_type = PopulationType.GEO_JSON_FILE
 
         case SimulationType.EXPLORE:
             conf.danger_zones = load_danger_zone_from_str(
@@ -92,18 +92,21 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
                         geo_file_name=input_data.worldpop_filepath + "to_json.json",
                         G=conf.G,
                     )
+                    conf.population_type = PopulationType.TIFF_FILE
                 case PopulationType.NUMBER:
                     conf.danger_zone_population_data = population_data_from_number(
                         danger_zone=conf.danger_zones,
                         population_number=input_data.population_number,
                         G=conf.G,
                     )
+                    conf.population_type = PopulationType.NUMBER
                 case PopulationType.GEO_JSON_FILE:
                     raise ValueError("Geojson file cannot be given in explore case")
     conf.origin_points = get_origin_points(
         conf.danger_zone_population_data, dangerzone=conf.danger_zones
     )
     conf.departure_end_time_sec = input_data.departure_end_time_sec
+    conf.diversifying_routes = input_data.diversifying_routes
     return conf
 
 
@@ -120,17 +123,6 @@ def gui_handler(gui_error_message: str = "") -> InputData:
 
     logging.info(input_data.pretty_summary())
     return input_data
-
-
-def write_danger_zone_data(
-    program_conf: ProgramConfig, stats: dict[str, int], filepath: str
-) -> None:
-    """
-    Writes the total area of the danger zone and the total area of the city graph to a CSV file.
-    """
-    write_danger_zone_data_simwrapper_csv(
-        program_conf=program_conf, stats=stats, filepath=filepath
-    )
 
 
 def gui_close(_signal: int, _frame: FrameType | None) -> None:

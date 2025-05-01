@@ -86,3 +86,16 @@ def test_verify(
         False,
         "Departure time must be less than 24 hours",
     )
+    input_data = InputData(
+        population_type=PopulationType.GEO_JSON_FILE,
+        simulation_type=SimulationType.CASE_STUDIES,
+        population_number=0,
+        danger_zones_geopandas_json="",
+        worldpop_filepath="",
+        departure_end_time_sec=0,
+        diversifying_routes=0,
+    )
+    assert verify_input(input_data) == (
+        False,
+        "Diversifying routes must be greater than or equal to 1",
+    )

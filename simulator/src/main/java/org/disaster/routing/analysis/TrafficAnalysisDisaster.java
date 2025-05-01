@@ -23,6 +23,7 @@ import tech.tablesaw.selection.Selection;
 import tech.tablesaw.table.TableSlice;
 import tech.tablesaw.table.TableSliceGroup;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -72,6 +73,30 @@ public class TrafficAnalysisDisaster implements MATSimAppCommand {
 		return table;
 	}
 
+	public static Table transposeTable(Table original) {
+        List<String> originalColumnNames = original.columnNames();
+        int rowCount = original.rowCount();
+
+        // First column: headers of original columns
+        StringColumn transposedRowHeader = StringColumn.create("Information", originalColumnNames);
+
+        // Create columns for each row in the original table
+        List<Column<?>> transposedColumns = new ArrayList<>();
+        transposedColumns.add(transposedRowHeader);
+
+        for (int i = 0; i < rowCount; i++) {
+            List<String> values = new ArrayList<>();
+            for (Column<?> col : original.columns()) {
+                values.add(col.getString(i));
+            }
+            StringColumn newCol = StringColumn.create("Value ", values);
+            transposedColumns.add(newCol);
+        }
+
+        return Table.create("Transposed Table", transposedColumns);
+    }
+	
+
 	@Override
 	public Integer call() throws Exception {
 
@@ -103,10 +128,10 @@ public class TrafficAnalysisDisaster implements MATSimAppCommand {
 
 		Table ds = createDataset(network, calc, volumes);
 
-		List<String> means = List.of("speed_performance_index", "congestion_index", "avg_speed", "road_capacity_utilization", "lane_km");
+		List<String> means = List.of("speed_performance_index", "congestion_index", "Avg. speed limit", "road_capacity_utilization", "lane_km");
 		Table dailyMean = normalizeColumns(ds.summarize(means, mean).by("link_id"));
 
-		List<String> sums = ds.columnNames().stream().filter(s -> s.startsWith("vol_") || s.endsWith("_volume")).toList();
+		List<String> sums = ds.columnNames().stream().filter(s -> s.startsWith("vol_") || s.endsWith(" volume")).toList();
 		Table dailySum = normalizeColumns(ds.summarize(sums, sum).by("link_id"));
 
 		Table daily = dailyMean.joinOn("link_id").inner(dailySum);
@@ -134,20 +159,16 @@ public class TrafficAnalysisDisaster implements MATSimAppCommand {
 			}
 		}
 
-		perRoadTypeAndHour
-			.sortOn("road_type", "hour")
-			.write().csv(output.getPath("traffic_stats_by_road_type_and_hour.csv").toFile());
+		perRoadTypeAndHour.sortOn("road_type", "hour").write().csv(output.getPath("traffic_stats_by_road_type_and_hour.csv").toFile());
 
 		Table dailyCongestionIndex = Table.create(StringColumn.create("road_type"), DoubleColumn.create("congestion_index"));
 
-		for (String roadType : roadTypes) {
-
-			double congestionIndex = calc.getNetworkCongestionIndex(0, 86400, roadType.equals("all") ? null : roadType);
-			Row row = dailyCongestionIndex.appendRow();
-			row.setString("road_type", roadType);
-			row.setDouble("congestion_index", congestionIndex);
-		}
-
+		String roadType = "all";
+		double congestionIndex = calc.getNetworkCongestionIndex(0, 86400, roadType.equals("all") ? null : roadType);
+		Row row1 = dailyCongestionIndex.appendRow();
+		row1.setString("road_type", roadType);
+		row1.setDouble("congestion_index", congestionIndex);
+		
 		Table perRoadType = dailyCongestionIndex.joinOn("road_type").leftOuter(
 			weightedMeanBy(ds, means, "road_type").rejectColumns("speed_performance_index", "congestion_index")
 		);
@@ -158,13 +179,17 @@ public class TrafficAnalysisDisaster implements MATSimAppCommand {
 		perRoadType.column("lane_km").setName("Total lane km");
 		perRoadType.column("road_type").setName("Road Type");
 		perRoadType.column("road_capacity_utilization").setName("Cap. Utilization");
-		perRoadType.column("avg_speed").setName("Avg. Speed [km/h]");
+		perRoadType.column("Avg. speed limit").setName("Avg. Speed limit[km/h]");
 		perRoadType.column("congestion_index").setName("Congestion Index");
 
 		roundColumns(perRoadType);
-		perRoadType
-			.sortOn("Road Type")
-			.write().csv(output.getPath("traffic_stats_by_road_type_daily.csv").toFile());
+		perRoadType.sortOn("Road Type");
+
+		Table transposedPerRoadType = perRoadType.copy();
+		transposedPerRoadType.removeColumns("Congestion Index");
+		transposedPerRoadType.removeColumns("Cap. Utilization");
+		transposedPerRoadType = transposeTable(transposedPerRoadType);
+		transposedPerRoadType.write().csv(output.getPath("traffic_stats_by_road_type_daily.csv").toFile());
 
 		Table congestion = Table.create(
 			DoubleColumn.create("time"),
@@ -303,9 +328,9 @@ public class TrafficAnalysisDisaster implements MATSimAppCommand {
 			DoubleColumn.create("lane_km"),
 			DoubleColumn.create("speed_performance_index"),
 			DoubleColumn.create("congestion_index"),
-			DoubleColumn.create("avg_speed"),
+			DoubleColumn.create("Avg. speed limit"),
 			DoubleColumn.create("road_capacity_utilization"),
-			DoubleColumn.create("simulated_traffic_volume")
+			DoubleColumn.create("Simulated traffic volume")
 		);
 
 		// Somehow Expensive operation
@@ -334,12 +359,12 @@ public class TrafficAnalysisDisaster implements MATSimAppCommand {
 				row.setDouble("congestion_index", calc.getLinkCongestionIndex(link, startTime, endTime));
 
 				// as km/h
-				row.setDouble("avg_speed", calc.getAvgSpeed(link, startTime, endTime) * 3.6);
+				row.setDouble("Avg. speed limit", calc.getAvgSpeed(link, startTime, endTime) * 3.6);
 
 				double capacity = link.getCapacity() * sample.getSample();
 				row.setDouble("road_capacity_utilization", vol[h] / capacity);
 
-				row.setDouble("simulated_traffic_volume", vol[h] / sample.getSample());
+				row.setDouble("Simulated traffic volume", vol[h] / sample.getSample());
 
 				for (String mode : modes) {
 					row.setDouble("vol_" + mode, volumes.getVolumesPerHourForLink(link.getId(), mode)[h] / sample.getSample());

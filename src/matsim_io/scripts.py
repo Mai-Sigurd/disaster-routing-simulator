@@ -2,8 +2,11 @@ import logging
 from pathlib import Path
 from typing import Optional
 
+import geopandas as gpd
 import yaml
 
+from data_loader.population import POPULATION
+from input_data import PopulationType
 from matsim_io import MATSIM_DATA_DIR
 
 dashboard_count = 1
@@ -69,4 +72,51 @@ def append_breakpoints_to_congestion_map(output_dir: str) -> None:
     data = yaml.safe_load(file_path.read_text(encoding="utf-8"))
     xytime_plot = data["layout"]["congestion_map"][0]
     xytime_plot["breakpoints"] = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    file_path.write_text(yaml.dump(data, sort_keys=False), encoding="utf-8")
+
+
+def change_population_visuals_map(
+    output_dir: str,
+    danger_zone_population: gpd.GeoDataFrame,
+    population_type: PopulationType,
+) -> None:
+    """
+    Change the population visuals map in the dashboard file.
+    """
+    max_population = round(danger_zone_population[POPULATION].max())
+
+    file_path = MATSIM_DATA_DIR / output_dir / "dashboard-2.yaml"
+    data = yaml.safe_load(file_path.read_text(encoding="utf-8"))
+    population_map = data["layout"]["population"][0]
+    population_map["shapes"] = {
+        "file": "/analysis/population_data.geojson",
+        "join": "osm_id",
+    }
+    population_map["datasets"] = {}
+    if population_type == PopulationType.NUMBER:
+        breakpoints = ""
+        steps = 1
+    else:
+        steps = 5
+        breakpoints = f"{int(max_population * 0.2)}, {int(max_population * 0.4)}, {int(max_population * 0.6)}, {int(max_population * 0.8)}"
+
+    population_map["display"] = {
+        "fill": {
+            "dataset": "population_data.geojson",
+            "columnName": "population",
+            "join": "",
+            "colorRamp": {
+                "ramp": "Viridis",
+                "steps": steps,
+                "breakpoints": breakpoints,
+            },
+        },
+        "radius": {
+            "dataset": "population_data.geojson",
+            "columnName": "population",
+            "scaleFactor": 3,
+            "join": "",
+        },
+    }
+    population_map["backgroundLayers"] = {}
     file_path.write_text(yaml.dump(data, sort_keys=False), encoding="utf-8")

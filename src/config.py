@@ -42,6 +42,8 @@ class ProgramConfig:
     cars_per_person: float = 1
     route_algos: list[RouteAlgo] = field(default_factory=list)
     departure_end_time_sec: int = ONE_HOUR
+    diversifying_routes: int = 1
+    population_type: PopulationType = PopulationType.TIFF_FILE
 
 
 def set_dev_input_data() -> InputData:
@@ -55,6 +57,7 @@ def set_dev_input_data() -> InputData:
         pop_geo_json_filepath=CPH_POPULATION_DATA,
         cars_per_person=cars_per_person_cph,
         departure_end_time_sec=ONE_HOUR,
+        diversifying_routes=3,
     )
 
 
@@ -69,6 +72,7 @@ def set_amager_input_data() -> InputData:
         pop_geo_json_filepath=CPH_POPULATION_DATA,
         cars_per_person=cars_per_person_cph,
         departure_end_time_sec=ONE_HOUR,
+        diversifying_routes=3,
     )
 
 
@@ -83,6 +87,7 @@ def set_ravenna_input_data() -> InputData:
         pop_geo_json_filepath=RAVENNA_POPULATION_DATA,
         cars_per_person=cars_per_person_ravenna,
         departure_end_time_sec=ONE_HOUR,
+        diversifying_routes=1,
     )
 
 
@@ -97,4 +102,5 @@ def set_small_data_input_data() -> InputData:
         danger_zones_geopandas_json=load_json_file_to_str(CPH_SMALL_AMAGER_DANGER_ZONE),
         cars_per_person=1,
         departure_end_time_sec=ONE_HOUR,
+        diversifying_routes=3,
     )
