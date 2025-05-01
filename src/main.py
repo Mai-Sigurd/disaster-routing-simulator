@@ -33,6 +33,7 @@ from matsim_io import MATSIM_DATA_DIR, mat_sim_files_exist, write_network, write
 from matsim_io.dashboards import (
     SimulationResult,
     append_breakpoints_to_congestion_map,
+    change_departure_arrivals_bar_graph,
     change_population_visuals_map,
     create_comparison_dashboard,
     move_dashboard,
@@ -160,7 +161,10 @@ def run_simulation(conf: ProgramConfig, algorithm: RouteAlgo) -> str:
     logging.info("Creating SimWrapper dashboard...")
     save_analysis_files(conf, stats, output_dir)
     append_breakpoints_to_congestion_map(output_dir)
-    change_population_visuals_map(output_dir, conf.danger_zone_population_data, conf.population_type)
+    change_population_visuals_map(
+        output_dir, conf.danger_zone_population_data, conf.population_type
+    )
+    change_departure_arrivals_bar_graph(output_dir)
     move_dashboard(output_dir, algorithm.title)
 
     return output_dir

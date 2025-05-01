@@ -58,32 +58,7 @@ public class DisasterRoutingDashboard implements Dashboard {
     private static void createTripDataViz(Layout layout, String rowId, String tab) {
         layout.row(rowId, tab).el(Plotly.class, (viz, data) -> {
             viz.title = "Departures and Arrivals";
-            viz.description = "by 10-minute intervals";
-            viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-                    .xAxis(Axis.builder().title("Time from start of simulation (minutes)").build())
-                    .yAxis(Axis.builder().title("Trips").build())
-                    .barMode(tech.tablesaw.plotly.components.Layout.BarMode.GROUP)
-                    .build();
-
-            Plotly.DataSet dataset = viz.addDataset(data.compute(TripPurposeBy10Min.class, "trip_purposes_by_10_minutes.csv"));
-
-            viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
-                            .name("Departures")
-                            .marker(Marker.builder().color("#1f77b4").build())  // Blue color
-                            .build(),
-                    dataset.mapping()
-                            .x("bin")
-                            .y("departure")
-            );
-
-            viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
-                            .name("Arrivals")
-                            .marker(Marker.builder().color("#ff7f0e").build())  // Orange color
-                            .build(),
-                    dataset.mapping()
-                            .x("bin")
-                            .y("arrival")
-            );
+            // Will be overwritten in python project
         });
     }
 

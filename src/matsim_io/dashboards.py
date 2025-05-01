@@ -126,6 +126,54 @@ def change_population_visuals_map(
     file_path.write_text(yaml.dump(data, sort_keys=False), encoding="utf-8")
 
 
+def change_departure_arrivals_bar_graph(output_dir: str) -> None:
+    """
+    Change the departure and arrivals bar graph in the dashboard file.
+    """
+    file_path = MATSIM_DATA_DIR / output_dir / "dashboard-2.yaml"
+    data = yaml.safe_load(file_path.read_text(encoding="utf-8"))
+    bar_graph = data["layout"]["departure-arrival"][0]
+    bar_graph["title"] = "Departures and Arrivals"
+    bar_graph["description"] = "by 10-minute intervals"
+    bar_graph["datasets"] = {
+        "dataset": {
+            "file": "/analysis/analysis/trip_purposes_by_10_minutes.csv",
+        }
+    }
+    bar_graph["traces"] = [
+        {
+            "x": "$dataset.bin",
+            "y": "$dataset.arrival",
+            "orientation": "v",
+            "type": "bar",
+            "name": "Arrival",
+            "original_name": "Arrival",
+        },
+        {
+            "x": "$dataset.bin",
+            "y": "$dataset.departure",
+            "type": "bar",
+            "orientation": "v",
+            "name": "Departure",
+            "original_name": "Departure",
+        },
+    ]
+    bar_graph["colorRamp"] = "Viridis"
+    bar_graph["layout"] = {
+        "xaxis": {
+            "title": "Time from start of simulation (minutes)",
+            "color": "#444",
+            "type": "-",
+        },
+        "yaxis": {
+            "title": "Number of people",
+            "color": "#444",
+            "type": "-",
+        },
+    }
+    file_path.write_text(yaml.dump(data, sort_keys=False), encoding="utf-8")
+
+
 @dataclass
 class SimulationResult:
     output_dir: str
