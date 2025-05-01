@@ -182,12 +182,14 @@ class SimulationResult:
     @property
     def label(self) -> str:
         """Slugified title for use in file names and URLs."""
-        return slugify(self.title)
+        result: str = slugify(self.title)
+        return result
 
     @property
     def output_path(self) -> Path:
         """Path to the output directory."""
-        return MATSIM_DATA_DIR / self.output_dir
+        result: Path = MATSIM_DATA_DIR / self.output_dir
+        return result
 
     @property
     def people_in_safety_csv_path(self) -> Path:
