@@ -160,7 +160,7 @@ def run_simulation(conf: ProgramConfig, algorithm: RouteAlgo) -> str:
     logging.info("Creating SimWrapper dashboard...")
     save_analysis_files(conf, stats, output_dir)
     append_breakpoints_to_congestion_map(output_dir)
-    change_population_visuals_map(output_dir, conf.danger_zone_population_data)
+    change_population_visuals_map(output_dir, conf.danger_zone_population_data, conf.population_type)
     move_dashboard(output_dir, algorithm.title)
 
     return output_dir
