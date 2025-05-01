@@ -47,7 +47,7 @@ def route_to_safety_with_weight_func(
         except nx.NetworkXError:
             logging.error(f"Origin node {origin} is not in the graph")
             continue
-        start, final_routes = _shortest_path_origin_point(
+        start, final_routes = _path_origin_point(
             origin=origin,
             G=G,
             danger_zone=danger_zone,
@@ -123,7 +123,7 @@ def handle_final_routes(
 ) -> Tuple[RouteDict, dict[str, bool]]:
     routes[origin] = final_routes
 
-    if should_reuse_paths and len(final_routes) > 1:
+    if should_reuse_paths and len(final_routes) > 0:
         # Only one route
         final_route = final_routes[0]
         has_path_been_calculated[origin] = True
@@ -141,7 +141,7 @@ def handle_final_routes(
     return routes, has_path_been_calculated
 
 
-def _shortest_path_origin_point(
+def _path_origin_point(
     origin: str,
     G: nx.MultiDiGraph,
     danger_zone: gpd.GeoDataFrame,
