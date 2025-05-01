@@ -6,7 +6,6 @@ import org.disaster.routing.analysis.TripPurposeBy10Min;
 import org.disaster.routing.analysis.TripStatsDisaster;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.application.analysis.population.TripAnalysis;
-import org.matsim.application.analysis.traffic.TrafficAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
@@ -19,6 +18,7 @@ import org.matsim.simwrapper.viz.XYTime;
 
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.components.Line;
+import tech.tablesaw.plotly.components.Marker;
 import tech.tablesaw.plotly.traces.BarTrace;
 import tech.tablesaw.plotly.traces.ScatterTrace;
 
@@ -51,6 +51,38 @@ public class DisasterRoutingDashboard implements Dashboard {
                             .name("purpose", ColorScheme.Spectral)
                             .x("bin")
                             .y(metric)
+            );
+        });
+    }
+
+    private static void createTripDataViz(Layout layout, String rowId, String tab) {
+        layout.row(rowId, tab).el(Plotly.class, (viz, data) -> {
+            viz.title = "Departures and Arrivals";
+            viz.description = "by 10-minute intervals";
+            viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+                    .xAxis(Axis.builder().title("Time from start of simulation (minutes)").build())
+                    .yAxis(Axis.builder().title("Trips").build())
+                    .barMode(tech.tablesaw.plotly.components.Layout.BarMode.GROUP)
+                    .build();
+
+            Plotly.DataSet dataset = viz.addDataset(data.compute(TripPurposeBy10Min.class, "trip_purposes_by_10_minutes.csv"));
+
+            viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
+                            .name("Departures")
+                            .marker(Marker.builder().color("#1f77b4").build())  // Blue color
+                            .build(),
+                    dataset.mapping()
+                            .x("bin")
+                            .y("departure")
+            );
+
+            viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
+                            .name("Arrivals")
+                            .marker(Marker.builder().color("#ff7f0e").build())  // Orange color
+                            .build(),
+                    dataset.mapping()
+                            .x("bin")
+                            .y("arrival")
             );
         });
     }
@@ -88,8 +120,9 @@ public class DisasterRoutingDashboard implements Dashboard {
                     viz.title = "Population density"";
                 });
 
-        createTripDataRow(layout, "departures", header.tab, "Departures", "departure", "Time from start of simulation (minutes)");
-        createTripDataRow(layout, "arrivals", header.tab, "Arrivals", "arrival", "Time from start of simulation (minutes)");
+        // createTripDataRow(layout, "departures", header.tab, "Departures", "departure", "Time from start of simulation (minutes)");
+        // createTripDataRow(layout, "arrivals", header.tab, "Arrivals", "arrival", "Time from start of simulation (minutes)");
+        createTripDataViz(layout, "departure-arrival", header.tab);
         createTripDataRow(layout, "traveltype", header.tab, "Travel times", "traveltime", "Time from departure to arrival (minutes)");
 
 
