@@ -150,7 +150,7 @@ def run_simulation(conf: ProgramConfig, algorithm: RouteAlgo) -> str:
     :return: The name of the output directory where the simulation results are saved.
     """
     logging.info(f"Starting simulation with algorithm: {algorithm.title}")
-    output_dir: str = slugify(f"{algorithm.title}-output")
+    output_dir = slugify(f"{algorithm.title}-output")
 
     logging.info("Computing paths to safety...")
     stats = compute_and_save_matsim_paths(conf, algorithm)

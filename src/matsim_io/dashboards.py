@@ -185,8 +185,7 @@ class SimulationResult:
     @property
     def label(self) -> str:
         """Slugified title for use in file names and URLs."""
-        result: str = slugify(self.title)
-        return result
+        return slugify(self.title)
 
     @property
     def output_path(self) -> Path:
