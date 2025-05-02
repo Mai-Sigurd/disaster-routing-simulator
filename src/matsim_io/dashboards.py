@@ -301,6 +301,7 @@ def _add_people_in_safety_graph(results: list[SimulationResult]) -> list:  # typ
                 }
                 for result in results
             ],
+            "colorRamp": "RdYlBu",
             "layout": {
                 "xaxis": {
                     "title": "Time from start of simulation (minutes)",
@@ -435,6 +436,7 @@ def _create_congestion_index_comparison(results: list[SimulationResult]) -> dict
             }
             for r in results
         ],
+        "colorRamp": "RdYlBu",
         "layout": {
             "xaxis": {"title": "Hour of day", "color": "#444", "type": "-"},
             "yaxis": {"title": "Congestion index", "color": "#444", "type": "-"},
