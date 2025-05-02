@@ -167,7 +167,7 @@ def run_simulation(conf: ProgramConfig, algorithm: RouteAlgo) -> str:
     change_departure_arrivals_bar_graph(output_dir)
     copy_dashboard(output_dir, algorithm.title)
 
-    return output_dir
+    return str(output_dir)
 
 
 def main(args: argparse.Namespace) -> None:
