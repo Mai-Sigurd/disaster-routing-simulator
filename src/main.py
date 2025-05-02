@@ -35,8 +35,8 @@ from matsim_io.dashboards import (
     append_breakpoints_to_congestion_map,
     change_departure_arrivals_bar_graph,
     change_population_visuals_map,
+    copy_dashboard,
     create_comparison_dashboard,
-    move_dashboard,
 )
 from routes.route import create_route_objects
 from routes.route_algo import RouteAlgo
@@ -165,7 +165,7 @@ def run_simulation(conf: ProgramConfig, algorithm: RouteAlgo) -> str:
         output_dir, conf.danger_zone_population_data, conf.population_type
     )
     change_departure_arrivals_bar_graph(output_dir)
-    move_dashboard(output_dir, algorithm.title)
+    copy_dashboard(output_dir, algorithm.title)
 
     return output_dir
 
@@ -174,7 +174,7 @@ def main(args: argparse.Namespace) -> None:
     if args.matsim_only:
         if mat_sim_files_exist("plans.xml.gz", "network.xml.gz"):
             run_matsim("output")
-            move_dashboard("output")
+            copy_dashboard("output")
             run_simwrapper_serve(SimulationType.CASE_STUDIES, path=MATSIM_DATA_DIR)
         else:
             logging.fatal(

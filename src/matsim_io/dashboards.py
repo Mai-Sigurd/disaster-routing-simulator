@@ -1,4 +1,5 @@
 import logging
+import shutil
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
@@ -16,7 +17,7 @@ from matsim_io import MATSIM_DATA_DIR
 dashboard_count = 2
 
 
-def move_dashboard(output_dir: str, dashboard_title: Optional[str] = None) -> None:
+def copy_dashboard(output_dir: str, dashboard_title: Optional[str] = None) -> None:
     """
     Moves the dashboard-2.yaml file in the given MATSim subdirectory up to the MATSim data directory.
     :param output_dir: Name of the output directory in the MATSim data directory.
@@ -35,7 +36,7 @@ def move_dashboard(output_dir: str, dashboard_title: Optional[str] = None) -> No
         return
 
     dest_path = MATSIM_DATA_DIR / f"dashboard-{dashboard_count}.yaml"
-    dashboard_path.rename(dest_path)
+    shutil.copy(dashboard_path, dest_path)
     dashboard_count += 1
 
     _rewrite_dashboard_dataset_paths(dest_path, output_dir)
