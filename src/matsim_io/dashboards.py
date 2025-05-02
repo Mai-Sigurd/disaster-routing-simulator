@@ -203,7 +203,6 @@ class SimulationResult:
 
 
 def create_comparison_dashboard(results: list[SimulationResult]) -> None:
-    people_in_safety_csv_file = combine_csv_datasets(results)
 
     dashboard = {
         "header": {
@@ -211,7 +210,17 @@ def create_comparison_dashboard(results: list[SimulationResult]) -> None:
             "description": "Comparison of different algorithms for routing out of the danger zone.",
         },
         "layout": {
-            "people_in_safety": [
+            "people_in_safety": _add_people_in_safety_graph(results),
+
+        },
+    }
+
+    dashboard_path = MATSIM_DATA_DIR / "dashboard-1.yaml"
+    dashboard_path.write_text(yaml.dump(dashboard, sort_keys=False), encoding="utf-8")
+
+def _add_people_in_safety_graph(results: list[SimulationResult]) ->  list: # type: ignore[type-arg]
+    people_in_safety_csv_file = combine_csv_datasets(results)
+    people_in_safety =  [
                 {
                     "type": "plotly",
                     "title": "People in Safety",
@@ -224,8 +233,8 @@ def create_comparison_dashboard(results: list[SimulationResult]) -> None:
                             "type": "scatter",
                             "x": "$dataset.bin",
                             "y": f"$dataset.cumulative_traveltime_{result.label}",
-                            "name": "People in safety",
-                            "original_name": "People in safety",
+                            "name": f"{result.title}",
+                            "original_name": f"{result.title}",
                             "mode": "lines",
                             "line": {
                                 "width": 2,
@@ -257,12 +266,10 @@ def create_comparison_dashboard(results: list[SimulationResult]) -> None:
                         },
                     },
                 }
-            ],
-        },
-    }
+            ]
+    return people_in_safety
 
-    dashboard_path = MATSIM_DATA_DIR / "dashboard-1.yaml"
-    dashboard_path.write_text(yaml.dump(dashboard, sort_keys=False), encoding="utf-8")
+
 
 
 def combine_csv_datasets(results: list[SimulationResult]) -> str:
