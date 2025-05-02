@@ -2,7 +2,7 @@ import logging
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 import geopandas as gpd
 import pandas as pd
@@ -266,7 +266,9 @@ def create_comparison_dashboard(results: list[SimulationResult]) -> None:
     dashboard_path.write_text(yaml.dump(dashboard, sort_keys=False), encoding="utf-8")
 
 
-def _add_people_in_safety_graph(results: list[SimulationResult]) -> list:  # type: ignore[type-arg]
+def _add_people_in_safety_graph(
+    results: list[SimulationResult],
+) -> list[dict[str, Any]]:
     people_in_safety_csv_file = combine_csv_datasets(results)
     people_in_safety = [
         {
@@ -327,18 +329,7 @@ def create_bar_graph_mode_share(
     description: str = "by 10-minute intervals",
     yaxis_title: str = "Number of people",
     xaxis_title: str = "Time from start of simulation (minutes)",
-) -> list:  # type: ignore[type-arg]
-    datasets = {}
-    for result in results:
-        datasets[result.label] = {
-            "file": result.mode_share_csv_path,
-            "aggregate": {
-                "func": "SUM",
-                "groupBy": ["dist_group"],
-                "target": "share",
-            },
-        }
-
+) -> list[dict[str, Any]]:
     return _create_bar_graph(
         results=results,
         y=y,
@@ -347,7 +338,17 @@ def create_bar_graph_mode_share(
         description=description,
         yaxis_title=yaxis_title,
         xaxis_title=xaxis_title,
-        datasets=datasets,
+        datasets={
+            r.label: {
+                "file": r.mode_share_csv_path,
+                "aggregate": {
+                    "func": "SUM",
+                    "groupBy": ["dist_group"],
+                    "target": "share",
+                },
+            }
+            for r in results
+        },
     )
 
 
@@ -359,10 +360,7 @@ def create_bar_graph_trip_purpose(
     description: str = "by 10-minute intervals",
     yaxis_title: str = "Number of people",
     xaxis_title: str = "Time from start of simulation (minutes)",
-) -> list:  # type: ignore[type-arg]
-    datasets = {}
-    for result in results:
-        datasets[result.label] = result.trip_purposes_by_10_minutes_csv_path
+) -> list[dict[str, Any]]:
     return _create_bar_graph(
         results=results,
         y=y,
@@ -371,7 +369,7 @@ def create_bar_graph_trip_purpose(
         description=description,
         yaxis_title=yaxis_title,
         xaxis_title=xaxis_title,
-        datasets=datasets,
+        datasets={r.label: r.trip_purposes_by_10_minutes_csv_path for r in results},
     )
 
 
@@ -383,9 +381,9 @@ def _create_bar_graph(
     description: str,
     yaxis_title: str,
     xaxis_title: str,
-    datasets: dict,  # type: ignore[type-arg]
-) -> list:  # type: ignore[type-arg]
-    bar_graph = [
+    datasets: dict[str, Any],
+) -> list[dict[str, Any]]:
+    return [
         {
             "type": "plotly",
             "title": title,
@@ -417,10 +415,11 @@ def _create_bar_graph(
             },
         }
     ]
-    return bar_graph
 
 
-def _create_congestion_index_comparison(results: list[SimulationResult]) -> dict:  # type: ignore[type-arg]
+def _create_congestion_index_comparison(
+    results: list[SimulationResult],
+) -> dict[str, Any]:
     """Create a comparison of the congestion index by hour for different simulation results."""
     return {
         "type": "plotly",
