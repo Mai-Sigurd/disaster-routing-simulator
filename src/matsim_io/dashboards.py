@@ -196,6 +196,11 @@ class SimulationResult:
         """Path to the "people_in_safety" analysis file."""
         return self.output_path / "analysis" / "analysis" / "people_in_safety.csv"
 
+    @property
+    def trip_purposes_by_10_minutes_csv_path(self) -> Path:
+        """Path to the "trip_purposes_by_10_minutes" analysis file."""
+        return self.output_path / "analysis" / "analysis" / "trip_purposes_by_10_minutes.csv"
+
 
 def create_comparison_dashboard(results: list[SimulationResult]) -> None:
     people_in_safety_csv_file = combine_csv_datasets(results)
