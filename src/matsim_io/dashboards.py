@@ -197,13 +197,12 @@ class SimulationResult:
         return self.output_path / "analysis" / "analysis" / "people_in_safety.csv"
 
     @property
-    def trip_purposes_by_10_minutes_csv_path(self) -> Path:
+    def trip_purposes_by_10_minutes_csv_path(self) -> str:
         """Path to the "trip_purposes_by_10_minutes" analysis file."""
-        return self.output_path / "analysis" / "analysis" / "trip_purposes_by_10_minutes.csv"
+        return f"{self.output_dir}/analysis/analysis/trip_purposes_by_10_minutes.csv"
 
 
 def create_comparison_dashboard(results: list[SimulationResult]) -> None:
-
     dashboard = {
         "header": {
             "title": "Comparison of different algorithms",
@@ -211,65 +210,119 @@ def create_comparison_dashboard(results: list[SimulationResult]) -> None:
         },
         "layout": {
             "people_in_safety": _add_people_in_safety_graph(results),
-
+            "departures": create_bar_graph_trip_purpose(
+                results, "departure", "Departures"
+            ),
+            "arrivals": create_bar_graph_trip_purpose(results, "arrival", "Arrivals"),
+            "travel_time": create_bar_graph_trip_purpose(
+                results,
+                "traveltime",
+                "Travel Time",
+                yaxis_title="Trips",
+                xaxis_title="Time from departure to arrival (minutes)",
+            ),
         },
     }
 
     dashboard_path = MATSIM_DATA_DIR / "dashboard-1.yaml"
     dashboard_path.write_text(yaml.dump(dashboard, sort_keys=False), encoding="utf-8")
 
-def _add_people_in_safety_graph(results: list[SimulationResult]) ->  list: # type: ignore[type-arg]
+
+def _add_people_in_safety_graph(results: list[SimulationResult]) -> list:  # type: ignore[type-arg]
     people_in_safety_csv_file = combine_csv_datasets(results)
-    people_in_safety =  [
+    people_in_safety = [
+        {
+            "type": "plotly",
+            "title": "People in Safety",
+            "description": "Fraction of people in safety over time.",
+            "datasets": {
+                "dataset": people_in_safety_csv_file,
+            },
+            "traces": [
                 {
-                    "type": "plotly",
-                    "title": "People in Safety",
-                    "description": "Fraction of people in safety over time.",
-                    "datasets": {
-                        "dataset": people_in_safety_csv_file,
-                    },
-                    "traces": [
-                        {
-                            "type": "scatter",
-                            "x": "$dataset.bin",
-                            "y": f"$dataset.cumulative_traveltime_{result.label}",
-                            "name": f"{result.title}",
-                            "original_name": f"{result.title}",
-                            "mode": "lines",
-                            "line": {
-                                "width": 2,
-                                "smoothing": 1,
-                                "shape": "spline",
-                                "dash": "solid",
-                                "simplify": True,
-                                "context": {
-                                    "width": 2,
-                                    "smoothing": 1,
-                                    "shape": "spline",
-                                    "dash": "solid",
-                                    "simplify": True,
-                                },
-                            },
-                        }
-                        for result in results
-                    ],
-                    "layout": {
-                        "xaxis": {
-                            "title": "Time from start of simulation (minutes)",
-                            "color": "#444",
-                            "type": "-",
-                        },
-                        "yaxis": {
-                            "title": "Fraction of people in safety",
-                            "color": "#444",
-                            "type": "-",
+                    "type": "scatter",
+                    "x": "$dataset.bin",
+                    "y": f"$dataset.cumulative_traveltime_{result.label}",
+                    "name": f"{result.title}",
+                    "original_name": f"{result.title}",
+                    "mode": "lines",
+                    "line": {
+                        "width": 2,
+                        "smoothing": 1,
+                        "shape": "spline",
+                        "dash": "solid",
+                        "simplify": True,
+                        "context": {
+                            "width": 2,
+                            "smoothing": 1,
+                            "shape": "spline",
+                            "dash": "solid",
+                            "simplify": True,
                         },
                     },
                 }
-            ]
+                for result in results
+            ],
+            "layout": {
+                "xaxis": {
+                    "title": "Time from start of simulation (minutes)",
+                    "color": "#444",
+                    "type": "-",
+                },
+                "yaxis": {
+                    "title": "Fraction of people in safety",
+                    "color": "#444",
+                    "type": "-",
+                },
+            },
+        }
+    ]
     return people_in_safety
 
 
+def create_bar_graph_trip_purpose(
+    results: list[SimulationResult],
+    column_name: str,
+    title: str,
+    yaxis_title: str = "Number of people",
+    xaxis_title: str = "Time from start of simulation (minutes)",
+) -> list:  # type: ignore[type-arg]
+    datasets = {}
+    for result in results:
+        datasets[result.label] = result.trip_purposes_by_10_minutes_csv_path
+    bar_graph = [
+        {
+            "type": "plotly",
+            "title": title,
+            "description": "by 10-minute intervals",
+            "datasets": datasets,
+            "traces": [
+                {
+                    "x": f"${result.label}.bin",
+                    "y": f"${result.label}.{column_name}",
+                    "orientation": "v",
+                    "type": "bar",
+                    "name": result.title,
+                    "original_name": result.title,
+                }
+                for result in results
+            ],
+            "colorRamp": "RdYlBu",
+            "layout": {
+                "xaxis": {
+                    "title": xaxis_title,
+                    "color": "#444",
+                    "type": "-",
+                },
+                "yaxis": {
+                    "title": f"{yaxis_title}",
+                    "color": "#444",
+                    "type": "-",
+                },
+            },
+        }
+    ]
+    return bar_graph
 
 
 def combine_csv_datasets(results: list[SimulationResult]) -> str:
