@@ -1,4 +1,6 @@
 import pickle
+import sys
+import traceback
 from enum import Enum
 
 import networkx as nx
@@ -39,55 +41,59 @@ def polaris_paths(
 
 if __name__ == "__main__":
     scenarios = [
-        ("copenhagen", set_amager_input_data()),
         ("ravenna", set_ravenna_input_data()),
+        ("copenhagen", set_amager_input_data()),
     ]
 
     for city, input_data in scenarios:
-        print(f"Running Polaris for {city.title()}")
-        conf = controller_input_data(input_data)
+        try:
+            print(f"Running Polaris for {city.title()}")
+            conf = controller_input_data(input_data)
 
-        print("Reading SUMO network")
-        net = read_sumo_road_network(f"{city}.net.xml.gz")
-        graph = from_sumo_to_igraph_network(net)
+            print("Reading SUMO network")
+            net = read_sumo_road_network(f"{city}.net.xml.gz")
+            graph = from_sumo_to_igraph_network(net)
 
-        print("Computing routes")
-        paths = conf.route_algos[0].route_to_safety(
-            conf.origin_points, conf.danger_zones, conf.G
-        )
-        routes = create_route_objects(
-            list_of_paths=paths,
-            population_data=conf.danger_zone_population_data,
-            start=0,
-            end=conf.departure_end_time_sec,
-            cars_per_person=conf.cars_per_person,
-        )
+            print("Computing routes")
+            paths = conf.route_algos[0].route_to_safety(
+                conf.origin_points, conf.danger_zones, conf.G
+            )
+            routes = create_route_objects(
+                origin_to_paths=paths,
+                population_data=conf.danger_zone_population_data,
+                start=0,
+                end=conf.departure_end_time_sec,
+                cars_per_person=conf.cars_per_person,
+            )
 
-        def first_outgoing_edge(node_id: str) -> Edge:
-            node = net.getNode(str(node_id))
-            edges = node.getOutgoing()
-            return edges[0].getID()
+            def first_outgoing_edge(node_id: str) -> Edge:
+                node = net.getNode(str(node_id))
+                edges = node.getOutgoing()
+                return edges[0].getID()
 
-        def last_incoming_edge(node_id: str) -> Edge:
-            node = net.getNode(str(node_id))
-            edges = node.getIncoming()
-            return edges[-1].getID()
+            def last_incoming_edge(node_id: str) -> Edge:
+                node = net.getNode(str(node_id))
+                edges = node.getIncoming()
+                return edges[-1].getID()
 
-        node_pairs = [
-            (r.path[0], r.path[-1])
-            for r in routes
-            for _ in range(r.num_people_on_route)
-        ]
-        edge_pairs = [
-            (first_outgoing_edge(from_node), last_incoming_edge(to_node))
-            for from_node, to_node in node_pairs
-        ]
+            node_pairs = [
+                (r.path[0], r.path[-1])
+                for r in routes
+                for _ in range(r.num_people_on_route)
+            ]
+            edge_pairs = [
+                (first_outgoing_edge(from_node), last_incoming_edge(to_node))
+                for from_node, to_node in node_pairs
+            ]
 
-        print("Running Polaris")
-        result_paths = polaris_paths(edge_pairs, graph, Weight.TRAVEL_TIME)
+            print("Running Polaris")
+            result_paths = polaris_paths(edge_pairs, graph, Weight.TRAVEL_TIME)
 
-        print("Saving results")
-        with open(f"{city}_igraph.pkl", "wb") as f:
-            pickle.dump(graph, f)
-        with open(f"{city}_polaris_paths.pkl", "wb") as f:
-            pickle.dump(result_paths, f)
+            print("Saving results")
+            with open(f"{city}_igraph.pkl", "wb") as f:
+                pickle.dump(graph, f)
+            with open(f"{city}_polaris_paths.pkl", "wb") as f:
+                pickle.dump(result_paths, f)
+        except Exception as e:
+            traceback.print_exc()
+            print(f"Error processing {city}: {e}", file=sys.stderr)
