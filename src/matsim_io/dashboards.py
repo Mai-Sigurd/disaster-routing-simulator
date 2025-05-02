@@ -204,6 +204,11 @@ class SimulationResult:
         return f"{self.output_dir}/analysis/analysis/trip_purposes_by_10_minutes.csv"
 
     @property
+    def traffic_stats_csv_path(self) -> str:
+        """Path to the traffic statistics analysis file."""
+        return f"{self.output_dir}/analysis/analysis/traffic_stats_by_road_type_and_hour.csv"
+
+    @property
     def mode_share_csv_path(self) -> str:
         """Path to the "mode_share" analysis file."""
         return f"{self.output_dir}/analysis/population/mode_share.csv"
@@ -217,6 +222,7 @@ def create_comparison_dashboard(results: list[SimulationResult]) -> None:
         },
         "layout": {
             "people_in_safety": _add_people_in_safety_graph(results),
+            "congestion_index_by_hour": _create_congestion_index_comparison(results),
             "Trip_distance_distribution": create_bar_graph_mode_share(
                 results=results,
                 y="share",
@@ -411,6 +417,29 @@ def _create_bar_graph(
         }
     ]
     return bar_graph
+
+
+def _create_congestion_index_comparison(results: list[SimulationResult]) -> dict:  # type: ignore[type-arg]
+    """Create a comparison of the congestion index by hour for different simulation results."""
+    return {
+        "type": "plotly",
+        "title": "Network congestion index",
+        "description": "by hour",
+        "datasets": {r.label: r.traffic_stats_csv_path for r in results},
+        "traces": [
+            {
+                "x": f"${r.label}.hour",
+                "y": f"${r.label}.congestion_index",
+                "type": "scatter",
+                "name": r.title,
+            }
+            for r in results
+        ],
+        "layout": {
+            "xaxis": {"title": "Hour of day", "color": "#444", "type": "-"},
+            "yaxis": {"title": "Congestion index", "color": "#444", "type": "-"},
+        },
+    }
 
 
 def combine_csv_datasets(results: list[SimulationResult]) -> str:
