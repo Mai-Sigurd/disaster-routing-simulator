@@ -178,7 +178,9 @@ def change_departure_arrivals_bar_graph(output_dir: str) -> None:
 @dataclass
 class SimulationResult:
     output_dir: str
+    """Name of the output directory of the simulation in the MATSim data directory."""
     title: str
+    """Title of the simulation, used for display purposes."""
 
     @property
     def label(self) -> str:
