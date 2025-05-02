@@ -201,6 +201,11 @@ class SimulationResult:
         """Path to the "trip_purposes_by_10_minutes" analysis file."""
         return f"{self.output_dir}/analysis/analysis/trip_purposes_by_10_minutes.csv"
 
+    @property
+    def mode_share_csv_path(self) -> str:
+        """Path to the "mode_share" analysis file."""
+        return f"{self.output_dir}/analysis/population/mode_share.csv"
+
 
 def create_comparison_dashboard(results: list[SimulationResult]) -> None:
     dashboard = {
@@ -210,14 +215,39 @@ def create_comparison_dashboard(results: list[SimulationResult]) -> None:
         },
         "layout": {
             "people_in_safety": _add_people_in_safety_graph(results),
-            "departures": create_bar_graph_trip_purpose(
-                results, "departure", "Departures"
+            "Trip_distance_distribution": create_bar_graph_mode_share(
+                results=results,
+                y="share",
+                x="dist_group",
+                title="Trip Distance Distribution",
+                description="",
+                yaxis_title="Proportion",
+                xaxis_title="Meters",
             ),
-            "arrivals": create_bar_graph_trip_purpose(results, "arrival", "Arrivals"),
+            "departures": create_bar_graph_trip_purpose(
+                results=results,
+                y="departure",
+                x="bin",
+                title="Departures",
+                description="by 10-minute intervals",
+                yaxis_title="Number of people",
+                xaxis_title="Time from start of simulation (minutes)",
+            ),
+            "arrivals": create_bar_graph_trip_purpose(
+                results=results,
+                y="arrival",
+                x="bin",
+                title="Arrivals",
+                description="by 10-minute intervals",
+                yaxis_title="Number of people",
+                xaxis_title="Time from start of simulation (minutes)",
+            ),
             "travel_time": create_bar_graph_trip_purpose(
                 results,
-                "traveltime",
-                "Travel Time",
+                y="traveltime",
+                x="bin",
+                title="Travel Time",
+                description="by 10-minute intervals",
                 yaxis_title="Trips",
                 xaxis_title="Time from departure to arrival (minutes)",
             ),
@@ -280,26 +310,82 @@ def _add_people_in_safety_graph(results: list[SimulationResult]) -> list:  # typ
     return people_in_safety
 
 
+def create_bar_graph_mode_share(
+    results: list[SimulationResult],
+    y: str,
+    x: str,
+    title: str,
+    description: str = "by 10-minute intervals",
+    yaxis_title: str = "Number of people",
+    xaxis_title: str = "Time from start of simulation (minutes)",
+) -> list:  # type: ignore[type-arg]
+    datasets = {}
+    for result in results:
+        datasets[result.label] = {
+            "file": result.mode_share_csv_path,
+            "aggregate": {
+                "func": "SUM",
+                "groupBy": ["dist_group"],
+                "target": "share",
+            },
+        }
+
+    return _create_bar_graph(
+        results=results,
+        y=y,
+        title=title,
+        x=x,
+        description=description,
+        yaxis_title=yaxis_title,
+        xaxis_title=xaxis_title,
+        datasets=datasets,
+    )
+
+
 def create_bar_graph_trip_purpose(
     results: list[SimulationResult],
-    column_name: str,
+    y: str,
+    x: str,
     title: str,
+    description: str = "by 10-minute intervals",
     yaxis_title: str = "Number of people",
     xaxis_title: str = "Time from start of simulation (minutes)",
 ) -> list:  # type: ignore[type-arg]
     datasets = {}
     for result in results:
         datasets[result.label] = result.trip_purposes_by_10_minutes_csv_path
+    return _create_bar_graph(
+        results=results,
+        y=y,
+        title=title,
+        x=x,
+        description=description,
+        yaxis_title=yaxis_title,
+        xaxis_title=xaxis_title,
+        datasets=datasets,
+    )
+
+
+def _create_bar_graph(
+    results: list[SimulationResult],
+    y: str,
+    title: str,
+    x: str,
+    description: str,
+    yaxis_title: str,
+    xaxis_title: str,
+    datasets: dict,  # type: ignore[type-arg]
+) -> list:  # type: ignore[type-arg]
     bar_graph = [
         {
             "type": "plotly",
             "title": title,
-            "description": "by 10-minute intervals",
+            "description": description,
             "datasets": datasets,
             "traces": [
                 {
-                    "x": f"${result.label}.bin",
-                    "y": f"${result.label}.{column_name}",
+                    "x": f"${result.label}.{x}",
+                    "y": f"${result.label}.{y}",
                     "orientation": "v",
                     "type": "bar",
                     "name": result.title,
