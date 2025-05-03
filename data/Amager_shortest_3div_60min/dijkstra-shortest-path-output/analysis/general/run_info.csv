@@ -1,0 +1,10 @@
+info,value
+JVM,"23.0.2; Homebrew; mixed mode, sharing; 64-bit"
+OS,Mac OS X; 15.4.1; aarch64
+CPU cores,10
+max. Memory,4096.0MB (4294967296B)
+MATSim-Build,r506e4627b8c449a7ddf920da67730ffff405dab4 ({2025-03-17 02:11:05})
+Command,"org.codehaus.plexus.classworlds.launcher.Launcher exec:java -Dexec.mainClass=org.disaster.routing.Main -Dexec.args=""dijkstra-shortest-path-output"""
+Start,2025-05-03 13:43:39
+End,2025-05-03 13:44:08
+Duration,29 seconds
