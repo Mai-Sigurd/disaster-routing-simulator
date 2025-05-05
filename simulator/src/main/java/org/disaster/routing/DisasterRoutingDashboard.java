@@ -150,7 +150,7 @@ public class DisasterRoutingDashboard implements Dashboard {
 
             viz.display.lineWidth.dataset = "traffic";
             viz.display.lineWidth.columnName = "Simulated traffic volume";
-            viz.display.lineWidth.scaleFactor = 10d;
+            viz.display.lineWidth.scaleFactor = 1250d;
             viz.display.lineWidth.join = "link_id";
 
             viz.height = 12d;
