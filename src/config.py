@@ -13,8 +13,7 @@ from routes.shortest_path import ShortestPath
 SOURCE_DIR = Path(__file__).parent.parent
 DATA_DIR = SOURCE_DIR / "data"
 EXPLORE_OUTPUT_FOLDER = DATA_DIR / "matsim"
-# TODO: Change this to a different folder for case studies
-CASE_STUDIES_OUTPUT_FOLDER = EXPLORE_OUTPUT_FOLDER
+CASE_STUDIES_OUTPUT_FOLDER = DATA_DIR / "matsim" / "case_studies"
 
 CPH_G_GRAPHML = "copenhagen.graphml"
 CPH_XTRA_SMALL_AMAGER_DANGER_ZONE = "dangerzone_lillebitteamager.geojson"
