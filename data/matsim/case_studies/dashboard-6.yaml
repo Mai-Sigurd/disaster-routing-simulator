@@ -1,0 +1,215 @@
+header:
+  title: Comparison of different algorithms
+  description: Comparison of different algorithms for routing out of the danger zone.
+layout:
+  people_in_safety:
+    - type: plotly
+      title: People in Safety
+      description: Fraction of people in safety over time.
+      datasets:
+        dataset: ravenna-analysis/people_in_safety.csv
+      traces:
+        - type: scatter
+          x: $dataset.bin
+          y: $dataset.cumulative_traveltime_fastest-ravenna-3
+          name: Ravenna - Fastest (3)
+          original_name: Ravenna - Fastest (3)
+          mode: lines
+          line:
+            width: 2
+            smoothing: 1
+            shape: spline
+            dash: solid
+            simplify: true
+            context:
+              width: 2
+              smoothing: 1
+              shape: spline
+              dash: solid
+              simplify: true
+        - type: scatter
+          x: $dataset.bin
+          y: $dataset.cumulative_traveltime_shortest-ravenna-3
+          name: Ravenna - Shortest (3)
+          original_name: Ravenna - Shortest (3)
+          mode: lines
+          line:
+            width: 2
+            smoothing: 1
+            shape: spline
+            dash: solid
+            simplify: true
+            context:
+              width: 2
+              smoothing: 1
+              shape: spline
+              dash: solid
+              simplify: true
+      colorRamp: RdYlBu
+      layout:
+        xaxis:
+          title: Time from start of simulation (minutes)
+          color: '#444'
+          type: '-'
+        yaxis:
+          title: Fraction of people in safety
+          color: '#444'
+          type: '-'
+  congestion_index_by_hour:
+    type: plotly
+    title: Network congestion index
+    description: by hour
+    datasets:
+      ravenna-fastest-3: ravenna-fastest-3-output/analysis/analysis/traffic_stats_by_road_type_and_hour.csv
+      ravenna-shortest-3: ravenna-shortest-3-output/analysis/analysis/traffic_stats_by_road_type_and_hour.csv
+    traces:
+      - x: $ravenna-fastest-3.hour
+        y: $ravenna-fastest-3.congestion_index
+        type: scatter
+        name: Ravenna - Fastest (3)
+      - x: $ravenna-shortest-3.hour
+        y: $ravenna-shortest-3.congestion_index
+        type: scatter
+        name: Ravenna - Shortest (3)
+    colorRamp: RdYlBu
+    layout:
+      xaxis:
+        title: Hour of day
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Congestion index
+        color: '#444'
+        type: '-'
+  Trip_distance_distribution:
+    - type: plotly
+      title: Trip Distance Distribution
+      description: ''
+      datasets:
+        ravenna-fastest-3:
+          file: ravenna-fastest-3-output/analysis/population/mode_share.csv
+          aggregate:
+            func: SUM
+            groupBy:
+              - dist_group
+            target: share
+        ravenna-shortest-3:
+          file: ravenna-shortest-3-output/analysis/population/mode_share.csv
+          aggregate:
+            func: SUM
+            groupBy:
+              - dist_group
+            target: share
+      traces:
+        - x: $ravenna-fastest-3.dist_group
+          y: $ravenna-fastest-3.share
+          orientation: v
+          type: bar
+          name: Ravenna - Fastest (3)
+          original_name: Ravenna - Fastest (3)
+        - x: $ravenna-shortest-3.dist_group
+          y: $ravenna-shortest-3.share
+          orientation: v
+          type: bar
+          name: Ravenna - Shortest (3)
+          original_name: Ravenna - Shortest (3)
+      colorRamp: RdYlBu
+      layout:
+        xaxis:
+          title: Meters
+          color: '#444'
+          type: '-'
+        yaxis:
+          title: Proportion
+          color: '#444'
+          type: '-'
+  departures:
+    - type: plotly
+      title: Departures
+      description: by 10-minute intervals
+      datasets:
+        ravenna-fastest-3: ravenna-fastest-3-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+        ravenna-shortest-3: ravenna-shortest-3-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      traces:
+        - x: $ravenna-fastest-3.bin
+          y: $ravenna-fastest-3.departure
+          orientation: v
+          type: bar
+          name: Ravenna - Fastest (3)
+          original_name: Ravenna - Fastest (3)
+        - x: $ravenna-shortest-3.bin
+          y: $ravenna-shortest-3.departure
+          orientation: v
+          type: bar
+          name: Ravenna - Shortest (3)
+          original_name: Ravenna - Shortest (3)
+      colorRamp: RdYlBu
+      layout:
+        xaxis:
+          title: Time from start of simulation (minutes)
+          color: '#444'
+          type: '-'
+        yaxis:
+          title: Number of people
+          color: '#444'
+          type: '-'
+  arrivals:
+    - type: plotly
+      title: Arrivals
+      description: by 10-minute intervals
+      datasets:
+        ravenna-fastest-3: ravenna-fastest-3-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+        ravenna-shortest-3: ravenna-shortest-3-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      traces:
+        - x: $ravenna-fastest-3.bin
+          y: $ravenna-fastest-3.arrival
+          orientation: v
+          type: bar
+          name: Ravenna - Fastest (3)
+          original_name: Ravenna - Fastest (3)
+        - x: $ravenna-shortest-3.bin
+          y: $ravenna-shortest-3.arrival
+          orientation: v
+          type: bar
+          name: Ravenna - Shortest (3)
+          original_name: Ravenna - Shortest (3)
+      colorRamp: RdYlBu
+      layout:
+        xaxis:
+          title: Time from start of simulation (minutes)
+          color: '#444'
+          type: '-'
+        yaxis:
+          title: Number of people
+          color: '#444'
+          type: '-'
+  travel_time:
+    - type: plotly
+      title: Travel Time
+      description: by 10-minute intervals
+      datasets:
+        ravenna-fastest-3: ravenna-fastest-3-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+        ravenna-shortest-3: ravenna-shortest-3-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      traces:
+        - x: $ravenna-fastest-3.bin
+          y: $ravenna-fastest-3.traveltime
+          orientation: v
+          type: bar
+          name: Ravenna - Fastest (3)
+          original_name: Ravenna - Fastest (3)
+        - x: $ravenna-shortest-3.bin
+          y: $ravenna-shortest-3.traveltime
+          orientation: v
+          type: bar
+          name: Ravenna - Shortest (3)
+          original_name: Ravenna - Shortest (3)
+      colorRamp: RdYlBu
+      layout:
+        xaxis:
+          title: Time from departure to arrival (minutes)
+          color: '#444'
+          type: '-'
+        yaxis:
+          title: Trips
+          color: '#444'
+          type: '-'

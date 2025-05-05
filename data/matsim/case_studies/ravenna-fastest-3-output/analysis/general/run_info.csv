@@ -1,0 +1,10 @@
+info,value
+JVM,"23.0.2; Homebrew; mixed mode, sharing; 64-bit"
+OS,Mac OS X; 15.3.2; aarch64
+CPU cores,8
+max. Memory,4096.0MB (4294967296B)
+MATSim-Build,r506e4627b8c449a7ddf920da67730ffff405dab4 ({2025-03-17 02:11:05})
+Command,"org.codehaus.plexus.classworlds.launcher.Launcher exec:java -Dexec.mainClass=org.disaster.routing.Main -Dexec.args=""fastest-ravenna-3-output"""
+Start,2025-05-05 03:48:57
+End,2025-05-05 03:49:22
+Duration,25 seconds

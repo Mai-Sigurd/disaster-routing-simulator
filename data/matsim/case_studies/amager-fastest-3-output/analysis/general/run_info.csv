@@ -1,0 +1,10 @@
+info,value
+JVM,"23.0.1; Oracle Corporation; mixed mode, sharing; 64-bit"
+OS,Windows 11; 10.0; amd64
+CPU cores,24
+max. Memory,8148.0MB (8543797248B)
+MATSim-Build,r506e4627b8c449a7ddf920da67730ffff405dab4 ({2025-03-17 02:11:05})
+Command,"org.codehaus.plexus.classworlds.launcher.Launcher exec:java -Dexec.mainClass=org.disaster.routing.Main -Dexec.args=""fastest-3-output"""
+Start,2025-05-04 15:45:21
+End,2025-05-04 15:45:39
+Duration,18 seconds

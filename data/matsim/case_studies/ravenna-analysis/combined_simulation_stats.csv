@@ -1,0 +1,6 @@
+Info, Value_x, Value_y
+Danger Zone Area (km²),18.61,18.61
+Departure time window length [minutes],60.0,60.0
+Total lane km,458.19,458.19
+Amount of routes,3932.0,3932.0
+Amount of nodes with no route to safety,-2303.0,-2303.0

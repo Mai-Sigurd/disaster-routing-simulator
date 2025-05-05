@@ -1,0 +1,329 @@
+header:
+  title: Comparison of different algorithms
+  description: Comparison of different algorithms for routing out of the danger zone.
+layout:
+  people_in_safety:
+    - type: plotly
+      title: People in Safety
+      description: Fraction of people in safety over time.
+      datasets:
+        dataset: analysis/people_in_safety.csv
+      traces:
+        - type: scatter
+          x: $dataset.bin
+          y: $dataset.cumulative_traveltime_amager-fastest-1
+          name: Amager - Fastest (1)
+          original_name: Amager - Fastest (1)
+          mode: lines
+          line:
+            width: 2
+            smoothing: 1
+            shape: spline
+            dash: solid
+            simplify: true
+            context:
+              width: 2
+              smoothing: 1
+              shape: spline
+              dash: solid
+              simplify: true
+        - type: scatter
+          x: $dataset.bin
+          y: $dataset.cumulative_traveltime_amager-fastest-3
+          name: Amager - Fastest (3)
+          original_name: Amager - Fastest (3)
+          mode: lines
+          line:
+            width: 2
+            smoothing: 1
+            shape: spline
+            dash: solid
+            simplify: true
+            context:
+              width: 2
+              smoothing: 1
+              shape: spline
+              dash: solid
+              simplify: true
+        - type: scatter
+          x: $dataset.bin
+          y: $dataset.cumulative_traveltime_amager-shortest-1
+          name: Amager - Shortest (1)
+          original_name: Amager - Shortest (1)
+          mode: lines
+          line:
+            width: 2
+            smoothing: 1
+            shape: spline
+            dash: solid
+            simplify: true
+            context:
+              width: 2
+              smoothing: 1
+              shape: spline
+              dash: solid
+              simplify: true
+        - type: scatter
+          x: $dataset.bin
+          y: $dataset.cumulative_traveltime_amager-shortest-3
+          name: Amager - Shortest (3)
+          original_name: Amager - Shortest (3)
+          mode: lines
+          line:
+            width: 2
+            smoothing: 1
+            shape: spline
+            dash: solid
+            simplify: true
+            context:
+              width: 2
+              smoothing: 1
+              shape: spline
+              dash: solid
+              simplify: true
+      colorRamp: RdYlBu
+      layout:
+        xaxis:
+          title: Time from start of simulation (minutes)
+          color: '#444'
+          type: '-'
+        yaxis:
+          title: Fraction of people in safety
+          color: '#444'
+          type: '-'
+  congestion_index_by_hour:
+    type: plotly
+    title: Network congestion index
+    description: by hour
+    datasets:
+      amager-fastest-1: amager-fastest-1-output/analysis/analysis/traffic_stats_by_road_type_and_hour.csv
+      amager-fastest-3: amager-fastest-3-output/analysis/analysis/traffic_stats_by_road_type_and_hour.csv
+      amager-shortest-1: amager-shortest-1-output/analysis/analysis/traffic_stats_by_road_type_and_hour.csv
+      amager-shortest-3: amager-shortest-3-output/analysis/analysis/traffic_stats_by_road_type_and_hour.csv
+    traces:
+      - x: $amager-fastest-1.hour
+        y: $amager-fastest-1.congestion_index
+        type: scatter
+        name: Amager - Fastest (1)
+      - x: $amager-fastest-3.hour
+        y: $amager-fastest-3.congestion_index
+        type: scatter
+        name: Amager - Fastest (3)
+      - x: $amager-shortest-1.hour
+        y: $amager-shortest-1.congestion_index
+        type: scatter
+        name: Amager - Shortest (1)
+      - x: $amager-shortest-3.hour
+        y: $amager-shortest-3.congestion_index
+        type: scatter
+        name: Amager - Shortest (3)
+    colorRamp: RdYlBu
+    layout:
+      xaxis:
+        title: Hour of day
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Congestion index
+        color: '#444'
+        type: '-'
+  Trip_distance_distribution:
+    - type: plotly
+      title: Trip Distance Distribution
+      description: ''
+      datasets:
+        amager-fastest-1:
+          file: amager-fastest-1-output/analysis/population/mode_share.csv
+          aggregate:
+            func: SUM
+            groupBy:
+              - dist_group
+            target: share
+        amager-fastest-3:
+          file: amager-fastest-3-output/analysis/population/mode_share.csv
+          aggregate:
+            func: SUM
+            groupBy:
+              - dist_group
+            target: share
+        amager-shortest-1:
+          file: amager-shortest-1-output/analysis/population/mode_share.csv
+          aggregate:
+            func: SUM
+            groupBy:
+              - dist_group
+            target: share
+        amager-shortest-3:
+          file: amager-shortest-3-output/analysis/population/mode_share.csv
+          aggregate:
+            func: SUM
+            groupBy:
+              - dist_group
+            target: share
+      traces:
+        - x: $amager-fastest-1.dist_group
+          y: $amager-fastest-1.share
+          orientation: v
+          type: bar
+          name: Amager - Fastest (1)
+          original_name: Amager - Fastest (1)
+        - x: $amager-fastest-3.dist_group
+          y: $amager-fastest-3.share
+          orientation: v
+          type: bar
+          name: Amager - Fastest (3)
+          original_name: Amager - Fastest (3)
+        - x: $amager-shortest-1.dist_group
+          y: $amager-shortest-1.share
+          orientation: v
+          type: bar
+          name: Amager - Shortest (1)
+          original_name: Amager - Shortest (1)
+        - x: $amager-shortest-3.dist_group
+          y: $amager-shortest-3.share
+          orientation: v
+          type: bar
+          name: Amager - Shortest (3)
+          original_name: Amager - Shortest (3)
+      colorRamp: RdYlBu
+      layout:
+        xaxis:
+          title: Meters
+          color: '#444'
+          type: '-'
+        yaxis:
+          title: Proportion
+          color: '#444'
+          type: '-'
+  departures:
+    - type: plotly
+      title: Departures
+      description: by 10-minute intervals
+      datasets:
+        amager-fastest-1: amager-fastest-1-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+        amager-fastest-3: amager-fastest-3-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+        amager-shortest-1: amager-shortest-1-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+        amager-shortest-3: amager-shortest-3-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      traces:
+        - x: $amager-fastest-1.bin
+          y: $amager-fastest-1.departure
+          orientation: v
+          type: bar
+          name: Amager - Fastest (1)
+          original_name: Amager - Fastest (1)
+        - x: $amager-fastest-3.bin
+          y: $amager-fastest-3.departure
+          orientation: v
+          type: bar
+          name: Amager - Fastest (3)
+          original_name: Amager - Fastest (3)
+        - x: $amager-shortest-1.bin
+          y: $amager-shortest-1.departure
+          orientation: v
+          type: bar
+          name: Amager - Shortest (1)
+          original_name: Amager - Shortest (1)
+        - x: $amager-shortest-3.bin
+          y: $amager-shortest-3.departure
+          orientation: v
+          type: bar
+          name: Amager - Shortest (3)
+          original_name: Amager - Shortest (3)
+      colorRamp: RdYlBu
+      layout:
+        xaxis:
+          title: Time from start of simulation (minutes)
+          color: '#444'
+          type: '-'
+        yaxis:
+          title: Number of people
+          color: '#444'
+          type: '-'
+  arrivals:
+    - type: plotly
+      title: Arrivals
+      description: by 10-minute intervals
+      datasets:
+        amager-fastest-1: amager-fastest-1-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+        amager-fastest-3: amager-fastest-3-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+        amager-shortest-1: amager-shortest-1-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+        amager-shortest-3: amager-shortest-3-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      traces:
+        - x: $amager-fastest-1.bin
+          y: $amager-fastest-1.arrival
+          orientation: v
+          type: bar
+          name: Amager - Fastest (1)
+          original_name: Amager - Fastest (1)
+        - x: $amager-fastest-3.bin
+          y: $amager-fastest-3.arrival
+          orientation: v
+          type: bar
+          name: Amager - Fastest (3)
+          original_name: Amager - Fastest (3)
+        - x: $amager-shortest-1.bin
+          y: $amager-shortest-1.arrival
+          orientation: v
+          type: bar
+          name: Amager - Shortest (1)
+          original_name: Amager - Shortest (1)
+        - x: $amager-shortest-3.bin
+          y: $amager-shortest-3.arrival
+          orientation: v
+          type: bar
+          name: Amager - Shortest (3)
+          original_name: Amager - Shortest (3)
+      colorRamp: RdYlBu
+      layout:
+        xaxis:
+          title: Time from start of simulation (minutes)
+          color: '#444'
+          type: '-'
+        yaxis:
+          title: Number of people
+          color: '#444'
+          type: '-'
+  travel_time:
+    - type: plotly
+      title: Travel Time
+      description: by 10-minute intervals
+      datasets:
+        amager-fastest-1: amager-fastest-1-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+        amager-fastest-3: amager-fastest-3-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+        amager-shortest-1: amager-shortest-1-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+        amager-shortest-3: amager-shortest-3-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      traces:
+        - x: $amager-fastest-1.bin
+          y: $amager-fastest-1.traveltime
+          orientation: v
+          type: bar
+          name: Amager - Fastest (1)
+          original_name: Amager - Fastest (1)
+        - x: $amager-fastest-3.bin
+          y: $amager-fastest-3.traveltime
+          orientation: v
+          type: bar
+          name: Amager - Fastest (3)
+          original_name: Amager - Fastest (3)
+        - x: $amager-shortest-1.bin
+          y: $amager-shortest-1.traveltime
+          orientation: v
+          type: bar
+          name: Amager - Shortest (1)
+          original_name: Amager - Shortest (1)
+        - x: $amager-shortest-3.bin
+          y: $amager-shortest-3.traveltime
+          orientation: v
+          type: bar
+          name: Amager - Shortest (3)
+          original_name: Amager - Shortest (3)
+      colorRamp: RdYlBu
+      layout:
+        xaxis:
+          title: Time from departure to arrival (minutes)
+          color: '#444'
+          type: '-'
+        yaxis:
+          title: Trips
+          color: '#444'
+          type: '-'
