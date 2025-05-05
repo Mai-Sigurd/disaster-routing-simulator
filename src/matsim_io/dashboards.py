@@ -199,6 +199,16 @@ class SimulationResult:
         return self.output_path / "analysis" / "analysis" / "people_in_safety.csv"
 
     @property
+    def trip_stats_csv_path(self) -> Path:
+        """Path to the trip statistics analysis file."""
+        return self.output_path / "analysis" / "analysis" / "trip_stats_disaster.csv"
+
+    @property
+    def danger_zone_data_csv_path(self) -> Path:
+        """Path to the trip statistics analysis file."""
+        return self.output_path / "analysis" / "danger_zone_data.csv"
+
+    @property
     def trip_purposes_by_10_minutes_csv_path(self) -> str:
         """Path to the "trip_purposes_by_10_minutes" analysis file."""
         return f"{self.output_dir}/analysis/analysis/trip_purposes_by_10_minutes.csv"
@@ -221,6 +231,7 @@ def create_comparison_dashboard(results: list[SimulationResult]) -> None:
             "description": "Comparison of different algorithms for routing out of the danger zone.",
         },
         "layout": {
+            "table_statistics": _create_statistics_tables(results),
             "people_in_safety": _add_people_in_safety_graph(results),
             "congestion_index_by_hour": _create_congestion_index_comparison(results),
             "Trip_distance_distribution": create_bar_graph_mode_share(
@@ -319,6 +330,90 @@ def _add_people_in_safety_graph(
         }
     ]
     return people_in_safety
+
+
+def _create_statistics_tables(results: list[SimulationResult]) -> list[dict[str, Any]]:
+    return [
+        _create_simulation_statistics_table(results),
+        _create_evacuation_statistics_table(results),
+    ]
+
+
+def _create_simulation_statistics_table(
+    results: list[SimulationResult],
+) -> dict[str, Any]:
+    """
+    Create a table that combines simulation statistics from multiple simulations.
+    Creates one column called "Value" since all the values are identical.
+    Also performs a sanity check to verify that contents of different DFs are indeed identical.
+
+    :param results: List of SimulationResult objects containing the paths to the simulation outputs.
+    :return: A dashboard widget configuration.
+    """
+    dfs = [
+        pd.read_csv(result.danger_zone_data_csv_path).rename(
+            columns={"car": result.title}
+        )
+        for result in results
+    ]
+
+    output_file = "analysis/simulation_stats.csv"
+    # Use the first result's data since they should all be identical
+    dfs[0].to_csv(MATSIM_DATA_DIR / output_file, index=False)
+
+    return {
+        "type": "csv",
+        "title": "Simulation Statistics",
+        "dataset": output_file,
+        "showAllRows": True,
+    }
+
+
+def _create_evacuation_statistics_table(
+    results: list[SimulationResult],
+) -> dict[str, Any]:
+    """
+    Create a table that combines trip statistics from multiple simulations, showing one column per simulation.
+    Each simulation's statistics will be in a column labeled with the algorithm's title.
+
+    :param results: List of SimulationResult objects containing the paths to the simulation outputs.
+    :return: A list of dashboard widget configurations.
+    """
+    dfs = [
+        pd.read_csv(result.trip_stats_csv_path).rename(columns={"car": result.title})
+        for result in results
+    ]
+
+    merged_df = dfs[0]
+    for df in dfs[1:]:
+        merged_df = pd.merge(merged_df, df, on="Info", how="outer")
+
+    required_metrics = [
+        "Number of cars",
+        "Total time traveled [h]",
+        "Total distance traveled [km]",
+        "Avg. speed [km/h]",
+        "Avg. distance per trip [km]",
+        "Avg. traveltime per trip [minutes]",
+    ]
+
+    filtered_df = merged_df[merged_df["Info"].isin(required_metrics)].copy()
+    filtered_df["sort_key"] = filtered_df["Info"].apply(
+        lambda x: required_metrics.index(x)
+        if x in required_metrics
+        else len(required_metrics)
+    )
+    filtered_df = filtered_df.sort_values("sort_key").drop("sort_key", axis=1)
+
+    output_file = "analysis/combined_trip_stats_disaster.csv"
+    filtered_df.to_csv(MATSIM_DATA_DIR / output_file, index=False)
+
+    return {
+        "type": "csv",
+        "title": "Evacuation Statistics",
+        "dataset": output_file,
+        "showAllRows": True,
+    }
 
 
 def create_bar_graph_mode_share(
