@@ -28,6 +28,7 @@ class InputData:
     population_type: PopulationType
     simulation_type: SimulationType
     danger_zones_geopandas_json: str
+    graph_ml_filepath: Path
     departure_end_time_sec: int
     population_number: int = 0
     worldpop_filepath: str = ""
