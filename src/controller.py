@@ -3,6 +3,8 @@ import subprocess
 from pathlib import Path
 from types import FrameType
 
+import osmnx as ox
+
 from config import (
     ROUTE_ALGOS,
     SOURCE_DIR,
@@ -64,9 +66,13 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
             if input_data.danger_zones_geopandas_json == "":
                 logging.fatal("Danger zone geojson is empty")
                 raise ValueError("Danger zone geojson is empty")
-            conf.G = download_osm_graph_from_polygon(
-                input_data.danger_zones_geopandas_json
-            )
+            if input_data.graph_ml_filepath != Path(""):
+                logging.info("Loading graph from %s", input_data.graph_ml_filepath)
+                conf.G = ox.load_graphml(filepath=input_data.graph_ml_filepath)
+            else:
+                conf.G = download_osm_graph_from_polygon(
+                    input_data.danger_zones_geopandas_json
+                )
             conf.danger_zones = load_danger_zone_from_str(
                 input_data.danger_zones_geopandas_json, "EPSG:4326"
             )
