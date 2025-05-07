@@ -112,3 +112,46 @@ def save_tiff_population_to_geojson(
         POPULATION_DIR / geo_file_name,
         driver="GeoJSON",
     )
+
+if __name__ == "__main__":
+    from config import CPH_AMAGER_DANGER_ZONE, RAVENNA_DANGER_ZONE
+    from data_loader import load_json_file_to_str
+    from data_loader.osm import download_osm_graph_from_polygon
+
+    POPULATION_DIR = DATA_DIR / "population"
+    osm_graph_dir = DATA_DIR / "osm_graph"
+    setups = [
+        {
+            "city": "Copenhagen",
+            "danger_zone": CPH_AMAGER_DANGER_ZONE,
+            "population_data": POPULATION_DIR / "denmark.tif",
+            "output_file": "CPHpop.geojson",
+        },
+        {
+            "city": "Ravenna",
+            "danger_zone": RAVENNA_DANGER_ZONE,
+            "population_data": POPULATION_DIR / "italy.tif",
+            "output_file": "RavennaPop.geojson",
+        },
+    ]
+
+    for setup in setups:
+        print("Downloading OSM graph for %s", setup["city"])
+        G = download_osm_graph_from_polygon(
+            load_json_file_to_str(setup["danger_zone"])
+        )
+        print("Saving OSM graph for %s", setup["city"])
+        ox.save_graphml(
+            G,
+            filepath=osm_graph_dir / f"{setup['city']}.graphml",
+            encoding="utf-8",
+        )
+        print("Saving population data for %s", setup["city"])
+        save_tiff_population_to_geojson(
+            tiff_file_path=setup["population_data"],
+            geo_file_name=setup["output_file"],
+            G=G,
+            maximum_distance_to_node=100,
+        )
+        # save G to graphML
+

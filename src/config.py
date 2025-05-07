@@ -24,9 +24,11 @@ CPH_AMAGER_MORE_EXITS_DANGER_ZONE = "dangerzone_amager_more_exits.geojson"
 CPH_POPULATION_DATA = "CPHpop.geojson"
 CPH_AMAGER_BBOX = "bbox_amager.geojson"
 RAVENNA_DANGER_ZONE = "ravenna.geojson"
-RAVENNA_POPULATION_DATA = "ravennaPopulation.geojson"
+RAVENNA_POPULATION_DATA = "ravennaPop.geojson"
 
 ONE_HOUR = 3600
+TWO_HOURS = 7200
+THREE_HOURS = 10800
 cars_per_person_cph = 0.24  # refer to our thesis
 cars_per_person_ravenna = 0.69  # refer to our thesis
 ROUTE_ALGOS = [FastestPath(), ShortestPath()]
