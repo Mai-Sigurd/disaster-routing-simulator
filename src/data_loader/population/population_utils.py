@@ -113,6 +113,7 @@ def save_tiff_population_to_geojson(
         driver="GeoJSON",
     )
 
+
 if __name__ == "__main__":
     from config import CPH_AMAGER_DANGER_ZONE, RAVENNA_DANGER_ZONE
     from data_loader import load_json_file_to_str
@@ -137,9 +138,7 @@ if __name__ == "__main__":
 
     for setup in setups:
         print("Downloading OSM graph for %s", setup["city"])
-        G = download_osm_graph_from_polygon(
-            load_json_file_to_str(setup["danger_zone"])
-        )
+        G = download_osm_graph_from_polygon(load_json_file_to_str(setup["danger_zone"]))
         print("Saving OSM graph for %s", setup["city"])
         ox.save_graphml(
             G,
@@ -154,4 +153,3 @@ if __name__ == "__main__":
             maximum_distance_to_node=100,
         )
         # save G to graphML
-
