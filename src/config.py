@@ -14,8 +14,9 @@ SOURCE_DIR = Path(__file__).parent.parent
 DATA_DIR = SOURCE_DIR / "data"
 EXPLORE_OUTPUT_FOLDER = DATA_DIR / "matsim"
 CASE_STUDIES_OUTPUT_FOLDER = DATA_DIR / "case_studies"
-
-CPH_G_GRAPHML = "copenhagen.graphml"
+GRAPH_DIR = DATA_DIR / "osm_graph"
+CPH_G_GRAPHML = "Copenhagen.graphml"
+RAVENNA_G_GRAPHML = "Ravenna.graphml"
 CPH_XTRA_SMALL_AMAGER_DANGER_ZONE = "dangerzone_lillebitteamager.geojson"
 CPH_SMALL_AMAGER_DANGER_ZONE = "mindre_del_af_amager.geojson"
 CPH_AMAGER_DANGER_ZONE = "dangerzone_amager.geojson"
@@ -56,6 +57,7 @@ def set_dev_input_data() -> InputData:
         population_type=PopulationType.GEO_JSON_FILE,
         simulation_type=SimulationType.CASE_STUDIES,
         danger_zones_geopandas_json=load_json_file_to_str(CPH_AMAGER_DANGER_ZONE),
+        graph_ml_filepath=GRAPH_DIR / CPH_G_GRAPHML,
         pop_geo_json_filepath=CPH_POPULATION_DATA,
         cars_per_person=cars_per_person_cph,
         departure_end_time_sec=ONE_HOUR,
@@ -72,6 +74,7 @@ def set_amager_input_data() -> InputData:
         simulation_type=SimulationType.CASE_STUDIES,
         danger_zones_geopandas_json=load_json_file_to_str(CPH_AMAGER_DANGER_ZONE),
         pop_geo_json_filepath=CPH_POPULATION_DATA,
+        graph_ml_filepath=GRAPH_DIR / CPH_G_GRAPHML,
         cars_per_person=cars_per_person_cph,
         departure_end_time_sec=ONE_HOUR,
         diversifying_routes=3,
@@ -87,6 +90,7 @@ def set_ravenna_input_data() -> InputData:
         simulation_type=SimulationType.CASE_STUDIES,
         danger_zones_geopandas_json=load_json_file_to_str(RAVENNA_DANGER_ZONE),
         pop_geo_json_filepath=RAVENNA_POPULATION_DATA,
+        graph_ml_filepath=GRAPH_DIR / RAVENNA_G_GRAPHML,
         cars_per_person=cars_per_person_ravenna,
         departure_end_time_sec=ONE_HOUR,
         diversifying_routes=1,
@@ -103,6 +107,7 @@ def set_small_data_input_data() -> InputData:
         population_number=1000,
         danger_zones_geopandas_json=load_json_file_to_str(CPH_SMALL_AMAGER_DANGER_ZONE),
         cars_per_person=1,
+        graph_ml_filepath=Path(""),
         departure_end_time_sec=ONE_HOUR,
         diversifying_routes=3,
     )
