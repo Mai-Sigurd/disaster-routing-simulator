@@ -178,7 +178,7 @@ def write_polaris_network(
 
 
 def write_polaris_plans(
-    routes: dict[tuple[Id, Id], list[dict[str, list[str] | list[int]]]],
+    routes: list[list[dict[str, list[str] | list[int]]]],
     plan_filename: str = "plans.xml",
     gzip_compress: bool = True,
 ) -> None:
@@ -198,13 +198,8 @@ def write_polaris_plans(
     with open_func(MATSIM_DATA_DIR / plan_filename, "wb+") as f_write:
         writer = PlansWriter(f_write)
         writer.start_population()
-        for i, ((v, w), route_list) in enumerate(routes.items()):
-            if len(route_list) != 1:
-                logging.warning(
-                    f"Multiple routes for the same origin-destination pair: {v}-{w}"
-                )
+        for i, route_list in enumerate(routes):
             route = route_list[0]["ig"]
-
             writer.start_person(i)
             writer.start_plan(selected=True)
             writer.add_activity_with_link("escape", link=route[0], end_time=0)

@@ -26,7 +26,6 @@ from matsim_io.dashboards import (
 from routes.fastest_path import FastestPath
 from routes.route import create_route_objects
 from routes.route_algo import RouteAlgo
-from routes.route_utils import vertex
 
 
 class Weight(Enum):
@@ -40,14 +39,14 @@ def polaris_paths(
     edge_pairs: list[tuple[Edge, Edge]],
     graph: nx.MultiDiGraph,
     weight: Weight,
-) -> dict[tuple[vertex, vertex], list[dict[str, list[str] | list[int]]]]:
+) -> list[list[dict[str, list[str] | list[int]]]]:
     model = MultiLevelModel(graph, k=3, attribute=weight.value)
     model.parameter_selection(n_vehicles=len(edge_pairs), random_state=42)
     model.fit(random_state=42)
 
-    paths = {}
+    paths = []
     for from_edge, to_edge in tqdm(edge_pairs, desc="Predicting least popular paths"):
-        paths[(from_edge, to_edge)] = model.predict(from_edge, to_edge)
+        paths.append(model.predict(from_edge, to_edge))
 
     return paths
 
@@ -59,7 +58,7 @@ def read_sumo_network_and_run_polaris(
     algorithm: RouteAlgo,
 ) -> tuple[
     igraph.Graph,
-    dict[tuple[vertex, vertex], list[dict[str, list[str] | list[int]]]],
+    list[list[dict[str, list[str] | list[int]]]],
     dict[str, int],
 ]:
     print("Reading SUMO network")
