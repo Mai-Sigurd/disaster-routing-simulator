@@ -1,11 +1,11 @@
 import argparse
 import logging
-import signal
 import webbrowser
 from pathlib import Path
 from typing import Optional
 
 from slugify import slugify
+from tqdm import tqdm
 
 from analysis.analysis import write_analysis_data_simwrapper
 from config import (
@@ -20,7 +20,6 @@ from config import (
 )
 from controller import (
     controller_input_data,
-    gui_close,
     gui_handler,
     run_matsim,
     sim_wrapper_serve,
@@ -38,8 +37,10 @@ from matsim_io.dashboards import (
     copy_dashboard,
     create_comparison_dashboard,
 )
+from routes.fastest_path import FastestPath
 from routes.route import create_route_objects
 from routes.route_algo import RouteAlgo
+from routes.shortest_path import ShortestPath
 
 logging.basicConfig(
     level=logging.INFO,
@@ -201,28 +202,61 @@ def main(args: argparse.Namespace) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument(
-        "-dev",
-        action="store_true",
-        help="Enable dev mode (skips GUI), and uses dev input data",
-    )
-    group.add_argument(
-        "-small",
-        action="store_true",
-        help="Enable dev mode (skips GUI), and uses small danger zone on amager",
-    )
-    group.add_argument("-amager", action="store_true", help="Use Amager danger zone")
-    group.add_argument("-ravenna", action="store_true", help="Use Ravenna danger zone")
-    group.add_argument(
-        "-gui-only", action="store_true", help="Run GUI only (without simulation)"
-    )
-    group.add_argument(
-        "-matsim-only",
-        action="store_true",
-        help="Run Matsim only (precomputed routes on Copenhagen)",
-    )
-    args = parser.parse_args()
-    signal.signal(signal.SIGTSTP, gui_close)
-    main(args)
+    # parser = argparse.ArgumentParser()
+    # group = parser.add_mutually_exclusive_group()
+    # group.add_argument(
+    #     "-dev",
+    #     action="store_true",
+    #     help="Enable dev mode (skips GUI), and uses dev input data",
+    # )
+    # group.add_argument(
+    #     "-small",
+    #     action="store_true",
+    #     help="Enable dev mode (skips GUI), and uses small danger zone on amager",
+    # )
+    # group.add_argument("-amager", action="store_true", help="Use Amager danger zone")
+    # group.add_argument("-ravenna", action="store_true", help="Use Ravenna danger zone")
+    # group.add_argument(
+    #     "-gui-only", action="store_true", help="Run GUI only (without simulation)"
+    # )
+    # group.add_argument(
+    #     "-matsim-only",
+    #     action="store_true",
+    #     help="Run Matsim only (precomputed routes on Copenhagen)",
+    # )
+    # args = parser.parse_args()
+    # signal.signal(signal.SIGTSTP, gui_close)
+    # main(args)
+
+    amager_input = set_amager_input_data()
+    ravenna_input = set_ravenna_input_data()
+
+    scenarios = [
+        (FastestPath(), ravenna_input, "Ravenna - Fastest (3)", 3),
+        (ShortestPath(), ravenna_input, "Ravenna - Shortest (3)", 3),
+        (FastestPath(), amager_input, "Amager - Fastest (1)", 1),
+        (ShortestPath(), amager_input, "Amager - Shortest (1)", 1),
+        (FastestPath(), amager_input, "Amager - Fastest (3)", 3),
+        (ShortestPath(), amager_input, "Amager - Shortest (3)", 3),
+    ]
+
+    results = []
+    for algorithm, input_data, title, end_points in tqdm(
+        scenarios, desc="Running algorithms"
+    ):
+        try:
+            logging.info(f"Starting algorithm: {title}")
+            program_config = controller_input_data(input_data)
+            program_config.diversifying_routes = end_points
+            algorithm.title = title
+
+            results.append(
+                SimulationResult(
+                    run_simulation(program_config, algorithm),
+                    algorithm.title,
+                )
+            )
+        except Exception as e:
+            logging.error(f"Error running algorithm {title}: {e}")
+
+    create_comparison_dashboard(results)
