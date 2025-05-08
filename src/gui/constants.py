@@ -5,7 +5,6 @@ gui_type = int | str
 
 MENU_TAG = "menu"
 
-OSM_JSON_BBOX = "OSM_JSON_BBOX"
 DANGER_ZONE = "DANGER_ZONE"
 
 POPULATION = "POPULATION"

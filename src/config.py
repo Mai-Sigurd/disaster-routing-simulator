@@ -24,7 +24,6 @@ CPH_SMALL_AMAGER_DANGER_ZONE = "mindre_del_af_amager.geojson"
 CPH_AMAGER_DANGER_ZONE = "dangerzone_amager.geojson"
 CPH_AMAGER_MORE_EXITS_DANGER_ZONE = "dangerzone_amager_more_exits.geojson"
 CPH_POPULATION_DATA = "CPHpop.geojson"
-CPH_AMAGER_BBOX = "bbox_amager.geojson"
 RAVENNA_DANGER_ZONE = "ravenna.geojson"
 RAVENNA_POPULATION_DATA = "ravennaPop.geojson"
 
