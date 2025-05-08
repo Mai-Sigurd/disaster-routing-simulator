@@ -2,10 +2,6 @@ from typing import BinaryIO, Optional
 
 from matsim.writers import Id, PopulationWriter, XmlWriter
 
-from utils import kmh_to_ms
-
-DANISH_DEFAULT_SPEED_LIMIT = 50  # km/h
-
 
 class NetworkWriter(XmlWriter):  # type: ignore[misc]
     FINISHED_SCOPE = 0
@@ -20,7 +16,7 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
         self._require_scope(self.NO_SCOPE)
         self._write_line('<?xml version="1.0" encoding="utf-8"?>')
         self._write_line(
-            '<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">'
+            '<!DOCTYPE network SYSTEM "https://www.matsim.org/files/dtd/network_v2.dtd">'
         )
         self._write_line(f'<network name="{name}">' if name else "<network>")
         self.indent += 1
@@ -72,7 +68,7 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
         from_node: Id,
         to_node: Id,
         length: float,
-        speed_limit: int | None = None,
+        speed_limit: float,
         perm_lanes: int | None = None,
     ) -> None:
         """
@@ -84,31 +80,28 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
         :param speed_limit: Maximum allowed speed of the link in meters per second.
         :param perm_lanes: Number of lanes on the link.
         """
-        if speed_limit is None:
-            speed_limit = DANISH_DEFAULT_SPEED_LIMIT
         if perm_lanes is None:
             perm_lanes = 1
 
         assert isinstance(length, (int, float)) and length > 0, (
             "length must be a positive number"
         )
-        assert isinstance(speed_limit, int) and speed_limit > 0, (
-            "speed_limit must be a positive integer"
+        assert isinstance(speed_limit, (int, float)) and speed_limit > 0, (
+            "speed_limit must be a positive number"
         )
         assert isinstance(perm_lanes, int) and perm_lanes > 0, (
             "perm_lanes must be a positive integer"
         )
 
-        free_speed = kmh_to_ms(speed_limit)
-        capacity = _compute_capacity(free_speed)
+        capacity = _compute_capacity(speed_limit)
         self._require_scope(self.LINKS_SCOPE)
         self._write_line(
             f'<link id="{link_id}"'
             f' from="{from_node}"'
             f' to="{to_node}"'
             f' length="{length}"'
-            f' freespeed="{free_speed:.2f}"'
-            f' capacity="{capacity:.2f}"'
+            f' freespeed="{speed_limit}"'
+            f' capacity="{capacity}"'
             f' permlanes="{perm_lanes}"/>'
         )
 
@@ -139,9 +132,9 @@ class PlansWriter(PopulationWriter):  # type: ignore[misc]
     def add_leg(
         self,
         route: list[Id],
-        mat_sim_routing: bool,
         mode: str = "car",
         departure_time: Optional[int] = None,
+        mat_sim_routing: bool = False,
     ) -> None:
         """
         Add a leg with to the plan, either with or without already planned route.
