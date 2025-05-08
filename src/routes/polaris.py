@@ -76,13 +76,14 @@ def read_sumo_network_and_run_polaris(
         end=conf.departure_end_time_sec,
         cars_per_person=conf.cars_per_person,
     )
+    with open(f"{output_name}_routes.pkl", "wb") as f:
+        pickle.dump(routes, f)
+
     stats = {
         "Amount of routes": len(routes),
         "Amount of nodes with no route to safety": len(conf.origin_points)
         - len(routes),
     }
-    with open(f"{output_name}_routes.pkl", "wb") as f:
-        pickle.dump(graph, f)
 
     def first_outgoing_edge(node_id: str) -> Edge:
         node = net.getNode(str(node_id))
