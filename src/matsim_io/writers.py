@@ -83,9 +83,6 @@ class NetworkWriter(XmlWriter):  # type: ignore[misc]
         if perm_lanes is None:
             perm_lanes = 1
 
-        assert isinstance(length, (int, float)) and length > 0, (
-            "length must be a positive number"
-        )
         assert isinstance(speed_limit, (int, float)) and speed_limit > 0, (
             "speed_limit must be a positive number"
         )
