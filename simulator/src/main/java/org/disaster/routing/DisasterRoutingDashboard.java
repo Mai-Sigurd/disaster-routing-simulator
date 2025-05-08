@@ -6,7 +6,6 @@ import org.disaster.routing.analysis.TripPurposeBy10Min;
 import org.disaster.routing.analysis.TripStatsDisaster;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.application.analysis.population.TripAnalysis;
-import org.matsim.application.analysis.traffic.TrafficAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
@@ -19,6 +18,7 @@ import org.matsim.simwrapper.viz.XYTime;
 
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.components.Line;
+import tech.tablesaw.plotly.components.Marker;
 import tech.tablesaw.plotly.traces.BarTrace;
 import tech.tablesaw.plotly.traces.ScatterTrace;
 
@@ -52,6 +52,13 @@ public class DisasterRoutingDashboard implements Dashboard {
                             .x("bin")
                             .y(metric)
             );
+        });
+    }
+
+    private static void createTripDataViz(Layout layout, String rowId, String tab) {
+        layout.row(rowId, tab).el(Plotly.class, (viz, data) -> {
+            viz.title = "Departures and Arrivals";
+            // Will be overwritten in python project
         });
     }
 
@@ -89,8 +96,9 @@ public class DisasterRoutingDashboard implements Dashboard {
                     viz.title = "Population density";
                 });
 
-        createTripDataRow(layout, "departures", header.tab, "Departures", "departure", "Time from start of simulation (minutes)");
-        createTripDataRow(layout, "arrivals", header.tab, "Arrivals", "arrival", "Time from start of simulation (minutes)");
+        // createTripDataRow(layout, "departures", header.tab, "Departures", "departure", "Time from start of simulation (minutes)");
+        // createTripDataRow(layout, "arrivals", header.tab, "Arrivals", "arrival", "Time from start of simulation (minutes)");
+        createTripDataViz(layout, "departure-arrival", header.tab);
         createTripDataRow(layout, "traveltype", header.tab, "Travel times", "traveltime", "Time from departure to arrival (minutes)");
 
 
@@ -150,7 +158,7 @@ public class DisasterRoutingDashboard implements Dashboard {
 
             viz.display.lineWidth.dataset = "traffic";
             viz.display.lineWidth.columnName = "Simulated traffic volume";
-            viz.display.lineWidth.scaleFactor = 10d;
+            viz.display.lineWidth.scaleFactor = 1250d;
             viz.display.lineWidth.join = "link_id";
 
             viz.height = 12d;
