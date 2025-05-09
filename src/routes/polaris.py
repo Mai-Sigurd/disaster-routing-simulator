@@ -54,7 +54,6 @@ def polaris_paths(
 def read_sumo_network_and_run_polaris(
     road_network_filename: str,
     conf: ProgramConfig,
-    output_name: str,
     algorithm: RouteAlgo,
 ) -> tuple[
     igraph.Graph,
@@ -64,6 +63,8 @@ def read_sumo_network_and_run_polaris(
     print("Reading SUMO network")
     net = read_sumo_road_network(road_network_filename)
     graph = from_sumo_to_igraph_network(net)
+
+    output_name = slugify(algorithm.title)
     with open(f"{output_name}_igraph.pkl", "wb") as f:
         pickle.dump(graph, f)
 
@@ -125,9 +126,9 @@ if __name__ == "__main__":
     ravenna_input = set_ravenna_input_data()
 
     scenarios = [
-        (FastestPath(), ravenna_input, "Ravenna - Polaris (3)", 3, "ravenna"),
         (FastestPath(), amager_input, "Amager - Polaris (1)", 1, "amager"),
-        (FastestPath(), amager_input, "Amager - Polaris (3)", 3, "amager"),
+        # (FastestPath(), amager_input, "Amager - Polaris (3)", 3, "amager"),
+        (FastestPath(), ravenna_input, "Ravenna - Polaris (3)", 3, "ravenna"),
     ]
 
     results = []
