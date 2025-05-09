@@ -140,7 +140,7 @@ if __name__ == "__main__":
             algorithm.title = title
 
             graph, paths, stats = read_sumo_network_and_run_polaris(
-                f"{city}.net.xml.gz", conf, city, algorithm
+                f"{city}.net.xml.gz", conf, algorithm
             )
             matsim_io.write_polaris_network(graph)
             matsim_io.write_polaris_plans(paths)
