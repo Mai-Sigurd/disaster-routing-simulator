@@ -1,4 +1,5 @@
 import logging
+import os
 import subprocess
 from pathlib import Path
 from types import FrameType
@@ -43,7 +44,11 @@ def run_matsim(output_dir_name: str = "output") -> None:
         f'-Dexec.args="{output_dir_name}"',
         "-Dlog4j.configurationFile=log4j2-silent.xml",
     ]
-    subprocess.run(cmd, cwd=SOURCE_DIR / "simulator", check=True)
+
+    env = os.environ.copy()
+    env["MAVEN_OPTS"] = "-Xmx12G -Xms4G"
+
+    subprocess.run(cmd, cwd=SOURCE_DIR / "simulator", check=True, env=env)
 
 
 def sim_wrapper_serve(output_path: Path) -> None:
