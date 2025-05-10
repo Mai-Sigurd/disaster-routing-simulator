@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 from pyproj import Geod
+from shapely.geometry.polygon import orient
 
 from config import ProgramConfig
 from data_loader.population import get_total_population
@@ -31,7 +32,7 @@ def _add_danger_zone_statistics(
 
     # Compute area for each geometry in the GeoDataFrame and sum the results
     danger_zone_area_m2 = sum(
-        geod.geometry_area_perimeter(geom)[0]
+        geod.geometry_area_perimeter(orient(geom, sign=1.0))[0]
         for geom in program_conf.danger_zones.geometry
     )
     danger_zone_area_km2 = danger_zone_area_m2 / 1_000_000
