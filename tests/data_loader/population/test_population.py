@@ -13,6 +13,7 @@ from shapely.geometry import LineString, Point, Polygon
 from data_loader.population import (
     POPULATION_DIR,
     distribute_population,
+    get_total_population,
     population_data_from_geojson,
     population_data_from_number,
 )
@@ -213,3 +214,9 @@ def test_snap_population_to_nodes() -> None:
     # Assert the geometry at the nodes (the geometry should match the nodes' geometry)
     assert result.iloc[0]["geometry"] == geometry[8]
     assert result.iloc[1]["geometry"] == geometry[3]
+
+
+def test__get_total_population() -> None:
+    population_data = gpd.GeoDataFrame(data={"pop": [10, 20]})
+    result = get_total_population(population_data, 1.0)
+    assert result == 30

@@ -67,12 +67,6 @@ def test_get_num_people_on_route() -> None:
     assert result == 10
 
 
-def test__get_total_population() -> None:
-    population_data = gpd.GeoDataFrame(data={"pop": [10, 20]})
-    result = route._get_total_population(population_data, 1.0)
-    assert result == 30
-
-
 def test_create_route_object_full(monkeypatch: pytest.MonkeyPatch) -> None:
     dict_of_paths = {"1": [["1", "2"]], "2": [["2", "1"]]}
     population_data = gpd.GeoDataFrame(data={"id": ["1", "2"], "pop": [7, 5]})
