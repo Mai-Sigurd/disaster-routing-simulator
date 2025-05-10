@@ -138,7 +138,7 @@ def change_departure_arrivals_bar_graph(output_dir: str) -> None:
     bar_graph["description"] = "by 10-minute intervals"
     bar_graph["datasets"] = {
         "dataset": {
-            "file": "/analysis/analysis/trip_purposes_by_10_minutes.csv",
+            "file": "analysis/analysis/trip_purposes_by_10_minutes.csv",
         }
     }
     bar_graph["traces"] = [
@@ -272,7 +272,7 @@ def create_comparison_dashboard(results: list[SimulationResult]) -> None:
             ),
         },
     }
-
+    remove_unclassified_from_trip_stats_by_road_type_and_hour_csv(results)
     dashboard_path = MATSIM_DATA_DIR / "dashboard-1.yaml"
     dashboard_path.write_text(yaml.dump(dashboard, sort_keys=False), encoding="utf-8")
 
@@ -561,3 +561,17 @@ def combine_csv_datasets(results: list[SimulationResult]) -> str:
     output_file = "analysis/people_in_safety.csv"
     merged_df.to_csv(MATSIM_DATA_DIR / output_file, index=False)
     return output_file
+
+
+def remove_unclassified_from_trip_stats_by_road_type_and_hour_csv(
+    results: list[SimulationResult],
+) -> None:
+    """
+    Remove the 'Unclassified' road type from the trip stat by road and hour CSV file.
+    :param results: List of SimulationResult objects containing the paths to the CSV files.
+    """
+    for result in results:
+        file_path = MATSIM_DATA_DIR / result.traffic_stats_csv_path
+        df = pd.read_csv(file_path)
+        df = df[df["road_type"] != "unclassified"]
+        df.to_csv(file_path, index=False)

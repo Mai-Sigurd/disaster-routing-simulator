@@ -78,7 +78,7 @@ def compute_and_save_matsim_paths(
     stats = {
         "Amount of routes": len(routes),
         "Amount of nodes with no route to safety": len(program_config.origin_points)
-        - len(routes),
+        - len(origin_to_paths.keys()),
     }
 
     write_network(program_config.G)

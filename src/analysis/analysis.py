@@ -2,8 +2,10 @@ import os
 from pathlib import Path
 
 from pyproj import Geod
+from shapely.geometry.polygon import orient
 
 from config import ProgramConfig
+from data_loader.population import get_total_population
 
 
 def write_analysis_data_simwrapper(
@@ -30,7 +32,7 @@ def _add_danger_zone_statistics(
 
     # Compute area for each geometry in the GeoDataFrame and sum the results
     danger_zone_area_m2 = sum(
-        geod.geometry_area_perimeter(geom)[0]
+        geod.geometry_area_perimeter(orient(geom, sign=1.0))[0]
         for geom in program_conf.danger_zones.geometry
     )
     danger_zone_area_km2 = danger_zone_area_m2 / 1_000_000
@@ -51,6 +53,9 @@ def _add_danger_zone_statistics(
         file.write(f"Total lane km, {round(total_lane_km, 2)}\n")
         for key, value in stats.items():
             file.write(f"{key}, {value}\n")
+        file.write(
+            f"Total population, {get_total_population(program_conf.danger_zone_population_data, program_conf.cars_per_person)}\n"
+        )
 
 
 def _add_population_file_to_output(
