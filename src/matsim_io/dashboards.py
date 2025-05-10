@@ -567,7 +567,7 @@ def remove_unclassified_from_trip_stats_by_road_type_and_hour_csv(
     results: list[SimulationResult],
 ) -> None:
     """
-    Remove the 'Unclassified' road type from the trip statistics CSV file.
+    Remove the 'Unclassified' road type from the trip stat by road and hour CSV file.
     :param results: List of SimulationResult objects containing the paths to the CSV files.
     """
     for result in results:
