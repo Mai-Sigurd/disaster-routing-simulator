@@ -1,10 +1,10 @@
 import os
 from pathlib import Path
-from data_loader.population import get_total_population
 
 from pyproj import Geod
 
 from config import ProgramConfig
+from data_loader.population import get_total_population
 
 
 def write_analysis_data_simwrapper(
@@ -52,7 +52,10 @@ def _add_danger_zone_statistics(
         file.write(f"Total lane km, {round(total_lane_km, 2)}\n")
         for key, value in stats.items():
             file.write(f"{key}, {value}\n")
-        file.write(f"Total population, {get_total_population(program_conf.danger_zone_population_data, program_conf.cars_per_person)}\n")
+        file.write(
+            f"Total population, {get_total_population(program_conf.danger_zone_population_data, program_conf.cars_per_person)}\n"
+        )
+
 
 def _add_population_file_to_output(
     program_conf: ProgramConfig, output_dir: Path

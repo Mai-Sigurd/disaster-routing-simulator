@@ -71,7 +71,6 @@ def _get_num_people_on_route(
     )
 
 
-
 def create_route_objects(
     origin_to_paths: dict[str, list[path]],
     population_data: gpd.GeoDataFrame,
