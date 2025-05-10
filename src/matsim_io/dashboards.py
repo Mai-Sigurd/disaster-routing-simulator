@@ -138,7 +138,7 @@ def change_departure_arrivals_bar_graph(output_dir: str) -> None:
     bar_graph["description"] = "by 10-minute intervals"
     bar_graph["datasets"] = {
         "dataset": {
-            "file": "/analysis/analysis/trip_purposes_by_10_minutes.csv",
+            "file": "analysis/analysis/trip_purposes_by_10_minutes.csv",
         }
     }
     bar_graph["traces"] = [
