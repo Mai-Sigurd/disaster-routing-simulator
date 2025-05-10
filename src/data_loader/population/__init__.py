@@ -115,3 +115,16 @@ def population_data_from_number(
     )
 
     return result
+
+
+def get_total_population(
+    population_data: gpd.GeoDataFrame, cars_per_person: float
+) -> int:
+    result = population_data[POPULATION].sum()
+    try:
+        if result == 0:
+            raise ValueError("Population data is 0")
+        return int(result * cars_per_person)
+    except TypeError:
+        logging.error("Population data is empty")
+        raise ValueError("Population data is empty")

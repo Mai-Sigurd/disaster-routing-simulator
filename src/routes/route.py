@@ -6,6 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 from tqdm import tqdm
 
+from data_loader.population import get_total_population
 from data_loader.population.population_utils import NODE_ID, POPULATION
 from routes.route_utils import path
 
@@ -70,18 +71,6 @@ def _get_num_people_on_route(
     )
 
 
-def _get_total_population(
-    population_data: gpd.GeoDataFrame, cars_per_person: float
-) -> int:
-    result = population_data[POPULATION].sum()
-    try:
-        if result == 0:
-            raise ValueError("Population data is 0")
-        return int(result * cars_per_person)
-    except TypeError:
-        logging.error("Population data is empty")
-        raise ValueError("Population data is empty")
-
 
 def create_route_objects(
     origin_to_paths: dict[str, list[path]],
@@ -100,7 +89,7 @@ def create_route_objects(
     :param cars_per_person: The number of cars per person.
     :return: A list of Route objects.
     """
-    total_population = _get_total_population(population_data, cars_per_person)
+    total_population = get_total_population(population_data, cars_per_person)
     result = []
     departure_times = _get_normal_dist_departure_time_list(total_population, start, end)
     for origin_point in tqdm(origin_to_paths.keys()):
