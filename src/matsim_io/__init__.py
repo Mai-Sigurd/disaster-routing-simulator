@@ -2,17 +2,23 @@ import gzip
 import logging
 import os
 
+import igraph
 import networkx as nx
 from matsim.writers import Id
 
 from data_loader import DATA_DIR
 from matsim_io.writers import NetworkWriter, PlansWriter
 from routes.route import Route
+from utils import kmh_to_ms
 
 MATSIM_DATA_DIR = DATA_DIR / "matsim"
 """Directory where MATSim network and plan files are saved."""
 LINK_IDS: dict[str, int] = {}
 """Dictionary mapping OSM link IDs to MATSim link IDs."""
+DEFAULT_SPEED_LIMIT_DENMARK = 50
+"""Default speed limit in Denmark in km/h."""
+
+VISITED_EDGES = set()
 
 
 def mat_sim_files_exist(plans_file: str, networks_file: str) -> bool:
@@ -54,7 +60,10 @@ def write_network(
                 from_node=v,
                 to_node=w,
                 length=link_data["length"],
-                speed_limit=_try_parse_min_int(link_data, "maxspeed"),
+                speed_limit=kmh_to_ms(
+                    _try_parse_min_int(link_data, "maxspeed")
+                    or DEFAULT_SPEED_LIMIT_DENMARK
+                ),
                 perm_lanes=_try_parse_min_int(link_data, "lanes"),
             )
 
@@ -97,10 +106,112 @@ def write_plans(
     with open_func(MATSIM_DATA_DIR / plan_filename, "wb+") as f_write:
         writer = PlansWriter(f_write)
         writer.start_population()
-
         count = 1
         for route in routes:
             count = _write_plan(route, writer, count, mat_sim_routing)
+        writer.end_population()
+
+    logging.info(f"Finished writing MATSim plans to {plan_filename}")
+
+
+def write_polaris_network(
+    graph: igraph.Graph,
+    network_name: str | None = None,
+    network_filename: str = "network.xml",
+    gzip_compress: bool = True,
+) -> None:
+    """
+    Write a network to a MATSim network file.
+    :param graph: Graph representing the network.
+    :param network_name: Name of the network.
+    :param network_filename: Name of the output file.
+    :param gzip_compress: Whether to save the file as a .gz compressed file.
+    """
+    network_filename = _validate_and_format_filename(network_filename, gzip_compress)
+    logging.info(f"Writing MATSim network to {network_filename}")
+
+    open_func = gzip.open if gzip_compress else open
+    with open_func(MATSIM_DATA_DIR / network_filename, "wb+") as f_write:
+        writer = NetworkWriter(f_write)
+        writer.start_network(network_name)
+
+        visited_nodes = set()
+        writer.start_nodes()
+        for edge in graph.es:
+            from_node, from_coords = edge.source, edge["coordinates"]["from"]
+            if from_node not in visited_nodes:
+                writer.add_node(from_node, from_coords[0], from_coords[1])
+                visited_nodes.add(from_node)
+            to_node, to_coords = edge.target, edge["coordinates"]["to"]
+            if to_node not in visited_nodes:
+                writer.add_node(to_node, to_coords[0], to_coords[1])
+                visited_nodes.add(to_node)
+        writer.end_nodes()
+
+        def _add_link(v: Id, w: Id, link_id: str) -> None:
+            # if edge["length"] <= 0 or edge["speed_limit"] <= 0:
+            #     logging.warning(f"Invalid edge data: {edge}")
+            #     return
+            speed_limit = (
+                edge["speed_limit"]
+                if edge["speed_limit"] > 0
+                else DEFAULT_SPEED_LIMIT_DENMARK
+            )
+            writer.add_link(
+                link_id,
+                from_node=v,
+                to_node=w,
+                length=edge["length"],
+                speed_limit=speed_limit,
+                perm_lanes=1,  # TODO: Add perm_lanes attribute to edges
+            )
+            VISITED_EDGES.add(link_id)
+
+        writer.start_links()
+        for edge in graph.es:
+            _add_link(edge.source, edge.target, edge.index)
+        writer.end_links()
+
+        writer.end_network()
+
+    logging.info(f"Finished writing MATSim network to {network_filename}")
+
+
+def write_polaris_plans(
+    routes: dict[tuple[Id, Id], list[dict[str, list[str] | list[int]]]],
+    plan_filename: str = "plans.xml",
+    gzip_compress: bool = True,
+) -> None:
+    """
+    Write a MATSim plan file based on a given network and routes.
+    :param routes: List of routes to turn into MATSim plans.
+    :param plan_filename: Name of the output file.
+    :param gzip_compress: Whether to save the file as a .gz compressed file.
+    """
+    if not routes:
+        logging.warning("No routes given. Writing empty MATSim plan file.")
+
+    plan_filename = _validate_and_format_filename(plan_filename, gzip_compress)
+    logging.info(f"Writing MATSim plans to {plan_filename}")
+
+    open_func = gzip.open if gzip_compress else open
+    with open_func(MATSIM_DATA_DIR / plan_filename, "wb+") as f_write:
+        writer = PlansWriter(f_write)
+        writer.start_population()
+        for i, ((v, w), route_list) in enumerate(routes.items()):
+            if len(route_list) != 1:
+                logging.warning(
+                    f"Multiple routes for the same origin-destination pair: {v}-{w}"
+                )
+            route = route_list[0]["ig"]
+
+            writer.start_person(i)
+            writer.start_plan(selected=True)
+            writer.add_activity_with_link("escape", link=route[0], end_time=0)
+            writer.add_leg(route, departure_time=0)
+            writer.add_activity_with_link("escape", link=route[-1])
+            writer.end_plan()
+            writer.end_person()
         writer.end_population()
 
     logging.info(f"Finished writing MATSim plans to {plan_filename}")

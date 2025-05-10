@@ -215,9 +215,9 @@ def test_add_link_invalid_params() -> None:
     writer = NetworkWriter(BytesIO())
 
     with pytest.raises(AssertionError, match="length must be a positive number"):
-        writer.add_link(1, 2, 3, length=-100)
+        writer.add_link(1, 2, 3, length=-100, speed_limit=50)
 
-    with pytest.raises(AssertionError, match="speed_limit must be a positive integer"):
+    with pytest.raises(AssertionError, match="speed_limit must be a positive number"):
         writer.add_link(1, 2, 3, length=100, speed_limit=-50)
 
     with pytest.raises(AssertionError, match="perm_lanes must be a positive integer"):
