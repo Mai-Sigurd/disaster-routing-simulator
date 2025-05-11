@@ -70,6 +70,8 @@ def read_sumo_network_and_run_polaris(
 
     print("Computing routes")
     paths = algorithm.route_to_safety(conf.origin_points, conf.danger_zones, conf.G)
+    with open(f"{output_name}_paths.pkl", "wb") as f:
+        pickle.dump(paths, f)
     routes = create_route_objects(
         origin_to_paths=paths,
         population_data=conf.danger_zone_population_data,
@@ -77,13 +79,9 @@ def read_sumo_network_and_run_polaris(
         end=conf.departure_end_time_sec,
         cars_per_person=conf.cars_per_person,
     )
-    with open(f"{output_name}_routes.pkl", "wb") as f:
-        pickle.dump(routes, f)
-
     stats = {
         "Amount of routes": len(routes),
-        "Amount of nodes with no route to safety": len(conf.origin_points)
-        - len(routes),
+        "Amount of nodes with no route to safety": len(conf.origin_points) - len(paths),
     }
 
     def first_outgoing_edge(node_id: str) -> Edge:
