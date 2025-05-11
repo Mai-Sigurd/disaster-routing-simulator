@@ -1,5 +1,6 @@
 import argparse
 import logging
+import traceback
 import webbrowser
 from pathlib import Path
 from typing import Optional
@@ -257,6 +258,7 @@ if __name__ == "__main__":
                 )
             )
         except Exception as e:
+            traceback.print_exc()
             logging.error(f"Error running algorithm {title}: {e}")
 
     create_comparison_dashboard(results)
