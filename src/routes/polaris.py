@@ -86,21 +86,23 @@ def read_sumo_network_and_run_polaris(
         "Amount of nodes with no route to safety": len(conf.origin_points) - len(paths),
     }
 
-    def first_outgoing_edge(node_id: str) -> Edge:
-        node = net.getNode(str(node_id))
-        edges = node.getOutgoing()
-        return edges[0].getID()
+    def outgoing_edge(node_id: str) -> str:
+        for edge in net.getNode(str(node_id)).getOutgoing():
+            if _is_driveable(edge.getType()):
+                return str(edge.getID())
+        raise ValueError(f"No outgoing edge found for node {node_id}")
 
-    def last_incoming_edge(node_id: str) -> Edge:
-        node = net.getNode(str(node_id))
-        edges = node.getIncoming()
-        return edges[-1].getID()
+    def incoming_edge(node_id: str) -> str:
+        for edge in net.getNode(str(node_id)).getIncoming():
+            if _is_driveable(edge.getType()):
+                return str(edge.getID())
+        raise ValueError(f"No incoming edge found for node {node_id}")
 
     node_pairs = [
         (r.path[0], r.path[-1]) for r in routes for _ in range(r.num_people_on_route)
     ]
     edge_pairs = [
-        (first_outgoing_edge(from_node), last_incoming_edge(to_node))
+        (outgoing_edge(from_node), incoming_edge(to_node))
         for from_node, to_node in node_pairs
     ]
 
@@ -119,6 +121,45 @@ def read_sumo_network_and_run_polaris(
         pickle.dump(result_paths, f)
 
     return graph, result_paths, stats
+
+
+EXCLUDED_HIGHWAY_TYPES = {
+    "abandoned",
+    "bridleway",
+    "bus_guideway",
+    "construction",
+    "corridor",
+    "cycleway",
+    "elevator",
+    "escalator",
+    "footway",
+    "no",
+    "path",
+    "pedestrian",
+    "planned",
+    "platform",
+    "proposed",
+    "raceway",
+    "razed",
+    "steps",
+    "track",
+}
+EXCLUDED_SERVICE_TYPES = {"emergency_access", "parking", "parking_aisle", "private"}
+
+
+def _is_driveable(edge_type: str) -> bool:
+    """
+    Check if the edge type is a public drivable road, as defined by OSMnx's `drive_service` filter.
+    Reference: https://github.com/gboeing/osmnx/blob/d06a4404e9032652a95e9ff7151dc7f7cd485351/osmnx/_overpass.py#L85-L92
+    :param edge_type: The type of the edge.
+    :return: True if the edge is a public drivable road, False otherwise.
+    """
+    if edge_type.startswith("highway."):
+        return edge_type.removeprefix("highway.") not in EXCLUDED_HIGHWAY_TYPES
+    if edge_type.startswith("service."):
+        return edge_type.removeprefix("service.") not in EXCLUDED_SERVICE_TYPES
+    logging.warning(f"Edge type '{edge_type}' is not a valid road type.")
+    return False
 
 
 if __name__ == "__main__":
