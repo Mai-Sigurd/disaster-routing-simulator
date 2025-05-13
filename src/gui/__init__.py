@@ -53,6 +53,79 @@ def _open_gui(error_message: str = "") -> None:
     set_fonts_theme(bold_text1 + bold_text2, t1, e_msg)
     change_windows("None", MENU_PICK_AREA)
     dpg.set_primary_window(MAIN_WINDOW, True)
+
+    with dpg.theme() as white_theme:
+        with dpg.theme_component(dpg.mvAll):
+            # Backgrounds
+            dpg.add_theme_color(
+                dpg.mvThemeCol_WindowBg, (255, 255, 255), category=dpg.mvThemeCat_Core
+            )
+            dpg.add_theme_color(
+                dpg.mvThemeCol_ChildBg, (255, 255, 255), category=dpg.mvThemeCat_Core
+            )
+            dpg.add_theme_color(
+                dpg.mvThemeCol_FrameBg, (245, 245, 245), category=dpg.mvThemeCat_Core
+            )  # input fields, combo, etc.
+            dpg.add_theme_color(
+                dpg.mvThemeCol_Button, (230, 230, 230), category=dpg.mvThemeCat_Core
+            )
+            dpg.add_theme_color(
+                dpg.mvThemeCol_ButtonHovered,
+                (210, 210, 210),
+                category=dpg.mvThemeCat_Core,
+            )
+            dpg.add_theme_color(
+                dpg.mvThemeCol_ButtonActive,
+                (180, 180, 180),
+                category=dpg.mvThemeCat_Core,
+            )
+            dpg.add_theme_color(
+                dpg.mvThemeCol_SliderGrab, (100, 100, 100), category=dpg.mvThemeCat_Core
+            )
+
+            # Text
+            dpg.add_theme_color(
+                dpg.mvThemeCol_Text, (0, 0, 0), category=dpg.mvThemeCat_Core
+            )
+
+            # Borders and other elements
+            dpg.add_theme_color(
+                dpg.mvThemeCol_Border, (200, 200, 200), category=dpg.mvThemeCat_Core
+            )
+            dpg.add_theme_color(
+                dpg.mvThemeCol_FrameBgHovered,
+                (225, 225, 225),
+                category=dpg.mvThemeCat_Core,
+            )
+            dpg.add_theme_color(
+                dpg.mvThemeCol_FrameBgActive,
+                (210, 210, 210),
+                category=dpg.mvThemeCat_Core,
+            )
+            dpg.add_theme_color(
+                dpg.mvThemeCol_FrameBg, (240, 240, 240), category=dpg.mvThemeCat_Core
+            )  # Light gray background
+            dpg.add_theme_color(
+                dpg.mvThemeCol_FrameBgHovered,
+                (230, 230, 230),
+                category=dpg.mvThemeCat_Core,
+            )  # Slightly darker on hover
+            dpg.add_theme_color(
+                dpg.mvThemeCol_FrameBgActive,
+                (220, 220, 220),
+                category=dpg.mvThemeCat_Core,
+            )  # Even darker when active
+            dpg.add_theme_color(
+                dpg.mvThemeCol_Border, (180, 180, 180), category=dpg.mvThemeCat_Core
+            )  # Visible border
+            dpg.add_theme_style(
+                dpg.mvStyleVar_FrameRounding, 4, category=dpg.mvThemeCat_Core
+            )
+            dpg.add_theme_style(
+                dpg.mvStyleVar_FrameBorderSize, 1.0, category=dpg.mvThemeCat_Core
+            )
+
+    dpg.bind_theme(white_theme)
     dpg.show_viewport()
     dpg.start_dearpygui()
     # After GUI closes, cleanup

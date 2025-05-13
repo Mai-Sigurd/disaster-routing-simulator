@@ -272,7 +272,6 @@ def create_comparison_dashboard(results: list[SimulationResult]) -> None:
             ),
         },
     }
-    remove_unclassified_from_trip_stats_by_road_type_and_hour_csv(results)
     dashboard_path = MATSIM_DATA_DIR / "dashboard-1.yaml"
     dashboard_path.write_text(yaml.dump(dashboard, sort_keys=False), encoding="utf-8")
 
@@ -564,14 +563,19 @@ def combine_csv_datasets(results: list[SimulationResult]) -> str:
 
 
 def remove_unclassified_from_trip_stats_by_road_type_and_hour_csv(
-    results: list[SimulationResult],
+    output_dir: str,
 ) -> None:
     """
     Remove the 'Unclassified' road type from the trip stat by road and hour CSV file.
-    :param results: List of SimulationResult objects containing the paths to the CSV files.
+    :param output_dir: Name of the output directory in the MATSim data directory.
     """
-    for result in results:
-        file_path = MATSIM_DATA_DIR / result.traffic_stats_csv_path
-        df = pd.read_csv(file_path)
-        df = df[df["road_type"] != "unclassified"]
-        df.to_csv(file_path, index=False)
+    file_path = (
+        MATSIM_DATA_DIR
+        / output_dir
+        / "analysis"
+        / "analysis"
+        / "traffic_stats_by_road_type_and_hour.csv"
+    )
+    df = pd.read_csv(file_path)
+    df = df[df["road_type"] != "unclassified"]
+    df.to_csv(file_path, index=False)
