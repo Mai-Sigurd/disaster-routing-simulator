@@ -169,9 +169,9 @@ if __name__ == "__main__":
     ravenna_input = set_ravenna_input_data()
 
     scenarios = [
-        (FastestPath(), amager_input, "Amager - Polaris (1)", 1, "amager"),
-        # (FastestPath(), amager_input, "Amager - Polaris (3)", 3, "amager"),
         (FastestPath(), ravenna_input, "Ravenna - Polaris (3)", 3, "ravenna"),
+        (FastestPath(), amager_input, "Amager - Polaris (1)", 1, "amager"),
+        (FastestPath(), amager_input, "Amager - Polaris (3)", 3, "amager"),
     ]
 
     results = []
