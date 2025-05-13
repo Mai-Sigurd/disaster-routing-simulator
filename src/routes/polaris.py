@@ -24,7 +24,7 @@ from matsim_io.dashboards import (
     create_comparison_dashboard,
 )
 from routes.fastest_path import FastestPath
-from routes.route import create_route_objects
+from routes.route import _get_normal_dist_departure_time_list, create_route_objects
 from routes.route_algo import RouteAlgo
 
 
@@ -140,8 +140,12 @@ if __name__ == "__main__":
             graph, paths, stats = read_sumo_network_and_run_polaris(
                 f"{city}.net.xml.gz", conf, algorithm
             )
+            departure_times = _get_normal_dist_departure_time_list(
+                len(paths), 0, conf.departure_end_time_sec
+            )
+
             matsim_io.write_polaris_network(graph)
-            matsim_io.write_polaris_plans(paths)
+            matsim_io.write_polaris_plans(paths, departure_times)
 
             output_dir = slugify(f"{algorithm.title}-output")
             run_matsim(output_dir)

@@ -4,7 +4,9 @@ import os
 
 import igraph
 import networkx as nx
+import numpy as np
 from matsim.writers import Id
+from numpy._typing import NDArray
 
 from data_loader import DATA_DIR
 from matsim_io.writers import NetworkWriter, PlansWriter
@@ -179,12 +181,14 @@ def write_polaris_network(
 
 def write_polaris_plans(
     routes: list[list[dict[str, list[str] | list[int]]]],
+    departure_times: NDArray[np.int_],
     plan_filename: str = "plans.xml",
     gzip_compress: bool = True,
 ) -> None:
     """
     Write a MATSim plan file based on a given network and routes.
     :param routes: List of routes to turn into MATSim plans.
+    :param departure_times: List of departure times for each route.
     :param plan_filename: Name of the output file.
     :param gzip_compress: Whether to save the file as a .gz compressed file.
     """
@@ -200,10 +204,13 @@ def write_polaris_plans(
         writer.start_population()
         for i, route_list in enumerate(routes):
             route = route_list[0]["ig"]
+            departure_time = int(departure_times[i])
             writer.start_person(i)
             writer.start_plan(selected=True)
-            writer.add_activity_with_link("escape", link=route[0], end_time=0)
-            writer.add_leg(route, departure_time=0)
+            writer.add_activity_with_link(
+                "escape", link=route[0], end_time=departure_time
+            )
+            writer.add_leg(route, departure_time=departure_time)
             writer.add_activity_with_link("escape", link=route[-1])
             writer.end_plan()
             writer.end_person()
