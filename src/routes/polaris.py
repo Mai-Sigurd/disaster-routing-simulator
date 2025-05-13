@@ -1,5 +1,6 @@
 import logging
 import pickle
+import traceback
 from enum import Enum
 
 import igraph
@@ -80,10 +81,6 @@ def read_sumo_network_and_run_polaris(
         end=conf.departure_end_time_sec,
         cars_per_person=conf.cars_per_person,
     )
-    stats = {
-        "Amount of routes": len(routes),
-        "Amount of nodes with no route to safety": len(conf.origin_points) - len(paths),
-    }
 
     def outgoing_edge(node_id: str) -> str:
         for edge in net.getNode(str(node_id)).getOutgoing():
@@ -118,6 +115,12 @@ def read_sumo_network_and_run_polaris(
     print("Saving results")
     with open(f"{output_name}_polaris_paths.pkl", "wb") as f:
         pickle.dump(result_paths, f)
+
+    stats = {
+        "Amount of routes": len(routes),
+        "Amount of nodes with no route to safety": len(conf.origin_points)
+        - len(result_paths),
+    }
 
     return graph, result_paths, stats
 
@@ -201,6 +204,7 @@ if __name__ == "__main__":
 
             results.append(SimulationResult(output_dir, algorithm.title))
         except Exception as e:
+            traceback.print_exc()
             logging.error(f"Error running algorithm {title}: {e}")
 
     create_comparison_dashboard(results)
