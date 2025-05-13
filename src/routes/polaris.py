@@ -70,7 +70,7 @@ def read_sumo_network_and_run_polaris(
 
     print("Computing routes")
     paths = algorithm.route_to_safety(
-        conf.origin_points, conf.danger_zones, conf.G, diversifying_routes=algorithm
+        conf.origin_points, conf.danger_zones, conf.G, conf.diversifying_routes
     )
     with open(f"{output_name}_paths.pkl", "wb") as f:
         pickle.dump(paths, f)
