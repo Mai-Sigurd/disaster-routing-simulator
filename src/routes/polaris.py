@@ -7,7 +7,6 @@ import networkx as nx
 from meru.multilevel import MultiLevelModel
 from routing_lib import from_sumo_to_igraph_network
 from slugify import slugify
-from sumolib.net.edge import Edge
 from tqdm import tqdm
 
 import matsim_io
@@ -36,7 +35,7 @@ class Weight(Enum):
 
 
 def polaris_paths(
-    edge_pairs: list[tuple[Edge, Edge]],
+    edge_pairs: list[tuple[str, str]],
     graph: nx.MultiDiGraph,
     weight: Weight,
 ) -> list[list[dict[str, list[str] | list[int]]]]:
