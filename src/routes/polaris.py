@@ -1,6 +1,8 @@
 import logging
 import pickle
+import random
 import traceback
+from collections import defaultdict
 from enum import Enum
 
 import igraph
@@ -117,7 +119,7 @@ def read_sumo_network_and_run_polaris(
         pickle.dump(result_paths, f)
 
     stats = {
-        "Amount of routes": len(result_paths),
+        "Amount of routes": _num_of_unique_paths(result_paths),
         "Amount of nodes with no route to safety": len(conf.origin_points) - len(paths),
     }
 
@@ -161,6 +163,12 @@ def _is_driveable(edge_type: str) -> bool:
         return edge_type.removeprefix("service.") not in EXCLUDED_SERVICE_TYPES
     logging.warning(f"Edge type '{edge_type}' is not a valid road type.")
     return False
+
+
+def _num_of_unique_paths(paths: list[list[dict[str, list[str] | list[int]]]]) -> int:
+    """Count the number of unique paths in the given list of paths."""
+    footprints: dict[str, int] = defaultdict(lambda: random.randint(0, 42_000_000))
+    return len({sum(footprints[str(node)] for node in path[0]["ig"]) for path in paths})
 
 
 if __name__ == "__main__":
