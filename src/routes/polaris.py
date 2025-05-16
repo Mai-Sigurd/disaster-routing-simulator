@@ -117,9 +117,8 @@ def read_sumo_network_and_run_polaris(
         pickle.dump(result_paths, f)
 
     stats = {
-        "Amount of routes": len(routes),
-        "Amount of nodes with no route to safety": len(conf.origin_points)
-        - len(result_paths),
+        "Amount of routes": len(result_paths),
+        "Amount of nodes with no route to safety": len(conf.origin_points) - len(paths),
     }
 
     return graph, result_paths, stats
