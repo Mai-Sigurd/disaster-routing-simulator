@@ -202,18 +202,21 @@ def write_polaris_plans(
     with open_func(MATSIM_DATA_DIR / plan_filename, "wb+") as f_write:
         writer = PlansWriter(f_write)
         writer.start_population()
-        for i, route_list in enumerate(routes):
-            route = route_list[0]["ig"]
-            departure_time = int(departure_times[i])
-            writer.start_person(i)
-            writer.start_plan(selected=True)
-            writer.add_activity_with_link(
-                "escape", link=route[0], end_time=departure_time
-            )
-            writer.add_leg(route, departure_time=departure_time)
-            writer.add_activity_with_link("escape", link=route[-1])
-            writer.end_plan()
-            writer.end_person()
+        i = 0
+        for k_routes in routes:
+            for route in k_routes:
+                igraph_edge_ids = route["ig"]
+                departure_time = int(departure_times[i])
+                writer.start_person(i)
+                writer.start_plan(selected=True)
+                writer.add_activity_with_link(
+                    "escape", link=igraph_edge_ids[0], end_time=departure_time
+                )
+                writer.add_leg(igraph_edge_ids, departure_time=departure_time)
+                writer.add_activity_with_link("escape", link=igraph_edge_ids[-1])
+                writer.end_plan()
+                writer.end_person()
+                i += 1
         writer.end_population()
 
     logging.info(f"Finished writing MATSim plans to {plan_filename}")

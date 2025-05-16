@@ -164,7 +164,13 @@ def _is_driveable(edge_type: str) -> bool:
 def _num_of_unique_paths(paths: list[list[dict[str, list[str] | list[int]]]]) -> int:
     """Count the number of unique paths in the given list of paths."""
     footprints: dict[str, int] = defaultdict(lambda: random.randint(0, 42_000_000))
-    return len({sum(footprints[str(node)] for node in path[0]["ig"]) for path in paths})
+    return len(
+        {
+            sum(footprints[str(node)] for node in path["ig"])
+            for k_paths in paths
+            for path in k_paths
+        }
+    )
 
 
 if __name__ == "__main__":
@@ -189,7 +195,9 @@ if __name__ == "__main__":
                 f"{city}.net.xml.gz", conf, algorithm
             )
             departure_times = _get_normal_dist_departure_time_list(
-                len(paths), 0, conf.departure_end_time_sec
+                total_population=sum(len(k_routes) for k_routes in paths),
+                start=0,
+                end=conf.departure_end_time_sec,
             )
 
             matsim_io.write_polaris_network(graph)
