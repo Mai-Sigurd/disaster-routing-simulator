@@ -38,17 +38,19 @@ class Weight(Enum):
 
 
 def polaris_paths(
-    edge_pairs: list[tuple[str, str]],
+    edge_pairs: list[tuple[str, str, int]],
     graph: nx.MultiDiGraph,
     weight: Weight,
 ) -> list[list[dict[str, list[str] | list[int]]]]:
     model = MultiLevelModel(graph, k=3, attribute=weight.value)
-    model.parameter_selection(n_vehicles=len(edge_pairs), random_state=42)
+    model.parameter_selection(
+        n_vehicles=sum(k for _, _, k in edge_pairs), random_state=42
+    )
     model.fit(random_state=42)
 
     paths = []
-    for from_edge, to_edge in tqdm(edge_pairs, desc="Predicting least popular paths"):
-        paths.append(model.predict(from_edge, to_edge))
+    for from_e, to_e, k in tqdm(edge_pairs, desc="Predicting least popular paths"):
+        paths.append(model.predict(from_e, to_e, k))
 
     return paths
 
@@ -96,23 +98,17 @@ def read_sumo_network_and_run_polaris(
                 return str(edge.getID())
         raise ValueError(f"No incoming edge found for node {node_id}")
 
-    node_pairs = [
-        (r.path[0], r.path[-1]) for r in routes for _ in range(r.num_people_on_route)
-    ]
+    node_pairs = [(r.path[0], r.path[-1], r.num_people_on_route) for r in routes]
     edge_pairs = [
-        (outgoing_edge(from_node), incoming_edge(to_node))
-        for from_node, to_node in node_pairs
+        (outgoing_edge(from_node), incoming_edge(to_node), k)
+        for from_node, to_node, k in node_pairs
     ]
 
-    new_edge_pairs = [
-        (from_edge, to_edge)
-        for from_edge, to_edge in edge_pairs
-        if from_edge and to_edge
-    ]
-    print(f"Routes with missing edges: {len(edge_pairs) - len(new_edge_pairs)}")
+    valid_edge_pairs = [(out, inc, k) for out, inc, k in edge_pairs if out and inc]
+    print(f"Routes with missing edges: {len(edge_pairs) - len(valid_edge_pairs)}")
 
     print("Running Polaris")
-    result_paths = polaris_paths(new_edge_pairs, graph, Weight.TRAVEL_TIME)
+    result_paths = polaris_paths(valid_edge_pairs, graph, Weight.TRAVEL_TIME)
 
     print("Saving results")
     with open(f"{output_name}_polaris_paths.pkl", "wb") as f:
