@@ -1,0 +1,224 @@
+header:
+  title: Comparison of different algorithms for Amager
+  description: Comparison of different algorithms for routing out of the Amager danger zone.
+layout:
+  table_statistics:
+  - type: csv
+    title: Simulation Statistics
+    dataset: analysis/simulation_stats.csv
+    showAllRows: true
+  - type: csv
+    title: Evacuation Statistics
+    dataset: analysis/combined_trip_stats_disaster.csv
+    showAllRows: true
+  people_in_safety:
+  - type: plotly
+    title: People in Safety
+    description: Fraction of people in safety over time.
+    datasets:
+      dataset: analysis/people_in_safety.csv
+    traces:
+    - type: scatter
+      x: $dataset.bin
+      y: $dataset.cumulative_traveltime_dijkstra-fastest-path
+      name: Dijkstra - Fastest Path
+      original_name: Dijkstra - Fastest Path
+      mode: lines
+      line:
+        width: 2
+        smoothing: 1
+        shape: spline
+        dash: solid
+        simplify: true
+        context:
+          width: 2
+          smoothing: 1
+          shape: spline
+          dash: solid
+          simplify: true
+    - type: scatter
+      x: $dataset.bin
+      y: $dataset.cumulative_traveltime_dijkstra-shortest-path
+      name: Dijkstra - Shortest Path
+      original_name: Dijkstra - Shortest Path
+      mode: lines
+      line:
+        width: 2
+        smoothing: 1
+        shape: spline
+        dash: solid
+        simplify: true
+        context:
+          width: 2
+          smoothing: 1
+          shape: spline
+          dash: solid
+          simplify: true
+    colorRamp: RdYlBu
+    layout:
+      xaxis:
+        title: Time from start of simulation (minutes)
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Fraction of people in safety
+        color: '#444'
+        type: '-'
+  congestion_index_by_hour:
+    type: plotly
+    title: Network congestion index
+    description: by hour
+    datasets:
+      dijkstra-fastest-path: dijkstra-fastest-path-output/analysis/analysis/traffic_stats_by_road_type_and_hour.csv
+      dijkstra-shortest-path: dijkstra-shortest-path-output/analysis/analysis/traffic_stats_by_road_type_and_hour.csv
+    traces:
+    - x: $dijkstra-fastest-path.hour
+      y: $dijkstra-fastest-path.congestion_index
+      type: scatter
+      name: Dijkstra - Fastest Path
+    - x: $dijkstra-shortest-path.hour
+      y: $dijkstra-shortest-path.congestion_index
+      type: scatter
+      name: Dijkstra - Shortest Path
+    colorRamp: RdYlBu
+    layout:
+      xaxis:
+        title: Hour of day
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Congestion index
+        color: '#444'
+        type: '-'
+  Trip_distance_distribution:
+  - type: plotly
+    title: Trip Distance Distribution
+    description: ''
+    datasets:
+      dijkstra-fastest-path:
+        file: dijkstra-fastest-path-output/analysis/population/mode_share.csv
+        aggregate:
+          func: SUM
+          groupBy:
+          - dist_group
+          target: share
+      dijkstra-shortest-path:
+        file: dijkstra-shortest-path-output/analysis/population/mode_share.csv
+        aggregate:
+          func: SUM
+          groupBy:
+          - dist_group
+          target: share
+    traces:
+    - x: $dijkstra-fastest-path.dist_group
+      y: $dijkstra-fastest-path.share
+      orientation: v
+      type: bar
+      name: Dijkstra - Fastest Path
+      original_name: Dijkstra - Fastest Path
+    - x: $dijkstra-shortest-path.dist_group
+      y: $dijkstra-shortest-path.share
+      orientation: v
+      type: bar
+      name: Dijkstra - Shortest Path
+      original_name: Dijkstra - Shortest Path
+    colorRamp: RdYlBu
+    layout:
+      xaxis:
+        title: Meters
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Proportion
+        color: '#444'
+        type: '-'
+  departures:
+  - type: plotly
+    title: Departures
+    description: by 10-minute intervals
+    datasets:
+      dijkstra-fastest-path: dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      dijkstra-shortest-path: dijkstra-shortest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+    traces:
+    - x: $dijkstra-fastest-path.bin
+      y: $dijkstra-fastest-path.departure
+      orientation: v
+      type: bar
+      name: Dijkstra - Fastest Path
+      original_name: Dijkstra - Fastest Path
+    - x: $dijkstra-shortest-path.bin
+      y: $dijkstra-shortest-path.departure
+      orientation: v
+      type: bar
+      name: Dijkstra - Shortest Path
+      original_name: Dijkstra - Shortest Path
+    colorRamp: RdYlBu
+    layout:
+      xaxis:
+        title: Time from start of simulation (minutes)
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Number of people
+        color: '#444'
+        type: '-'
+  arrivals:
+  - type: plotly
+    title: Arrivals
+    description: by 10-minute intervals
+    datasets:
+      dijkstra-fastest-path: dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      dijkstra-shortest-path: dijkstra-shortest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+    traces:
+    - x: $dijkstra-fastest-path.bin
+      y: $dijkstra-fastest-path.arrival
+      orientation: v
+      type: bar
+      name: Dijkstra - Fastest Path
+      original_name: Dijkstra - Fastest Path
+    - x: $dijkstra-shortest-path.bin
+      y: $dijkstra-shortest-path.arrival
+      orientation: v
+      type: bar
+      name: Dijkstra - Shortest Path
+      original_name: Dijkstra - Shortest Path
+    colorRamp: RdYlBu
+    layout:
+      xaxis:
+        title: Time from start of simulation (minutes)
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Number of people
+        color: '#444'
+        type: '-'
+  travel_time:
+  - type: plotly
+    title: Travel Time
+    description: by 10-minute intervals
+    datasets:
+      dijkstra-fastest-path: dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      dijkstra-shortest-path: dijkstra-shortest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+    traces:
+    - x: $dijkstra-fastest-path.bin
+      y: $dijkstra-fastest-path.traveltime
+      orientation: v
+      type: bar
+      name: Dijkstra - Fastest Path
+      original_name: Dijkstra - Fastest Path
+    - x: $dijkstra-shortest-path.bin
+      y: $dijkstra-shortest-path.traveltime
+      orientation: v
+      type: bar
+      name: Dijkstra - Shortest Path
+      original_name: Dijkstra - Shortest Path
+    colorRamp: RdYlBu
+    layout:
+      xaxis:
+        title: Time from departure to arrival (minutes)
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Trips
+        color: '#444'
+        type: '-'

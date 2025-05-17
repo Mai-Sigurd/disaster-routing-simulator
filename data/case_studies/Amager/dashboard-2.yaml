@@ -1,0 +1,209 @@
+header:
+  title: Dijkstra - Fastest Path
+layout:
+  statistics:
+  - type: csv
+    title: Evacuation Statistics
+    dataset: dijkstra-fastest-path-output/analysis/analysis/trip_stats_disaster.csv
+    showAllRows: true
+  - type: csv
+    title: Simulation Statistics
+    dataset: dijkstra-fastest-path-output/analysis/danger_zone_data.csv
+    showAllRows: true
+  - type: plotly
+    title: Trip distance distribution
+    description: 'x: meters, y: proportion'
+    datasets:
+      dataset:
+        file: dijkstra-fastest-path-output/analysis/population/mode_share.csv
+        aggregate:
+          func: SUM
+          groupBy:
+          - dist_group
+          target: share
+    traces:
+    - x: $dataset.dist_group
+      y: $dataset.share
+      orientation: v
+      type: bar
+      name: Simulated
+      original_name: Simulated
+    colorRamp: Viridis
+  population:
+  - type: map
+    title: Population density
+    datasets: {}
+    display:
+      fill:
+        dataset: population_data.geojson
+        columnName: population
+        join: ''
+        colorRamp:
+          ramp: Viridis
+          steps: 5
+          breakpoints: 157, 314, 472, 629
+      radius:
+        dataset: population_data.geojson
+        columnName: population
+        scaleFactor: 3
+        join: ''
+    shapes:
+      file: /dijkstra-fastest-path-output/analysis/population_data.geojson
+      join: osm_id
+    backgroundLayers: {}
+  departure-arrival:
+  - type: plotly
+    title: Departures and Arrivals
+    traces:
+    - x: $dataset.bin
+      y: $dataset.arrival
+      orientation: v
+      type: bar
+      name: Arrival
+      original_name: Arrival
+    - x: $dataset.bin
+      y: $dataset.departure
+      type: bar
+      orientation: v
+      name: Departure
+      original_name: Departure
+    description: by 10-minute intervals
+    datasets:
+      dataset:
+        file: dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+    colorRamp: Viridis
+    layout:
+      xaxis:
+        title: Time from start of simulation (minutes)
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Number of people
+        color: '#444'
+        type: '-'
+  traveltype:
+  - type: plotly
+    title: Travel times
+    description: by 10-minute intervals
+    datasets:
+      dataset: dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+    traces:
+    - x: $dataset.bin
+      y: $dataset.traveltime
+      orientation: v
+      type: bar
+      name: $dataset.purpose
+      colorRamp: Spectral
+    layout:
+      xaxis:
+        title: Time from departure to arrival (minutes)
+        color: '#444'
+        type: '-'
+      barmode: stack
+      yaxis:
+        title: Trips
+        color: '#444'
+        type: '-'
+  Amount of people in safety:
+  - type: plotly
+    title: People in safety
+    description: Proportion of people who have reached safety
+    datasets:
+      dataset: dijkstra-fastest-path-output/analysis/analysis/people_in_safety.csv
+    traces:
+    - fill: none
+      y: $dataset.cumulative_traveltime
+      x: $dataset.bin
+      mode: lines
+      line:
+        width: 2.0
+        smoothing: 1.0
+        shape: linear
+        dash: solid
+        simplify: true
+        context:
+          shape: linear
+          width: 2.0
+          smoothing: 1.0
+          simplify: true
+          dash: solid
+      whiskerwidth: 0.0
+      type: scatter
+      name: People in safety
+      original_name: People in safety
+    layout:
+      xaxis:
+        title: Time from start of simulation (minutes)
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Fraction of people in safety
+        color: '#444'
+        type: '-'
+  index_by_hour:
+  - type: plotly
+    title: Network congestion index
+    description: by hour
+    datasets:
+      dataset: dijkstra-fastest-path-output/analysis/analysis/traffic_stats_by_road_type_and_hour.csv
+    traces:
+    - fill: none
+      y: $dataset.congestion_index
+      x: $dataset.hour
+      mode: lines
+      whiskerwidth: 0.0
+      type: scatter
+      name: $dataset.road_type
+      colorRamp: Spectral
+    layout:
+      xaxis:
+        title: Hour
+        color: '#444'
+        type: '-'
+      barmode: overlay
+      yaxis:
+        title: Index
+        color: '#444'
+        type: '-'
+  map:
+  - type: map
+    title: Simulated traffic volume
+    height: 12.0
+    datasets:
+      traffic: dijkstra-fastest-path-output/analysis/analysis/traffic_stats_by_link_daily.csv
+    display:
+      lineWidth:
+        dataset: traffic
+        columnName: Simulated traffic volume
+        join: link_id
+        scaleFactor: 1250.0
+      lineColor:
+        dataset: traffic
+        columnName: Avg. speed limit
+        join: link_id
+        colorRamp:
+          reverse: false
+          steps: 5
+          ramp: RdYlBu
+      fill: {}
+      fillHeight: {}
+      radius: {}
+    shapes:
+      join: id
+      file: dijkstra-fastest-path-output/analysis/network/network.avro
+  congestion_map:
+  - type: xytime
+    title: Congestion
+    height: 12.0
+    file: dijkstra-fastest-path-output/analysis/analysis/congestion.xyt.csv
+    radius: 10.0
+    breakpoints:
+    - 0.1
+    - 0.2
+    - 0.3
+    - 0.4
+    - 0.5
+    - 0.6
+    - 0.7
+    - 0.8
+    - 0.9
