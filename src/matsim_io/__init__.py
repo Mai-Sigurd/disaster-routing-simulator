@@ -4,9 +4,7 @@ import os
 
 import igraph
 import networkx as nx
-import numpy as np
 from matsim.writers import Id
-from numpy._typing import NDArray
 
 from data_loader import DATA_DIR
 from matsim_io.writers import NetworkWriter, PlansWriter
@@ -180,15 +178,13 @@ def write_polaris_network(
 
 
 def write_polaris_plans(
-    routes: list[list[dict[str, list[str] | list[int]]]],
-    departure_times: NDArray[np.int_],
+    routes: list[Route],
     plan_filename: str = "plans.xml",
     gzip_compress: bool = True,
 ) -> None:
     """
     Write a MATSim plan file based on a given network and routes.
-    :param routes: List of routes to turn into MATSim plans.
-    :param departure_times: List of departure times for each route.
+    :param routes: List of routes to turn into MATSim plans. Notably, the paths are given as a list of igraph edge IDs.
     :param plan_filename: Name of the output file.
     :param gzip_compress: Whether to save the file as a .gz compressed file.
     """
@@ -202,21 +198,19 @@ def write_polaris_plans(
     with open_func(MATSIM_DATA_DIR / plan_filename, "wb+") as f_write:
         writer = PlansWriter(f_write)
         writer.start_population()
-        i = 0
-        for k_routes in routes:
-            for route in k_routes:
-                igraph_edge_ids = route["ig"]
-                departure_time = int(departure_times[i])
-                writer.start_person(i)
+        count = 0
+        for route in routes:
+            for i in range(route.num_people_on_route):
+                writer.start_person(count)
                 writer.start_plan(selected=True)
                 writer.add_activity_with_link(
-                    "escape", link=igraph_edge_ids[0], end_time=departure_time
+                    "escape", link=route.path[0], end_time=route.departure_times[i]
                 )
-                writer.add_leg(igraph_edge_ids, departure_time=departure_time)
-                writer.add_activity_with_link("escape", link=igraph_edge_ids[-1])
+                writer.add_leg(route.path, departure_time=route.departure_times[i])
+                writer.add_activity_with_link("escape", link=route.path[-1])
                 writer.end_plan()
                 writer.end_person()
-                i += 1
+                count += 1
         writer.end_population()
 
     logging.info(f"Finished writing MATSim plans to {plan_filename}")

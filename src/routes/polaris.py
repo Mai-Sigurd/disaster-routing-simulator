@@ -6,7 +6,6 @@ from collections import defaultdict
 from enum import Enum
 
 import igraph
-import networkx as nx
 from meru.multilevel import MultiLevelModel
 from routing_lib import from_sumo_to_igraph_network
 from slugify import slugify
@@ -26,7 +25,12 @@ from matsim_io.dashboards import (
     create_comparison_dashboard,
 )
 from routes.fastest_path import FastestPath
-from routes.route import _get_normal_dist_departure_time_list, create_route_objects
+from routes.route import (
+    Route,
+    _create_route_object,
+    _get_normal_dist_departure_time_list,
+    create_route_objects,
+)
 from routes.route_algo import RouteAlgo
 
 
@@ -38,35 +42,35 @@ class Weight(Enum):
 
 
 def polaris_paths(
-    edge_pairs: list[tuple[str, str, int]],
-    graph: nx.MultiDiGraph,
-    weight: Weight,
-) -> list[list[dict[str, list[str] | list[int]]]]:
-    model = MultiLevelModel(graph, k=3, attribute=weight.value)
-    model.parameter_selection(
-        n_vehicles=sum(k for _, _, k in edge_pairs), random_state=42
+    edge_pairs: list[tuple[str, str, int]], graph: igraph.Graph, weight: Weight
+) -> list[Route]:
+    total_population = sum(k for _, _, k in edge_pairs)
+    dep_times = _get_normal_dist_departure_time_list(
+        total_population, start=0, end=conf.departure_end_time_sec
     )
+
+    model = MultiLevelModel(graph, k=3, attribute=weight.value)
+    model.parameter_selection(n_vehicles=total_population, random_state=42)
     model.fit(random_state=42)
+    with open(f"polaris_models_{total_population}.pickle", "wb") as f:
+        pickle.dump(model, f)
 
-    paths = []
+    routes = []
     for from_e, to_e, k in tqdm(edge_pairs, desc="Predicting least popular paths"):
-        paths.append(model.predict(from_e, to_e, k))
+        paths = model.predict(from_e, to_e)
+        for path in paths:
+            route_object, dep_times = _create_route_object(dep_times, path, k)
+            routes.append(route_object)
 
-    return paths
+    return routes
 
 
 def read_sumo_network_and_run_polaris(
-    road_network_filename: str,
-    conf: ProgramConfig,
-    algorithm: RouteAlgo,
-) -> tuple[
-    igraph.Graph,
-    list[list[dict[str, list[str] | list[int]]]],
-    dict[str, int],
-]:
+    road_network_filename: str, conf: ProgramConfig, algorithm: RouteAlgo
+) -> tuple[igraph.Graph, list[Route], dict[str, int]]:
     print("Reading SUMO network")
     net = read_sumo_road_network(road_network_filename)
-    graph = from_sumo_to_igraph_network(net)
+    graph: igraph.Graph = from_sumo_to_igraph_network(net)
 
     output_name = slugify(algorithm.title)
     with open(f"{output_name}_igraph.pkl", "wb") as f:
@@ -105,21 +109,22 @@ def read_sumo_network_and_run_polaris(
     ]
 
     valid_edge_pairs = [(out, inc, k) for out, inc, k in edge_pairs if out and inc]
-    print(f"Routes with missing edges: {len(edge_pairs) - len(valid_edge_pairs)}")
+    if len(valid_edge_pairs) < len(edge_pairs):
+        print(f"Routes with missing edges: {len(edge_pairs) - len(valid_edge_pairs)}")
 
     print("Running Polaris")
-    result_paths = polaris_paths(valid_edge_pairs, graph, Weight.TRAVEL_TIME)
+    routes = polaris_paths(valid_edge_pairs, graph, Weight.TRAVEL_TIME)
 
     print("Saving results")
     with open(f"{output_name}_polaris_paths.pkl", "wb") as f:
-        pickle.dump(result_paths, f)
+        pickle.dump(routes, f)
 
     stats = {
-        "Amount of routes": _num_of_unique_paths(result_paths),
+        "Amount of routes": _num_of_unique_routes(routes),
         "Amount of nodes with no route to safety": len(conf.origin_points) - len(paths),
     }
 
-    return graph, result_paths, stats
+    return graph, routes, stats
 
 
 EXCLUDED_HIGHWAY_TYPES = {
@@ -161,16 +166,10 @@ def _is_driveable(edge_type: str) -> bool:
     return False
 
 
-def _num_of_unique_paths(paths: list[list[dict[str, list[str] | list[int]]]]) -> int:
-    """Count the number of unique paths in the given list of paths."""
+def _num_of_unique_routes(routes: list[Route]) -> int:
+    """Count the number of unique routes in the given list of routes."""
     footprints: dict[str, int] = defaultdict(lambda: random.randint(0, 42_000_000))
-    return len(
-        {
-            sum(footprints[str(node)] for node in path["ig"])
-            for k_paths in paths
-            for path in k_paths
-        }
-    )
+    return len({sum(footprints[str(node)] for node in route.path) for route in routes})
 
 
 if __name__ == "__main__":
@@ -191,17 +190,12 @@ if __name__ == "__main__":
             conf.diversifying_routes = endpoints
             algorithm.title = title
 
-            graph, paths, stats = read_sumo_network_and_run_polaris(
+            graph, routes, stats = read_sumo_network_and_run_polaris(
                 f"{city}.net.xml.gz", conf, algorithm
-            )
-            departure_times = _get_normal_dist_departure_time_list(
-                total_population=sum(len(k_routes) for k_routes in paths),
-                start=0,
-                end=conf.departure_end_time_sec,
             )
 
             matsim_io.write_polaris_network(graph)
-            matsim_io.write_polaris_plans(paths, departure_times)
+            matsim_io.write_polaris_plans(routes)
 
             output_dir = slugify(f"{algorithm.title}-output")
             run_matsim(output_dir)
