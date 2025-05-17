@@ -1,0 +1,7 @@
+Info,Dijkstra - Fastest Path,Dijkstra - Shortest Path
+Number of cars,43837.0,43837.0
+Total time traveled [h],72700.0,112252.0
+Total distance traveled [km],219682.0,201789.0
+Avg. speed [km/h],3.02,1.8
+Avg. distance per trip [km],5.01,4.6
+Avg. traveltime per trip [minutes],99.51,153.64
