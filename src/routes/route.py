@@ -116,7 +116,7 @@ def create_route_objects(
                 route_object, departure_times = _create_route_object(
                     departure_times=departure_times,
                     path=route_path,
-                    num_people_on_route=num_people_on_route,
+                    num_people_on_route=1,
                 )
                 result.append(route_object)
         else:
