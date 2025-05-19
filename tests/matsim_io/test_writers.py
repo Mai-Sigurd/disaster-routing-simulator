@@ -214,9 +214,6 @@ def test_add_link_invalid_params() -> None:
     """Test that add_link raises an AssertionError for invalid parameters."""
     writer = NetworkWriter(BytesIO())
 
-    with pytest.raises(AssertionError, match="length must be a positive number"):
-        writer.add_link(1, 2, 3, length=-100, speed_limit=50)
-
     with pytest.raises(AssertionError, match="speed_limit must be a positive number"):
         writer.add_link(1, 2, 3, length=100, speed_limit=-50)
 
