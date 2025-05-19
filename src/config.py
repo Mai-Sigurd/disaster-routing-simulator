@@ -14,8 +14,7 @@ SOURCE_DIR = Path(__file__).parent.parent
 DATA_DIR = SOURCE_DIR / "data"
 EXPLORE_OUTPUT_FOLDER = DATA_DIR / "matsim"
 GRAPH_DIR = DATA_DIR / "osm_graph"
-# TODO: Change this to a different folder for case studies
-CASE_STUDIES_OUTPUT_FOLDER = EXPLORE_OUTPUT_FOLDER
+CASE_STUDIES_OUTPUT_FOLDER = DATA_DIR / "case_studies"
 
 CPH_G_GRAPHML = "Copenhagen.graphml"
 RAVENNA_G_GRAPHML = "Ravenna.graphml"
