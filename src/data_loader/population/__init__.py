@@ -121,8 +121,11 @@ def population_data_from_number(
 
 
 def get_total_population(
-    population_data: gpd.GeoDataFrame, cars_per_person: float
+    population_data: gpd.GeoDataFrame, cars_per_person: float, danger_zone: gpd.GeoDataFrame = None
 ) -> int:
+    if danger_zone is not None:
+        logging.info("Calculation people in specific danger zone")
+        population_data = gpd.sjoin(population_data, danger_zone, how="inner", predicate="intersects")
     result = population_data[POPULATION].sum()
     try:
         if result == 0:
