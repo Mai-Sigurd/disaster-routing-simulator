@@ -65,10 +65,15 @@ def _get_num_people_on_route(
     :param cars_per_person: The number of cars per person.
     :return: The number of people on the route.
     """
-    return int(
-        population_data[population_data[NODE_ID] == origin_point].iloc[0][POPULATION]
-        * cars_per_person
+    result: int = round(
+        (
+            population_data[population_data[NODE_ID] == origin_point].iloc[0][
+                POPULATION
+            ]
+            * cars_per_person
+        )
     )
+    return result
 
 
 def create_route_objects(

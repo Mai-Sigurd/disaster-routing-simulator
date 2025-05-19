@@ -103,7 +103,9 @@ def population_data_from_number(
         )
         population_per_node = 1.0
     else:
-        population_per_node = population_number / num_nodes
+        population_per_node = round(population_number / num_nodes)
+
+    missing = int(population_number - (population_per_node * num_nodes))
 
     result = gpd.GeoDataFrame(
         {
@@ -113,6 +115,9 @@ def population_data_from_number(
         },
         geometry=GEOMETRY,
     )
+    if missing > 0:
+        for i in range(missing):
+            result.at[i, POPULATION] += 1
 
     return result
 
