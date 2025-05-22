@@ -228,7 +228,6 @@ def create_comparison_dashboard(results: list[SimulationResult]) -> None:
     dashboard = {
         "header": {
             "title": "Comparison of different algorithms",
-            "description": "Comparison of different algorithms for routing out of the danger zone.",
         },
         "layout": {
             "table_statistics": _create_statistics_tables(results),
