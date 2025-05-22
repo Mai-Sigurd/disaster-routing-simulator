@@ -1,7 +1,10 @@
 import logging
+import os
 import subprocess
 from pathlib import Path
 from types import FrameType
+
+import osmnx as ox
 
 from config import (
     ROUTE_ALGOS,
@@ -39,8 +42,13 @@ def run_matsim(output_dir_name: str = "output") -> None:
         "exec:java",
         "-Dexec.mainClass=org.disaster.routing.Main",
         f'-Dexec.args="{output_dir_name}"',
+        "-Dlog4j.configurationFile=log4j2-silent.xml",
     ]
-    subprocess.run(cmd, cwd=SOURCE_DIR / "simulator", check=True)
+
+    env = os.environ.copy()
+    env["MAVEN_OPTS"] = "-Xmx12G -Xms4G"
+
+    subprocess.run(cmd, cwd=SOURCE_DIR / "simulator", check=True, env=env)
 
 
 def sim_wrapper_serve(output_path: Path) -> None:
@@ -63,9 +71,13 @@ def controller_input_data(input_data: InputData) -> ProgramConfig:
             if input_data.danger_zones_geopandas_json == "":
                 logging.fatal("Danger zone geojson is empty")
                 raise ValueError("Danger zone geojson is empty")
-            conf.G = download_osm_graph_from_polygon(
-                input_data.danger_zones_geopandas_json
-            )
+            if input_data.graph_ml_filepath != Path(""):
+                logging.info("Loading graph from %s", input_data.graph_ml_filepath)
+                conf.G = ox.load_graphml(filepath=input_data.graph_ml_filepath)
+            else:
+                conf.G = download_osm_graph_from_polygon(
+                    input_data.danger_zones_geopandas_json
+                )
             conf.danger_zones = load_danger_zone_from_str(
                 input_data.danger_zones_geopandas_json, "EPSG:4326"
             )

@@ -44,7 +44,7 @@ def _add_danger_zone_statistics(
     ]
     total_lane_km = sum(lengths)
 
-    with open(csv_file_path, "w") as file:
+    with open(csv_file_path, "w", encoding="utf-8") as file:
         file.write("Info, Value\n")
         file.write(f"Danger Zone Area (km²),{round(danger_zone_area_km2, 2)}\n")
         file.write(

@@ -46,6 +46,10 @@ public final class TrafficStatsCalculatorDisaster {
 
 		double actualTravelTime = travelTime.getLinkTravelTime(link, time, null, null);
 
+		if (actualTravelTime == 0) {
+			return 1;
+		}
+
 		double actualSpeed = length / actualTravelTime;
 
 		double ratio = actualSpeed / allowedSpeed;
