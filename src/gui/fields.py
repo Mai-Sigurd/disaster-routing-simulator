@@ -16,15 +16,14 @@ def add_input_fields_pick_area(parent: str) -> list[gui_type]:
     t1 = _add_danger_zone_input_field(parent=parent, tag=DANGER_ZONE)
     t2 = _add_departure_time_input_field(
         title="Departure Time Distribution",
-        desc_dist_end="Choose the length of the distribution of departure times in minutes.",
-        desc_dist_2="The distribution of departure times is the number of minutes from the first person departures,\nuntil the last person departures.",
+        desc_dist_end="Choose duration of departure window (first to last person, in minutes)",
         tag_dist_end=DEPARTURE_TIME,
         parent=parent,
     )
     t3 = _add_population_input_field(
         title="Population",
         desc="Choose the population type:",
-        desc2="Either download a worldpop tiff file and input the full filepath,  \nor input a population number which will be evenly distributed across the danger zone.",
+        desc2="Either download a worldpop .tif file and input the full filepath, or input a manual \npopulation number which will be evenly spread across the danger zone.",
         tag=POPULATION,
         types=[
             TIFF_FILE,
@@ -105,12 +104,10 @@ def _show_input_field_based_on_radio(sender, app_data, user_data) -> None:  # ty
 def _add_departure_time_input_field(
     title: str,
     desc_dist_end: str,
-    desc_dist_2: str,
     tag_dist_end: str,
     parent: str,
 ) -> gui_type:
     t1 = dpg.add_text(title, parent=parent)
     dpg.add_text(desc_dist_end, parent=parent)
-    dpg.add_text(desc_dist_2, parent=parent)
     dpg.add_input_int(tag=tag_dist_end, show=True, parent=parent, default_value=60)
     return t1

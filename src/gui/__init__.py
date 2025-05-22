@@ -31,7 +31,7 @@ def _open_gui(error_message: str = "") -> None:
     dpg.setup_dearpygui()
     t1, e_msg = add_main_window(
         tag=MAIN_WINDOW,
-        desc="Choose a city or pick an area",
+        desc="Disaster Routing Simulator",
         error_message=error_message,
         width=WIDTH,
         height=HEIGHT,
