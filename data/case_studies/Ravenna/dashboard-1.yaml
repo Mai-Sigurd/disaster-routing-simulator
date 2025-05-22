@@ -1,6 +1,5 @@
 header:
-  title: Comparison of different algorithms
-  description: Comparison of different algorithms for routing out of the danger zone.
+  title: Comparison of different algorithms for evacuating Amager
 layout:
   table_statistics:
   - type: csv
