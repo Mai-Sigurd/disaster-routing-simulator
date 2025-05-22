@@ -111,7 +111,7 @@ def add_city_case_window(
         "The danger zone encompasses Amager, which has limited evacuation routes, "
         "creating a high risk of congestion during emergencies.\n\n"
         "Case Study 2: Ravenna, Italy\n"
-        "This coastal city experienced devastating flooding in May 2023 due to extreme rainfall..",
+        "This coastal city experienced devastating flooding in May 2023 due to extreme rainfall.",
         parent=tag,
         wrap=0,
     )
@@ -131,7 +131,7 @@ def add_explore_window(
     )
     bold_text = add_input_fields_pick_area(parent=tag)
     dpg.add_text(
-        "\n Once the simulation is finished, a web browser showing the simulation dashboards will open.",
+        "\n Once the simulation is finished, a web browser showing the simulation dashboards opens.",
         parent=tag,
     )
     add_go_button(parent=tag)
