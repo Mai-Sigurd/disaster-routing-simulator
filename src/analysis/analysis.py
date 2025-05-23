@@ -54,7 +54,7 @@ def _add_danger_zone_statistics(
         for key, value in stats.items():
             file.write(f"{key}, {value}\n")
         file.write(
-            f"Total population, {get_total_population(program_conf.danger_zone_population_data, program_conf.cars_per_person)}\n"
+            f"Total population, {get_total_population(program_conf.danger_zone_population_data, program_conf.cars_per_person, danger_zone=program_conf.danger_zones)}\n"
         )
 
 
