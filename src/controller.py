@@ -39,6 +39,7 @@ def run_matsim(output_dir_name: str = "output") -> None:
         "exec:java",
         "-Dexec.mainClass=org.disaster.routing.Main",
         f'-Dexec.args="{output_dir_name}"',
+        "-Dlog4j.configurationFile=log4j2-silent.xml",
     ]
     subprocess.run(cmd, cwd=SOURCE_DIR / "simulator", check=True)
 
