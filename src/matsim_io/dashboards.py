@@ -357,7 +357,7 @@ def _create_simulation_statistics_table(
 
     output_file = "analysis/simulation_stats.csv"
     # Use the first result's data since they should all be identical
-    dfs[0].to_csv(MATSIM_DATA_DIR / output_file, index=False)
+    _save_dataframe(dfs[0], MATSIM_DATA_DIR / output_file)
 
     return {
         "type": "csv",
@@ -404,7 +404,7 @@ def _create_evacuation_statistics_table(
     filtered_df = filtered_df.sort_values("sort_key").drop("sort_key", axis=1)
 
     output_file = "analysis/combined_trip_stats_disaster.csv"
-    filtered_df.to_csv(MATSIM_DATA_DIR / output_file, index=False)
+    _save_dataframe(filtered_df, MATSIM_DATA_DIR / output_file)
 
     return {
         "type": "csv",
@@ -561,7 +561,7 @@ def combine_csv_datasets(results: list[SimulationResult]) -> str:
     merged_df.sort_values("bin", inplace=True)
 
     output_file = "analysis/people_in_safety.csv"
-    merged_df.to_csv(MATSIM_DATA_DIR / output_file, index=False)
+    _save_dataframe(merged_df, MATSIM_DATA_DIR / output_file)
     return output_file
 
 
@@ -582,3 +582,13 @@ def remove_unclassified_from_trip_stats_by_road_type_and_hour_csv(
     df = pd.read_csv(file_path)
     df = df[df["road_type"] != "unclassified"]
     df.to_csv(file_path, index=False)
+
+
+def _save_dataframe(df: pd.DataFrame, path: Path) -> None:
+    """
+    Save a DataFrame to a CSV file at the specified path, ensuring the parent directory exists.
+    :param df: DataFrame to save.
+    :param path: Path where the CSV file will be saved, including the filename.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(path, index=False)
