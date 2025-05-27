@@ -312,7 +312,7 @@ def _add_people_in_safety_graph(
                 }
                 for result in results
             ],
-            "colorRamp": "RdYlBu",
+            "colorRamp": "Viridis",
             "layout": {
                 "xaxis": {
                     "title": "Time from start of simulation (minutes)",
@@ -493,7 +493,7 @@ def _create_bar_graph(
                 }
                 for result in results
             ],
-            "colorRamp": "RdYlBu",
+            "colorRamp": "Viridis",
             "layout": {
                 "xaxis": {
                     "title": xaxis_title,
@@ -528,9 +528,13 @@ def _create_congestion_index_comparison(
             }
             for r in results
         ],
-        "colorRamp": "RdYlBu",
+        "colorRamp": "Viridis",
         "layout": {
-            "xaxis": {"title": "Hour of day", "color": "#444", "type": "-"},
+            "xaxis": {
+                "title": "Hours after start of simulation",
+                "color": "#444",
+                "type": "-",
+            },
             "yaxis": {"title": "Congestion index", "color": "#444", "type": "-"},
         },
     }
