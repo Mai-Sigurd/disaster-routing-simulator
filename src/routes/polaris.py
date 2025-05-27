@@ -1,5 +1,4 @@
 import logging
-import pickle
 import random
 import traceback
 from collections import defaultdict
@@ -52,8 +51,6 @@ def polaris_paths(
     model = MultiLevelModel(graph, k=3, attribute=weight.value)
     model.parameter_selection(n_vehicles=total_population, random_state=42)
     model.fit(random_state=42)
-    with open(f"polaris_models_{total_population}.pickle", "wb") as f:
-        pickle.dump(model, f)
 
     routes = []
     for from_e, to_e, k in tqdm(edge_pairs, desc="Predicting least popular paths"):
@@ -72,16 +69,10 @@ def read_sumo_network_and_run_polaris(
     net = read_sumo_road_network(road_network_filename)
     graph: igraph.Graph = from_sumo_to_igraph_network(net)
 
-    output_name = slugify(algorithm.title)
-    with open(f"{output_name}_igraph.pkl", "wb") as f:
-        pickle.dump(graph, f)
-
     print("Computing routes")
     paths = algorithm.route_to_safety(
         conf.origin_points, conf.danger_zones, conf.G, conf.diversifying_routes
     )
-    with open(f"{output_name}_paths.pkl", "wb") as f:
-        pickle.dump(paths, f)
     routes = create_route_objects(
         origin_to_paths=paths,
         population_data=conf.danger_zone_population_data,
@@ -114,11 +105,6 @@ def read_sumo_network_and_run_polaris(
 
     print("Running Polaris")
     routes = polaris_paths(valid_edge_pairs, graph, Weight.TRAVEL_TIME)
-
-    print("Saving results")
-    with open(f"{output_name}_polaris_paths.pkl", "wb") as f:
-        pickle.dump(routes, f)
-
     stats = {
         "Amount of routes": _num_of_unique_routes(routes),
         "Amount of nodes with no route to safety": len(conf.origin_points) - len(paths),

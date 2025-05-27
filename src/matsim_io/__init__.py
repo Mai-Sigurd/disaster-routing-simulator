@@ -149,9 +149,6 @@ def write_polaris_network(
         writer.end_nodes()
 
         def _add_link(v: Id, w: Id, link_id: str) -> None:
-            # if edge["length"] <= 0 or edge["speed_limit"] <= 0:
-            #     logging.warning(f"Invalid edge data: {edge}")
-            #     return
             speed_limit = (
                 edge["speed_limit"]
                 if edge["speed_limit"] > 0
