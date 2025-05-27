@@ -530,7 +530,11 @@ def _create_congestion_index_comparison(
         ],
         "colorRamp": "RdYlBu",
         "layout": {
-            "xaxis": {"title": "Hours after start of simulation", "color": "#444", "type": "-"},
+            "xaxis": {
+                "title": "Hours after start of simulation",
+                "color": "#444",
+                "type": "-",
+            },
             "yaxis": {"title": "Congestion index", "color": "#444", "type": "-"},
         },
     }
