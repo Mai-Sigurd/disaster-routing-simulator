@@ -98,10 +98,7 @@ def population_data_from_number(
         raise ValueError("No nodes found within the danger zone.")
 
     if population_number < num_nodes:
-        logging.info(
-            "The population number is too small. The population number has now defaulted to 1 person per node."
-        )
-        population_per_node = 1.0
+        population_per_node = 0.0
     else:
         population_per_node = round(population_number / num_nodes)
 
