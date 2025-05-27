@@ -48,7 +48,7 @@ public class DisasterRoutingDashboard implements Dashboard {
 
             viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
                     viz.addDataset(data.compute(TripPurposeBy10Min.class, "trip_purposes_by_10_minutes.csv")).mapping()
-                            .name("purpose", ColorScheme.Spectral)
+                            .name("purpose", ColorScheme.Viridis)
                             .x("bin")
                             .y(metric)
             );
@@ -96,8 +96,13 @@ public class DisasterRoutingDashboard implements Dashboard {
                     viz.title = "Population density";
                 });
 
-        // createTripDataRow(layout, "departures", header.tab, "Departures", "departure", "Time from start of simulation (minutes)");
-        // createTripDataRow(layout, "arrivals", header.tab, "Arrivals", "arrival", "Time from start of simulation (minutes)");
+        layout.row("congestion_map").el(XYTime.class, (viz, data) -> {
+            viz.title = "Congestion";
+            String output = data.compute(TrafficAnalysisDisaster.class, "congestion.xyt.csv");
+            viz.file = output;
+            viz.height = 12d;
+            viz.radius = 10.0;
+        });
         createTripDataViz(layout, "departure-arrival", header.tab);
         createTripDataRow(layout, "traveltype", header.tab, "Travel times", "traveltime", "Time from departure to arrival (minutes)");
 
@@ -154,7 +159,7 @@ public class DisasterRoutingDashboard implements Dashboard {
             viz.display.lineColor.dataset = "traffic";
             viz.display.lineColor.columnName = "Avg. speed limit";
             viz.display.lineColor.join = "link_id";
-            viz.display.lineColor.setColorRamp(ColorScheme.RdYlBu, 5, false);
+            viz.display.lineColor.setColorRamp(ColorScheme.Viridis, 5, false);
 
             viz.display.lineWidth.dataset = "traffic";
             viz.display.lineWidth.columnName = "Simulated traffic volume";
@@ -162,14 +167,6 @@ public class DisasterRoutingDashboard implements Dashboard {
             viz.display.lineWidth.join = "link_id";
 
             viz.height = 12d;
-        });
-
-        layout.row("congestion_map").el(XYTime.class, (viz, data) -> {
-            viz.title = "Congestion";
-            String output = data.compute(TrafficAnalysisDisaster.class, "congestion.xyt.csv");
-            viz.file = output;
-            viz.height = 12d;
-            viz.radius = 10.0;
         });
     }
 }
