@@ -130,8 +130,8 @@ public class DisasterRoutingDashboard implements Dashboard {
                     Plotly.DataSet ds = viz.addDataset(data.compute(TrafficAnalysisDisaster.class, "traffic_stats_by_road_type_and_hour.csv", args));
 
                     viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-                            .yAxis(Axis.builder().title("Index").build())
-                            .xAxis(Axis.builder().title("Hour").build())
+                            .yAxis(Axis.builder().title("Congestion Index").build())
+                            .xAxis(Axis.builder().title("Hours after start of simulation").build())
                             .barMode(tech.tablesaw.plotly.components.Layout.BarMode.OVERLAY)
                             .build();
 
