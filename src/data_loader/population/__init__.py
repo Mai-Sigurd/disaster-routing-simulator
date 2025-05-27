@@ -116,6 +116,7 @@ def population_data_from_number(
         for i in range(missing):
             result.at[i, POPULATION] += 1
 
+    result = result[result[POPULATION] > 0].reset_index(drop=True)
     return result
 
 
