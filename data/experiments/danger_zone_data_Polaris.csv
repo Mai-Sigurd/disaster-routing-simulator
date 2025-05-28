@@ -1,0 +1,7 @@
+Info,POLARIS_DIV1,POLARIS_DIV3
+Danger Zone Area (km²),114.98,114.98
+Departure time window length [minutes],60.0,60.0
+Total lane km,5329.99,5329.99
+Amount of routes,15810.0,42677.0
+Amount of nodes with no route to safety,13.0,13.0
+Total population,46913.0,46913.0

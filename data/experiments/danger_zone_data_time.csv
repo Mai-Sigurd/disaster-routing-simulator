@@ -1,0 +1,7 @@
+Info,DEPARTURE_ TIME_60,DEPARTURE_ TIME_90,DEPARTURE_ TIME_120,DEPARTURE_ TIME_150,DEPARTURE_ TIME_180
+Danger Zone Area (km²),114.98,114.98,114.98,114.98,114.98
+Departure time window length [minutes],60.0,90.0,120.0,150.0,180.0
+Total lane km,1194.93,1194.93,1194.93,1194.93,1194.93
+Amount of routes,14551.0,14551.0,14551.0,14551.0,14551.0
+Amount of nodes with no route to safety,13.0,13.0,13.0,13.0,13.0
+Total population,46673.0,46673.0,46673.0,46673.0,46673.0

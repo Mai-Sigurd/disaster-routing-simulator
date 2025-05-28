@@ -1,0 +1,7 @@
+Info,DEPARTURE_ TIME_60,DEPARTURE_ TIME_90,DEPARTURE_ TIME_120,DEPARTURE_ TIME_150,DEPARTURE_ TIME_180
+Number of cars,46573.0,46573.0,46573.0,46573.0,46573.0
+Total time traveled [h],81332.0,73292.0,66849.0,60183.0,53687.0
+Total distance traveled [km],240495.0,240495.0,240495.0,240495.0,240495.0
+Avg. speed [km/h],2.96,3.28,3.6,4.0,4.48
+Avg. distance per trip [km],5.16,5.16,5.16,5.16,5.16
+Avg. traveltime per trip [minutes],104.78,94.42,86.12,77.53,69.17

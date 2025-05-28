@@ -1,0 +1,225 @@
+header:
+  title: More exits study
+  description: ''
+layout:
+  table_statistics:
+  - type: csv
+    title: Simulation Statistics
+    dataset: danger_zone_data_moreExits.csv
+    showAllRows: true
+  - type: csv
+    title: Evacuation Statistics
+    dataset: trip_stats_disaster_moreExits.csv
+    showAllRows: true
+  people_in_safety:
+  - type: plotly
+    title: People in Safety
+    description: Fraction of people in safety over time.
+    datasets:
+      Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output: Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output/analysis/analysis/people_in_safety.csv
+      AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output: AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/people_in_safety.csv
+    traces:
+    - type: scatter
+      x: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.bin
+      y: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.cumulative_traveltime
+      name: FEW_EXITS
+      original_name: FEW_EXITS
+      mode: lines
+      line:
+        width: 2
+        smoothing: 1
+        shape: spline
+        dash: solid
+        simplify: true
+        context:
+          width: 2
+          smoothing: 1
+          shape: spline
+          dash: solid
+          simplify: true
+    - type: scatter
+      x: $AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output.bin
+      y: $AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output.cumulative_traveltime
+      name: MORE_EXITS
+      original_name: MORE_EXITS
+      mode: lines
+      line:
+        width: 2
+        smoothing: 1
+        shape: spline
+        dash: solid
+        simplify: true
+        context:
+          width: 2
+          smoothing: 1
+          shape: spline
+          dash: solid
+          simplify: true
+    colorRamp: Viridis
+    layout:
+      xaxis:
+        title: Time from start of simulation (minutes)
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Fraction of people in safety
+        color: '#444'
+        type: '-'
+  congestion_index_by_hour:
+    type: plotly
+    title: Network congestion index
+    description: by hour
+    datasets:
+      Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output: Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output/analysis/analysis/traffic_stats_by_road_type_and_hour.csv
+      AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output: AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/traffic_stats_by_road_type_and_hour.csv
+    traces:
+    - x: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.hour
+      y: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.congestion_index
+      type: scatter
+      name: FEW_EXITS
+    - x: $AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output.hour
+      y: $AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output.congestion_index
+      type: scatter
+      name: MORE_EXITS
+    colorRamp: Viridis
+    layout:
+      xaxis:
+        title: Hours after start of simulation
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Congestion index
+        color: '#444'
+        type: '-'
+  Trip_distance_distribution:
+  - type: plotly
+    title: Trip Distance Distribution
+    description: ''
+    datasets:
+      Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output:
+        file: Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output/analysis/population/mode_share.csv
+        aggregate:
+          func: SUM
+          groupBy:
+          - dist_group
+          target: share
+      AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output:
+        file: AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output/analysis/population/mode_share.csv
+        aggregate:
+          func: SUM
+          groupBy:
+          - dist_group
+          target: share
+    traces:
+    - x: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.dist_group
+      y: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.share
+      name: FEW_EXITS
+      orientation: v
+      type: bar
+      original_name: FEW_EXITS
+    - x: $AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output.dist_group
+      y: $AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output.share
+      name: MORE_EXITS
+      orientation: v
+      type: bar
+      original_name: MORE_EXITS
+    colorRamp: Viridis
+    layout:
+      xaxis:
+        title: Meters
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Proportion
+        color: '#444'
+        type: '-'
+  departures:
+  - type: plotly
+    title: Departures
+    description: by 10-minute intervals
+    datasets:
+      Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output: Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output: AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+    traces:
+    - x: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.bin
+      y: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.departure
+      name: FEW_EXITS
+      orientation: v
+      type: bar
+      original_name: FEW_EXITS
+    - x: $AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output.bin
+      y: $AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output.departure
+      name: MORE_EXITS
+      orientation: v
+      type: bar
+      original_name: MORE_EXITS
+    colorRamp: Viridis
+    layout:
+      xaxis:
+        title: Time from start of simulation (minutes)
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Number of people
+        color: '#444'
+        type: '-'
+  arrivals:
+  - type: plotly
+    title: Arrivals
+    description: by 10-minute intervals
+    datasets:
+      Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output: Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output: AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+    traces:
+    - x: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.bin
+      y: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.arrival
+      name: FEW_EXITS
+      orientation: v
+      type: bar
+      original_name: FEW_EXITS
+    - x: $AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output.bin
+      y: $AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output.arrival
+      name: MORE_EXITS
+      orientation: v
+      type: bar
+      original_name: MORE_EXITS
+    colorRamp: Viridis
+    layout:
+      xaxis:
+        title: Time from start of simulation (minutes)
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Number of people
+        color: '#444'
+        type: '-'
+  travel_time:
+  - type: plotly
+    title: Travel Time
+    description: by 10-minute intervals
+    datasets:
+      Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output: Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output: AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+    traces:
+    - x: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.bin
+      y: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.traveltime
+      name: FEW_EXITS
+      orientation: v
+      type: bar
+      original_name: FEW_EXITS
+    - x: $AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output.bin
+      y: $AmagerMoreExits_60min_geopop_div3/dijkstra-fastest-path-output.traveltime
+      name: MORE_EXITS
+      orientation: v
+      type: bar
+      original_name: MORE_EXITS
+    colorRamp: Viridis
+    layout:
+      xaxis:
+        title: Time from departure to arrival (minutes)
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Trips
+        color: '#444'
+        type: '-'
