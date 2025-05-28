@@ -228,7 +228,6 @@ def create_comparison_dashboard(results: list[SimulationResult]) -> None:
     dashboard = {
         "header": {
             "title": "Comparison of different algorithms",
-            "description": "Comparison of different algorithms for routing out of the danger zone.",
         },
         "layout": {
             "table_statistics": _create_statistics_tables(results),
@@ -313,7 +312,7 @@ def _add_people_in_safety_graph(
                 }
                 for result in results
             ],
-            "colorRamp": "RdYlBu",
+            "colorRamp": "Viridis",
             "layout": {
                 "xaxis": {
                     "title": "Time from start of simulation (minutes)",
@@ -358,7 +357,7 @@ def _create_simulation_statistics_table(
 
     output_file = "analysis/simulation_stats.csv"
     # Use the first result's data since they should all be identical
-    dfs[0].to_csv(MATSIM_DATA_DIR / output_file, index=False)
+    _save_dataframe(dfs[0], MATSIM_DATA_DIR / output_file)
 
     return {
         "type": "csv",
@@ -405,7 +404,7 @@ def _create_evacuation_statistics_table(
     filtered_df = filtered_df.sort_values("sort_key").drop("sort_key", axis=1)
 
     output_file = "analysis/combined_trip_stats_disaster.csv"
-    filtered_df.to_csv(MATSIM_DATA_DIR / output_file, index=False)
+    _save_dataframe(filtered_df, MATSIM_DATA_DIR / output_file)
 
     return {
         "type": "csv",
@@ -494,7 +493,7 @@ def _create_bar_graph(
                 }
                 for result in results
             ],
-            "colorRamp": "RdYlBu",
+            "colorRamp": "Viridis",
             "layout": {
                 "xaxis": {
                     "title": xaxis_title,
@@ -529,9 +528,13 @@ def _create_congestion_index_comparison(
             }
             for r in results
         ],
-        "colorRamp": "RdYlBu",
+        "colorRamp": "Viridis",
         "layout": {
-            "xaxis": {"title": "Hour of day", "color": "#444", "type": "-"},
+            "xaxis": {
+                "title": "Hours after start of simulation",
+                "color": "#444",
+                "type": "-",
+            },
             "yaxis": {"title": "Congestion index", "color": "#444", "type": "-"},
         },
     }
@@ -558,7 +561,7 @@ def combine_csv_datasets(results: list[SimulationResult]) -> str:
     merged_df.sort_values("bin", inplace=True)
 
     output_file = "analysis/people_in_safety.csv"
-    merged_df.to_csv(MATSIM_DATA_DIR / output_file, index=False)
+    _save_dataframe(merged_df, MATSIM_DATA_DIR / output_file)
     return output_file
 
 
@@ -579,3 +582,13 @@ def remove_unclassified_from_trip_stats_by_road_type_and_hour_csv(
     df = pd.read_csv(file_path)
     df = df[df["road_type"] != "unclassified"]
     df.to_csv(file_path, index=False)
+
+
+def _save_dataframe(df: pd.DataFrame, path: Path) -> None:
+    """
+    Save a DataFrame to a CSV file at the specified path, ensuring the parent directory exists.
+    :param df: DataFrame to save.
+    :param path: Path where the CSV file will be saved, including the filename.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(path, index=False)
