@@ -30,7 +30,7 @@ To run the project, execute the following command:
 python src/main.py
 ```
 This will open a browser showcasing the dashboard.
-Nb. SimWrapper does not work with the Safari browser. Paste the link into another browser.
+N.B.: SimWrapper does not work with the Safari browser. Paste the link into another browser.
 
 ## Developer Guide
 
