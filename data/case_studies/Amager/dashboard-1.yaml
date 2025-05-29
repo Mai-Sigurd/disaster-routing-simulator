@@ -82,7 +82,7 @@ layout:
     colorRamp: RdYlBu
     layout:
       xaxis:
-        title: Hour of day
+        title: Hours after start of simulation
         color: '#444'
         type: '-'
       yaxis:

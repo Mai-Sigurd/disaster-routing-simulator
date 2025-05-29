@@ -157,7 +157,7 @@ layout:
           colorRamp: Viridis
       layout:
         xaxis:
-          title: Hour
+          title: Hours after start of simulation
           color: "#444"
           type: "-"
         barmode: overlay
