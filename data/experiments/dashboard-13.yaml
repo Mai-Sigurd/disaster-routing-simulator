@@ -1,0 +1,399 @@
+header:
+  title: Time study
+  description: ''
+layout:
+  table_statistics:
+  - type: csv
+    title: Simulation Statistics
+    dataset: danger_zone_data_time.csv
+    showAllRows: true
+  - type: csv
+    title: Evacuation Statistics
+    dataset: trip_stats_disaster_time.csv
+    showAllRows: true
+  people_in_safety:
+  - type: plotly
+    title: People in Safety
+    description: Fraction of people in safety over time.
+    datasets:
+      Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output: Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output/analysis/analysis/people_in_safety.csv
+      Amager_90min_geopop_div3/dijkstra-fastest-path-output: Amager_90min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/people_in_safety.csv
+      Amager_120min_geopop_div3/dijkstra-fastest-path-output: Amager_120min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/people_in_safety.csv
+      Amager_150min_geopop_div3/dijkstra-fastest-path-output: Amager_150min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/people_in_safety.csv
+      Amager_180min_geopop_div3/dijkstra-fastest-path-output: Amager_180min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/people_in_safety.csv
+    traces:
+    - type: scatter
+      x: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.bin
+      y: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.cumulative_traveltime
+      name: DEPARTURE_TIME_60
+      original_name: DEPARTURE_TIME_60
+      mode: lines
+      line:
+        width: 2
+        smoothing: 1
+        shape: spline
+        dash: solid
+        simplify: true
+        context:
+          width: 2
+          smoothing: 1
+          shape: spline
+          dash: solid
+          simplify: true
+    - type: scatter
+      x: $Amager_90min_geopop_div3/dijkstra-fastest-path-output.bin
+      y: $Amager_90min_geopop_div3/dijkstra-fastest-path-output.cumulative_traveltime
+      name: DEPARTURE_TIME_90
+      original_name: DEPARTURE_TIME_90
+      mode: lines
+      line:
+        width: 2
+        smoothing: 1
+        shape: spline
+        dash: solid
+        simplify: true
+        context:
+          width: 2
+          smoothing: 1
+          shape: spline
+          dash: solid
+          simplify: true
+    - type: scatter
+      x: $Amager_120min_geopop_div3/dijkstra-fastest-path-output.bin
+      y: $Amager_120min_geopop_div3/dijkstra-fastest-path-output.cumulative_traveltime
+      name: DEPARTURE_TIME_120
+      original_name: DEPARTURE_TIME_120
+      mode: lines
+      line:
+        width: 2
+        smoothing: 1
+        shape: spline
+        dash: solid
+        simplify: true
+        context:
+          width: 2
+          smoothing: 1
+          shape: spline
+          dash: solid
+          simplify: true
+    - type: scatter
+      x: $Amager_150min_geopop_div3/dijkstra-fastest-path-output.bin
+      y: $Amager_150min_geopop_div3/dijkstra-fastest-path-output.cumulative_traveltime
+      name: DEPARTURE_TIME_150
+      original_name: DEPARTURE_TIME_150
+      mode: lines
+      line:
+        width: 2
+        smoothing: 1
+        shape: spline
+        dash: solid
+        simplify: true
+        context:
+          width: 2
+          smoothing: 1
+          shape: spline
+          dash: solid
+          simplify: true
+    - type: scatter
+      x: $Amager_180min_geopop_div3/dijkstra-fastest-path-output.bin
+      y: $Amager_180min_geopop_div3/dijkstra-fastest-path-output.cumulative_traveltime
+      name: DEPARTURE_TIME_180
+      original_name: DEPARTURE_TIME_180
+      mode: lines
+      line:
+        width: 2
+        smoothing: 1
+        shape: spline
+        dash: solid
+        simplify: true
+        context:
+          width: 2
+          smoothing: 1
+          shape: spline
+          dash: solid
+          simplify: true
+    colorRamp: Viridis
+    layout:
+      xaxis:
+        title: Time from start of simulation (minutes)
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Fraction of people in safety
+        color: '#444'
+        type: '-'
+  congestion_index_by_hour:
+    type: plotly
+    title: Network congestion index
+    description: by hour
+    datasets:
+      Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output: Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output/analysis/analysis/traffic_stats_by_road_type_and_hour.csv
+      Amager_90min_geopop_div3/dijkstra-fastest-path-output: Amager_90min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/traffic_stats_by_road_type_and_hour.csv
+      Amager_120min_geopop_div3/dijkstra-fastest-path-output: Amager_120min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/traffic_stats_by_road_type_and_hour.csv
+      Amager_150min_geopop_div3/dijkstra-fastest-path-output: Amager_150min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/traffic_stats_by_road_type_and_hour.csv
+      Amager_180min_geopop_div3/dijkstra-fastest-path-output: Amager_180min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/traffic_stats_by_road_type_and_hour.csv
+    traces:
+    - x: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.hour
+      y: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.congestion_index
+      type: scatter
+      name: DEPARTURE_TIME_60
+    - x: $Amager_90min_geopop_div3/dijkstra-fastest-path-output.hour
+      y: $Amager_90min_geopop_div3/dijkstra-fastest-path-output.congestion_index
+      type: scatter
+      name: DEPARTURE_TIME_90
+    - x: $Amager_120min_geopop_div3/dijkstra-fastest-path-output.hour
+      y: $Amager_120min_geopop_div3/dijkstra-fastest-path-output.congestion_index
+      type: scatter
+      name: DEPARTURE_TIME_120
+    - x: $Amager_150min_geopop_div3/dijkstra-fastest-path-output.hour
+      y: $Amager_150min_geopop_div3/dijkstra-fastest-path-output.congestion_index
+      type: scatter
+      name: DEPARTURE_TIME_150
+    - x: $Amager_180min_geopop_div3/dijkstra-fastest-path-output.hour
+      y: $Amager_180min_geopop_div3/dijkstra-fastest-path-output.congestion_index
+      type: scatter
+      name: DEPARTURE_TIME_180
+    colorRamp: Viridis
+    layout:
+      xaxis:
+        title: Hours after start of simulation
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Congestion index
+        color: '#444'
+        type: '-'
+  Trip_distance_distribution:
+  - type: plotly
+    title: Trip Distance Distribution
+    description: ''
+    datasets:
+      Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output:
+        file: Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output/analysis/population/mode_share.csv
+        aggregate:
+          func: SUM
+          groupBy:
+          - dist_group
+          target: share
+      Amager_90min_geopop_div3/dijkstra-fastest-path-output:
+        file: Amager_90min_geopop_div3/dijkstra-fastest-path-output/analysis/population/mode_share.csv
+        aggregate:
+          func: SUM
+          groupBy:
+          - dist_group
+          target: share
+      Amager_120min_geopop_div3/dijkstra-fastest-path-output:
+        file: Amager_120min_geopop_div3/dijkstra-fastest-path-output/analysis/population/mode_share.csv
+        aggregate:
+          func: SUM
+          groupBy:
+          - dist_group
+          target: share
+      Amager_150min_geopop_div3/dijkstra-fastest-path-output:
+        file: Amager_150min_geopop_div3/dijkstra-fastest-path-output/analysis/population/mode_share.csv
+        aggregate:
+          func: SUM
+          groupBy:
+          - dist_group
+          target: share
+      Amager_180min_geopop_div3/dijkstra-fastest-path-output:
+        file: Amager_180min_geopop_div3/dijkstra-fastest-path-output/analysis/population/mode_share.csv
+        aggregate:
+          func: SUM
+          groupBy:
+          - dist_group
+          target: share
+    traces:
+    - x: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.dist_group
+      y: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.share
+      name: DEPARTURE_TIME_60
+      orientation: v
+      type: bar
+      original_name: DEPARTURE_TIME_60
+    - x: $Amager_90min_geopop_div3/dijkstra-fastest-path-output.dist_group
+      y: $Amager_90min_geopop_div3/dijkstra-fastest-path-output.share
+      name: DEPARTURE_TIME_90
+      orientation: v
+      type: bar
+      original_name: DEPARTURE_TIME_90
+    - x: $Amager_120min_geopop_div3/dijkstra-fastest-path-output.dist_group
+      y: $Amager_120min_geopop_div3/dijkstra-fastest-path-output.share
+      name: DEPARTURE_TIME_120
+      orientation: v
+      type: bar
+      original_name: DEPARTURE_TIME_120
+    - x: $Amager_150min_geopop_div3/dijkstra-fastest-path-output.dist_group
+      y: $Amager_150min_geopop_div3/dijkstra-fastest-path-output.share
+      name: DEPARTURE_TIME_150
+      orientation: v
+      type: bar
+      original_name: DEPARTURE_TIME_150
+    - x: $Amager_180min_geopop_div3/dijkstra-fastest-path-output.dist_group
+      y: $Amager_180min_geopop_div3/dijkstra-fastest-path-output.share
+      name: DEPARTURE_TIME_180
+      orientation: v
+      type: bar
+      original_name: DEPARTURE_TIME_180
+    colorRamp: Viridis
+    layout:
+      xaxis:
+        title: Meters
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Proportion
+        color: '#444'
+        type: '-'
+  departures:
+  - type: plotly
+    title: Departures
+    description: by 10-minute intervals
+    datasets:
+      Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output: Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      Amager_90min_geopop_div3/dijkstra-fastest-path-output: Amager_90min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      Amager_120min_geopop_div3/dijkstra-fastest-path-output: Amager_120min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      Amager_150min_geopop_div3/dijkstra-fastest-path-output: Amager_150min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      Amager_180min_geopop_div3/dijkstra-fastest-path-output: Amager_180min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+    traces:
+    - x: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.bin
+      y: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.departure
+      name: DEPARTURE_TIME_60
+      orientation: v
+      type: bar
+      original_name: DEPARTURE_TIME_60
+    - x: $Amager_90min_geopop_div3/dijkstra-fastest-path-output.bin
+      y: $Amager_90min_geopop_div3/dijkstra-fastest-path-output.departure
+      name: DEPARTURE_TIME_90
+      orientation: v
+      type: bar
+      original_name: DEPARTURE_TIME_90
+    - x: $Amager_120min_geopop_div3/dijkstra-fastest-path-output.bin
+      y: $Amager_120min_geopop_div3/dijkstra-fastest-path-output.departure
+      name: DEPARTURE_TIME_120
+      orientation: v
+      type: bar
+      original_name: DEPARTURE_TIME_120
+    - x: $Amager_150min_geopop_div3/dijkstra-fastest-path-output.bin
+      y: $Amager_150min_geopop_div3/dijkstra-fastest-path-output.departure
+      name: DEPARTURE_TIME_150
+      orientation: v
+      type: bar
+      original_name: DEPARTURE_TIME_150
+    - x: $Amager_180min_geopop_div3/dijkstra-fastest-path-output.bin
+      y: $Amager_180min_geopop_div3/dijkstra-fastest-path-output.departure
+      name: DEPARTURE_TIME_180
+      orientation: v
+      type: bar
+      original_name: DEPARTURE_TIME_180
+    colorRamp: Viridis
+    layout:
+      xaxis:
+        title: Time from start of simulation (minutes)
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Number of people
+        color: '#444'
+        type: '-'
+  arrivals:
+  - type: plotly
+    title: Arrivals
+    description: by 10-minute intervals
+    datasets:
+      Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output: Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      Amager_90min_geopop_div3/dijkstra-fastest-path-output: Amager_90min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      Amager_120min_geopop_div3/dijkstra-fastest-path-output: Amager_120min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      Amager_150min_geopop_div3/dijkstra-fastest-path-output: Amager_150min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      Amager_180min_geopop_div3/dijkstra-fastest-path-output: Amager_180min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+    traces:
+    - x: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.bin
+      y: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.arrival
+      name: DEPARTURE_TIME_60
+      orientation: v
+      type: bar
+      original_name: DEPARTURE_TIME_60
+    - x: $Amager_90min_geopop_div3/dijkstra-fastest-path-output.bin
+      y: $Amager_90min_geopop_div3/dijkstra-fastest-path-output.arrival
+      name: DEPARTURE_TIME_90
+      orientation: v
+      type: bar
+      original_name: DEPARTURE_TIME_90
+    - x: $Amager_120min_geopop_div3/dijkstra-fastest-path-output.bin
+      y: $Amager_120min_geopop_div3/dijkstra-fastest-path-output.arrival
+      name: DEPARTURE_TIME_120
+      orientation: v
+      type: bar
+      original_name: DEPARTURE_TIME_120
+    - x: $Amager_150min_geopop_div3/dijkstra-fastest-path-output.bin
+      y: $Amager_150min_geopop_div3/dijkstra-fastest-path-output.arrival
+      name: DEPARTURE_TIME_150
+      orientation: v
+      type: bar
+      original_name: DEPARTURE_TIME_150
+    - x: $Amager_180min_geopop_div3/dijkstra-fastest-path-output.bin
+      y: $Amager_180min_geopop_div3/dijkstra-fastest-path-output.arrival
+      name: DEPARTURE_TIME_180
+      orientation: v
+      type: bar
+      original_name: DEPARTURE_TIME_180
+    colorRamp: Viridis
+    layout:
+      xaxis:
+        title: Time from start of simulation (minutes)
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Number of people
+        color: '#444'
+        type: '-'
+  travel_time:
+  - type: plotly
+    title: Travel Time
+    description: by 10-minute intervals
+    datasets:
+      Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output: Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      Amager_90min_geopop_div3/dijkstra-fastest-path-output: Amager_90min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      Amager_120min_geopop_div3/dijkstra-fastest-path-output: Amager_120min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      Amager_150min_geopop_div3/dijkstra-fastest-path-output: Amager_150min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      Amager_180min_geopop_div3/dijkstra-fastest-path-output: Amager_180min_geopop_div3/dijkstra-fastest-path-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+    traces:
+    - x: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.bin
+      y: $Amager_60min_geopop_div3_basis/dijkstra-fastest-path-output.traveltime
+      name: DEPARTURE_TIME_60
+      orientation: v
+      type: bar
+      original_name: DEPARTURE_TIME_60
+    - x: $Amager_90min_geopop_div3/dijkstra-fastest-path-output.bin
+      y: $Amager_90min_geopop_div3/dijkstra-fastest-path-output.traveltime
+      name: DEPARTURE_TIME_90
+      orientation: v
+      type: bar
+      original_name: DEPARTURE_TIME_90
+    - x: $Amager_120min_geopop_div3/dijkstra-fastest-path-output.bin
+      y: $Amager_120min_geopop_div3/dijkstra-fastest-path-output.traveltime
+      name: DEPARTURE_TIME_120
+      orientation: v
+      type: bar
+      original_name: DEPARTURE_TIME_120
+    - x: $Amager_150min_geopop_div3/dijkstra-fastest-path-output.bin
+      y: $Amager_150min_geopop_div3/dijkstra-fastest-path-output.traveltime
+      name: DEPARTURE_TIME_150
+      orientation: v
+      type: bar
+      original_name: DEPARTURE_TIME_150
+    - x: $Amager_180min_geopop_div3/dijkstra-fastest-path-output.bin
+      y: $Amager_180min_geopop_div3/dijkstra-fastest-path-output.traveltime
+      name: DEPARTURE_TIME_180
+      orientation: v
+      type: bar
+      original_name: DEPARTURE_TIME_180
+    colorRamp: Viridis
+    layout:
+      xaxis:
+        title: Time from departure to arrival (minutes)
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Trips
+        color: '#444'
+        type: '-'
