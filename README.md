@@ -4,7 +4,7 @@ In order to run the project, follow the steps outline in the Setup section and r
 
 ## Setup
 
-This project requires **Python 3.12+**.
+This project requires **Python 3.10+**.
 
 
 ### Virtual environment
@@ -29,6 +29,8 @@ To run the project, execute the following command:
 ```bash
 python src/main.py
 ```
+This will open a browser showcasing the dashboard.
+N.B.: SimWrapper does not work with the Safari browser. Paste the link into another browser.
 
 ## Developer Guide
 
