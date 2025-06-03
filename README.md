@@ -4,7 +4,7 @@ In order to run the project, follow the steps outline in the Setup section and r
 
 ## Setup
 
-This project requires **Python 3.10+**, and JAVA 
+This project requires **Python 3.10+**, and Java
 
 
 ### Virtual environment
