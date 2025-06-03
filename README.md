@@ -22,6 +22,8 @@ poetry install
 ```
 
 ### Install Java
+If you are using macOS, you can install Java using Homebrew:
+
 ```bash
 # Install Java 23 and Maven
 brew install openjdk@23 maven
