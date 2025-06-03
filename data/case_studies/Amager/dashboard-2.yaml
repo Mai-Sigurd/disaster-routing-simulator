@@ -51,6 +51,23 @@ layout:
       file: /dijkstra-fastest-path-output/analysis/population_data.geojson
       join: osm_id
     backgroundLayers: {}
+  congestion_map:
+  - type: xytime
+    title: Congestion
+    height: 12.0
+    file: dijkstra-fastest-path-output/analysis/analysis/congestion.xyt.csv
+    radius: 10.0
+    breakpoints:
+    - 0.1
+    - 0.2
+    - 0.3
+    - 0.4
+    - 0.5
+    - 0.6
+    - 0.7
+    - 0.8
+    - 0.9
+
   departure-arrival:
   - type: plotly
     title: Departures and Arrivals
@@ -93,7 +110,7 @@ layout:
       orientation: v
       type: bar
       name: $dataset.purpose
-      colorRamp: Spectral
+      colorRamp: Viridis
     layout:
       xaxis:
         title: Time from departure to arrival (minutes)
@@ -154,10 +171,10 @@ layout:
       whiskerwidth: 0.0
       type: scatter
       name: $dataset.road_type
-      colorRamp: Spectral
+      colorRamp: Viridis
     layout:
       xaxis:
-        title: Hour
+        title: Hours after start of simulation
         color: '#444'
         type: '-'
       barmode: overlay
@@ -191,19 +208,3 @@ layout:
     shapes:
       join: id
       file: dijkstra-fastest-path-output/analysis/network/network.avro
-  congestion_map:
-  - type: xytime
-    title: Congestion
-    height: 12.0
-    file: dijkstra-fastest-path-output/analysis/analysis/congestion.xyt.csv
-    radius: 10.0
-    breakpoints:
-    - 0.1
-    - 0.2
-    - 0.3
-    - 0.4
-    - 0.5
-    - 0.6
-    - 0.7
-    - 0.8
-    - 0.9

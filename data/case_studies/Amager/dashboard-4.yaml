@@ -93,7 +93,7 @@ layout:
           orientation: v
           type: bar
           name: $dataset.purpose
-          colorRamp: Spectral
+          colorRamp: Viridis
       layout:
         xaxis:
           title: Time from departure to arrival (minutes)
@@ -154,10 +154,10 @@ layout:
           whiskerwidth: 0.0
           type: scatter
           name: $dataset.road_type
-          colorRamp: Spectral
+          colorRamp: Viridis
       layout:
         xaxis:
-          title: Hour
+          title: Hours after start of simulation
           color: "#444"
           type: "-"
         barmode: overlay

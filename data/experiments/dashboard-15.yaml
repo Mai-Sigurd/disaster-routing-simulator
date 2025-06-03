@@ -1,0 +1,341 @@
+header:
+  title: Diversifying endpoints study
+  description: ''
+layout:
+  table_statistics:
+  - type: csv
+    title: Simulation Statistics
+    dataset: danger_zone_data_diversifying.csv
+    showAllRows: true
+  - type: csv
+    title: Evacuation Statistics
+    dataset: trip_stats_disaster_diversifying.csv
+    showAllRows: true
+  people_in_safety:
+  - type: plotly
+    title: People in Safety
+    description: Fraction of people in safety over time.
+    datasets:
+      fastest-shortest-combined/amager-fastest-1-output: fastest-shortest-combined/amager-fastest-1-output/analysis/analysis/people_in_safety.csv
+      fastest-shortest-combined/amager-fastest-3-output: fastest-shortest-combined/amager-fastest-3-output/analysis/analysis/people_in_safety.csv
+      fastest-shortest-combined/amager-shortest-1-output: fastest-shortest-combined/amager-shortest-1-output/analysis/analysis/people_in_safety.csv
+      fastest-shortest-combined/amager-shortest-3-output: fastest-shortest-combined/amager-shortest-3-output/analysis/analysis/people_in_safety.csv
+    traces:
+    - type: scatter
+      x: $fastest-shortest-combined/amager-fastest-1-output.bin
+      y: $fastest-shortest-combined/amager-fastest-1-output.cumulative_traveltime
+      name: FASTEST_DIV1
+      original_name: FASTEST_DIV1
+      mode: lines
+      line:
+        width: 2
+        smoothing: 1
+        shape: spline
+        dash: solid
+        simplify: true
+        context:
+          width: 2
+          smoothing: 1
+          shape: spline
+          dash: solid
+          simplify: true
+    - type: scatter
+      x: $fastest-shortest-combined/amager-fastest-3-output.bin
+      y: $fastest-shortest-combined/amager-fastest-3-output.cumulative_traveltime
+      name: FASTEST_DIV3
+      original_name: FASTEST_DIV3
+      mode: lines
+      line:
+        width: 2
+        smoothing: 1
+        shape: spline
+        dash: solid
+        simplify: true
+        context:
+          width: 2
+          smoothing: 1
+          shape: spline
+          dash: solid
+          simplify: true
+    - type: scatter
+      x: $fastest-shortest-combined/amager-shortest-1-output.bin
+      y: $fastest-shortest-combined/amager-shortest-1-output.cumulative_traveltime
+      name: SHORTEST_DIV1
+      original_name: SHORTEST_DIV1
+      mode: lines
+      line:
+        width: 2
+        smoothing: 1
+        shape: spline
+        dash: solid
+        simplify: true
+        context:
+          width: 2
+          smoothing: 1
+          shape: spline
+          dash: solid
+          simplify: true
+    - type: scatter
+      x: $fastest-shortest-combined/amager-shortest-3-output.bin
+      y: $fastest-shortest-combined/amager-shortest-3-output.cumulative_traveltime
+      name: SHORTEST_DIV3
+      original_name: SHORTEST_DIV3
+      mode: lines
+      line:
+        width: 2
+        smoothing: 1
+        shape: spline
+        dash: solid
+        simplify: true
+        context:
+          width: 2
+          smoothing: 1
+          shape: spline
+          dash: solid
+          simplify: true
+    colorRamp: Viridis
+    layout:
+      xaxis:
+        title: Time from start of simulation (minutes)
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Fraction of people in safety
+        color: '#444'
+        type: '-'
+  congestion_index_by_hour:
+    type: plotly
+    title: Network congestion index
+    description: by hour
+    datasets:
+      fastest-shortest-combined/amager-fastest-1-output: fastest-shortest-combined/amager-fastest-1-output/analysis/analysis/traffic_stats_by_road_type_and_hour.csv
+      fastest-shortest-combined/amager-fastest-3-output: fastest-shortest-combined/amager-fastest-3-output/analysis/analysis/traffic_stats_by_road_type_and_hour.csv
+      fastest-shortest-combined/amager-shortest-1-output: fastest-shortest-combined/amager-shortest-1-output/analysis/analysis/traffic_stats_by_road_type_and_hour.csv
+      fastest-shortest-combined/amager-shortest-3-output: fastest-shortest-combined/amager-shortest-3-output/analysis/analysis/traffic_stats_by_road_type_and_hour.csv
+    traces:
+    - x: $fastest-shortest-combined/amager-fastest-1-output.hour
+      y: $fastest-shortest-combined/amager-fastest-1-output.congestion_index
+      type: scatter
+      name: FASTEST_DIV1
+    - x: $fastest-shortest-combined/amager-fastest-3-output.hour
+      y: $fastest-shortest-combined/amager-fastest-3-output.congestion_index
+      type: scatter
+      name: FASTEST_DIV3
+    - x: $fastest-shortest-combined/amager-shortest-1-output.hour
+      y: $fastest-shortest-combined/amager-shortest-1-output.congestion_index
+      type: scatter
+      name: SHORTEST_DIV1
+    - x: $fastest-shortest-combined/amager-shortest-3-output.hour
+      y: $fastest-shortest-combined/amager-shortest-3-output.congestion_index
+      type: scatter
+      name: SHORTEST_DIV3
+    colorRamp: Viridis
+    layout:
+      xaxis:
+        title: Hours after start of simulation
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Congestion index
+        color: '#444'
+        type: '-'
+  Trip_distance_distribution:
+  - type: plotly
+    title: Trip Distance Distribution
+    description: ''
+    datasets:
+      fastest-shortest-combined/amager-fastest-1-output:
+        file: fastest-shortest-combined/amager-fastest-1-output/analysis/population/mode_share.csv
+        aggregate:
+          func: SUM
+          groupBy:
+          - dist_group
+          target: share
+      fastest-shortest-combined/amager-fastest-3-output:
+        file: fastest-shortest-combined/amager-fastest-3-output/analysis/population/mode_share.csv
+        aggregate:
+          func: SUM
+          groupBy:
+          - dist_group
+          target: share
+      fastest-shortest-combined/amager-shortest-1-output:
+        file: fastest-shortest-combined/amager-shortest-1-output/analysis/population/mode_share.csv
+        aggregate:
+          func: SUM
+          groupBy:
+          - dist_group
+          target: share
+      fastest-shortest-combined/amager-shortest-3-output:
+        file: fastest-shortest-combined/amager-shortest-3-output/analysis/population/mode_share.csv
+        aggregate:
+          func: SUM
+          groupBy:
+          - dist_group
+          target: share
+    traces:
+    - x: $fastest-shortest-combined/amager-fastest-1-output.dist_group
+      y: $fastest-shortest-combined/amager-fastest-1-output.share
+      name: FASTEST_DIV1
+      orientation: v
+      type: bar
+      original_name: FASTEST_DIV1
+    - x: $fastest-shortest-combined/amager-fastest-3-output.dist_group
+      y: $fastest-shortest-combined/amager-fastest-3-output.share
+      name: FASTEST_DIV3
+      orientation: v
+      type: bar
+      original_name: FASTEST_DIV3
+    - x: $fastest-shortest-combined/amager-shortest-1-output.dist_group
+      y: $fastest-shortest-combined/amager-shortest-1-output.share
+      name: SHORTEST_DIV1
+      orientation: v
+      type: bar
+      original_name: SHORTEST_DIV1
+    - x: $fastest-shortest-combined/amager-shortest-3-output.dist_group
+      y: $fastest-shortest-combined/amager-shortest-3-output.share
+      name: SHORTEST_DIV3
+      orientation: v
+      type: bar
+      original_name: SHORTEST_DIV3
+    colorRamp: Viridis
+    layout:
+      xaxis:
+        title: Meters
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Proportion
+        color: '#444'
+        type: '-'
+  departures:
+  - type: plotly
+    title: Departures
+    description: by 10-minute intervals
+    datasets:
+      fastest-shortest-combined/amager-fastest-1-output: fastest-shortest-combined/amager-fastest-1-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      fastest-shortest-combined/amager-fastest-3-output: fastest-shortest-combined/amager-fastest-3-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      fastest-shortest-combined/amager-shortest-1-output: fastest-shortest-combined/amager-shortest-1-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      fastest-shortest-combined/amager-shortest-3-output: fastest-shortest-combined/amager-shortest-3-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+    traces:
+    - x: $fastest-shortest-combined/amager-fastest-1-output.bin
+      y: $fastest-shortest-combined/amager-fastest-1-output.departure
+      name: FASTEST_DIV1
+      orientation: v
+      type: bar
+      original_name: FASTEST_DIV1
+    - x: $fastest-shortest-combined/amager-fastest-3-output.bin
+      y: $fastest-shortest-combined/amager-fastest-3-output.departure
+      name: FASTEST_DIV3
+      orientation: v
+      type: bar
+      original_name: FASTEST_DIV3
+    - x: $fastest-shortest-combined/amager-shortest-1-output.bin
+      y: $fastest-shortest-combined/amager-shortest-1-output.departure
+      name: SHORTEST_DIV1
+      orientation: v
+      type: bar
+      original_name: SHORTEST_DIV1
+    - x: $fastest-shortest-combined/amager-shortest-3-output.bin
+      y: $fastest-shortest-combined/amager-shortest-3-output.departure
+      name: SHORTEST_DIV3
+      orientation: v
+      type: bar
+      original_name: SHORTEST_DIV3
+    colorRamp: Viridis
+    layout:
+      xaxis:
+        title: Time from start of simulation (minutes)
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Number of people
+        color: '#444'
+        type: '-'
+  arrivals:
+  - type: plotly
+    title: Arrivals
+    description: by 10-minute intervals
+    datasets:
+      fastest-shortest-combined/amager-fastest-1-output: fastest-shortest-combined/amager-fastest-1-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      fastest-shortest-combined/amager-fastest-3-output: fastest-shortest-combined/amager-fastest-3-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      fastest-shortest-combined/amager-shortest-1-output: fastest-shortest-combined/amager-shortest-1-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      fastest-shortest-combined/amager-shortest-3-output: fastest-shortest-combined/amager-shortest-3-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+    traces:
+    - x: $fastest-shortest-combined/amager-fastest-1-output.bin
+      y: $fastest-shortest-combined/amager-fastest-1-output.arrival
+      name: FASTEST_DIV1
+      orientation: v
+      type: bar
+      original_name: FASTEST_DIV1
+    - x: $fastest-shortest-combined/amager-fastest-3-output.bin
+      y: $fastest-shortest-combined/amager-fastest-3-output.arrival
+      name: FASTEST_DIV3
+      orientation: v
+      type: bar
+      original_name: FASTEST_DIV3
+    - x: $fastest-shortest-combined/amager-shortest-1-output.bin
+      y: $fastest-shortest-combined/amager-shortest-1-output.arrival
+      name: SHORTEST_DIV1
+      orientation: v
+      type: bar
+      original_name: SHORTEST_DIV1
+    - x: $fastest-shortest-combined/amager-shortest-3-output.bin
+      y: $fastest-shortest-combined/amager-shortest-3-output.arrival
+      name: SHORTEST_DIV3
+      orientation: v
+      type: bar
+      original_name: SHORTEST_DIV3
+    colorRamp: Viridis
+    layout:
+      xaxis:
+        title: Time from start of simulation (minutes)
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Number of people
+        color: '#444'
+        type: '-'
+  travel_time:
+  - type: plotly
+    title: Travel Time
+    description: by 10-minute intervals
+    datasets:
+      fastest-shortest-combined/amager-fastest-1-output: fastest-shortest-combined/amager-fastest-1-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      fastest-shortest-combined/amager-fastest-3-output: fastest-shortest-combined/amager-fastest-3-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      fastest-shortest-combined/amager-shortest-1-output: fastest-shortest-combined/amager-shortest-1-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+      fastest-shortest-combined/amager-shortest-3-output: fastest-shortest-combined/amager-shortest-3-output/analysis/analysis/trip_purposes_by_10_minutes.csv
+    traces:
+    - x: $fastest-shortest-combined/amager-fastest-1-output.bin
+      y: $fastest-shortest-combined/amager-fastest-1-output.traveltime
+      name: FASTEST_DIV1
+      orientation: v
+      type: bar
+      original_name: FASTEST_DIV1
+    - x: $fastest-shortest-combined/amager-fastest-3-output.bin
+      y: $fastest-shortest-combined/amager-fastest-3-output.traveltime
+      name: FASTEST_DIV3
+      orientation: v
+      type: bar
+      original_name: FASTEST_DIV3
+    - x: $fastest-shortest-combined/amager-shortest-1-output.bin
+      y: $fastest-shortest-combined/amager-shortest-1-output.traveltime
+      name: SHORTEST_DIV1
+      orientation: v
+      type: bar
+      original_name: SHORTEST_DIV1
+    - x: $fastest-shortest-combined/amager-shortest-3-output.bin
+      y: $fastest-shortest-combined/amager-shortest-3-output.traveltime
+      name: SHORTEST_DIV3
+      orientation: v
+      type: bar
+      original_name: SHORTEST_DIV3
+    colorRamp: Viridis
+    layout:
+      xaxis:
+        title: Time from departure to arrival (minutes)
+        color: '#444'
+        type: '-'
+      yaxis:
+        title: Trips
+        color: '#444'
+        type: '-'
