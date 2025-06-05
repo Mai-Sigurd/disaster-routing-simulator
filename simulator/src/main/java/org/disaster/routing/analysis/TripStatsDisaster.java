@@ -296,7 +296,7 @@ public class TripStatsDisaster implements MATSimAppCommand {
         try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("trip_stats_disaster.csv")), CSVFormat.DEFAULT)) {
 
             printer.print("Info");
-            printer.print(m);
+            printer.print("Value");
 
             printer.println();
 

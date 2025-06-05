@@ -1,7 +1,7 @@
-Info, Value
-Danger Zone Area (km²),114.98
-Departure time window length [minutes],60.0
-Total lane km,1194.93
-Amount of routes,13638.0
-Amount of nodes with no route to safety,13.0
-Total population,46673.0
+Info,Dijkstra - Fastest Path,Dijkstra - Shortest Path
+Danger Zone Area (km²),114.98,114.98
+Departure time window length [minutes],60.0,60.0
+Total lane km,1702.74,1702.74
+Amount of routes,14551.0,14551.0
+Amount of nodes with no route to safety,13.0,13.0
+Total population,46913.0,46913.0
