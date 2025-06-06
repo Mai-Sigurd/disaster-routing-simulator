@@ -1,20 +1,12 @@
-import heapq as hq
 import logging
 from typing import Dict
 
 import geopandas as gpd
 import networkx as nx
 import zope.interface
-from tqdm import tqdm
 
 from routes.route_algo import RouteAlgo
-from routes.route_utils import (
-    get_final_route,
-    is_in_dangerzone,
-    path,
-    update_priority,
-    vertex,
-)
+from routes.route_utils import path, route_to_safety_with_weight_func, vertex
 
 
 @zope.interface.implementer(RouteAlgo)
@@ -39,88 +31,24 @@ class ShortestPath:
         :param diversifying_routes: The number of routes to find for each origin point
         :return: A dictionary from an origin point to a list of 1 or more paths
         """
-        should_reuse_paths = diversifying_routes == 1
-        has_path_been_calculated = dict((node, False) for node in origin_points)
-        routes: dict[vertex, list[path]] = {}
-
         logging.info("Routing shortest path to safety for all origin points")
-
-        for origin in tqdm(origin_points):
-            amount_of_routes = 0
-            if has_path_been_calculated[origin] and should_reuse_paths:
-                continue  # path has already been calculated in another iteration
-            try:
-                if len(list(G.neighbors(origin))) == 0:
-                    logging.info(f"Node {origin} has no neighbors")
-                    continue  # Skip if the origin node doesn't have neighbors
-            except nx.NetworkXError:
-                logging.error(f"Origin node {origin} is not in the graph")
-                continue
-            sptSet = dict((node, False) for node in list(G.nodes))
-            dist: list[tuple[float, str]] = [(float("inf"), node) for node in G.nodes]
-            node_priority = {node: float("inf") for node in G.nodes}
-            hq.heapify(dist)
-            predecessor: dict[str, str | None] = {
-                node: None for node in G.nodes
-            }  # To track the shortest path
-
-            update_priority(dist, node_priority, origin, 0)
-            while dist:
-                priority, smallest_node = hq.heappop(
-                    dist
-                )  # popping the node with the current smallest dist to origin
-                if priority == float("inf"):
-                    logging.info(
-                        f"Node {origin} cannot reach any nodes outside the dangerzone"
-                    )
-                    break
-                if (
-                    priority == node_priority[smallest_node]
-                ):  # Only use values that are not outdated
-                    if not sptSet[smallest_node]:
-                        sptSet[smallest_node] = True
-                        for _, neighbour, edge_data in G.edges(
-                            smallest_node, data=True
-                        ):  # looping through all adjacent vertices
-                            weight = edge_data.get("length", float("inf"))
-                            # Default weight to inf, weight of edge between smallest_node and neighbour
-                            new_distance = priority + weight
-
-                            if is_in_dangerzone(smallest_node, danger_zone, G):
-                                if new_distance < node_priority[neighbour]:
-                                    update_priority(
-                                        dist, node_priority, neighbour, new_distance
-                                    )
-                                    predecessor[neighbour] = smallest_node
-                else:
-                    # This node has already been processed with a better path
-                    continue
-                if not is_in_dangerzone(
-                    smallest_node, danger_zone, G
-                ):  # We have found the shortest route to node outside danger zone
-                    final_route, amount_of_routes = get_final_route(
-                        amount_of_routes=amount_of_routes,
-                        predecessor=predecessor,
-                        smallest_node=smallest_node,
-                        origin=origin,
-                    )
-                    if final_route[0] in routes:
-                        routes[final_route[0]].append(final_route)
-                    else:
-                        routes[final_route[0]] = [final_route]
-
-                    if should_reuse_paths:
-                        has_path_been_calculated[origin] = True
-                        for i in range(
-                            len(final_route) - 1
-                        ):  # -1 since the last node is outside the danger zone and therefore does not need a path
-                            if (
-                                final_route[i] in has_path_been_calculated
-                                and not has_path_been_calculated[final_route[i]]
-                            ):
-                                routes[final_route[i]] = [final_route[i:]]
-                                # we take the route from i and forward
-                                has_path_been_calculated[final_route[i]] = True
-                    if amount_of_routes >= diversifying_routes:
-                        break  # there is no need to find other routes for this origin point
+        routes: Dict[vertex, list[path]] = route_to_safety_with_weight_func(
+            origin_points=origin_points,
+            danger_zone=danger_zone,
+            G=G,
+            weight_func=_shortest_path_weight_func,
+            diversifying_routes=diversifying_routes,
+        )
         return routes
+
+
+def _shortest_path_weight_func(priority: float, edge_data) -> float:  # type: ignore
+    """
+    Calculates the weight of an edge in the shortest path algorithm.
+    :param priority: The current priority of the node.
+    :param edge_data: The data associated with the edge.
+    """
+    weight = edge_data.get("length", float("inf"))
+    # Default weight to inf, weight of edge between smallest_node and neighbour
+    new_distance: float = priority + weight
+    return new_distance
