@@ -51,8 +51,8 @@ layout:
         join: link_id
         colorRamp:
           ramp: RdYlBu
-          steps: 5
           reverse: false
+          steps: 5
       fill: {}
       fillHeight: {}
       radius: {}

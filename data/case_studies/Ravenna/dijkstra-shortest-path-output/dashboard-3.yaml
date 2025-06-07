@@ -11,10 +11,10 @@ layout:
         constant:
           source: Simulated
         aggregate:
-          func: SUM
+          target: share
           groupBy:
           - main_mode
-          target: share
+          func: SUM
     traces:
     - x: $dataset.share
       "y": $dataset.source
@@ -29,10 +29,10 @@ layout:
       dataset:
         file: analysis/population/mode_share.csv
         aggregate:
-          func: SUM
+          target: share
           groupBy:
           - dist_group
-          target: share
+          func: SUM
     traces:
     - x: $dataset.dist_group
       "y": $dataset.share
@@ -101,8 +101,8 @@ layout:
       dataset:
         file: analysis/population/mode_share_distance_distribution.csv
         pivot:
-          valuesTo: share
           namesTo: main_mode
+          valuesTo: share
           exclude:
           - dist
         constant:
