@@ -26,8 +26,8 @@ layout:
         join: link_id
         colorRamp:
           ramp: RdYlBu
-          steps: 5
           reverse: true
+          steps: 5
       fill: {}
       fillHeight: {}
       radius: {}
@@ -90,9 +90,9 @@ layout:
         file: analysis/general/memory_stats.csv
         pivot:
           valuesTo: values
+          namesTo: names
           exclude:
           - time
-          namesTo: names
     traces:
     - x: $dataset.time
       "y": $dataset.values

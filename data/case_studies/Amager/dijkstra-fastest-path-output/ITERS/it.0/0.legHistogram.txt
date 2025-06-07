@@ -1,0 +1,3 @@
+time	time	departures_all	arrivals_all	stuck_all	en-route_all	departures_car	arrivals_car	stuck_car	en-route_car
+00:00:00	0	307	44	0	263	307	44	0	263
+00:05:00	300	46266	46529	0	0	46266	46529	0	0

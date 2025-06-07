@@ -25,15 +25,15 @@ layout:
         columnName: simulated_traffic_volume
         join: link_id
         colorRamp:
-          reverse: true
-          steps: 5
           ramp: RdYlBu
+          steps: 5
+          reverse: true
       fill: {}
       fillHeight: {}
       radius: {}
     shapes:
-      join: linkId
       file: analysis/network/network.avro
+      join: linkId
   warnings:
   - type: text
     file: analysis/general/status.md
@@ -89,8 +89,8 @@ layout:
       dataset:
         file: analysis/general/memory_stats.csv
         pivot:
-          valuesTo: values
           namesTo: names
+          valuesTo: values
           exclude:
           - time
     traces:

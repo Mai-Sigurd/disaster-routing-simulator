@@ -50,15 +50,15 @@ layout:
         columnName: avg_speed
         join: link_id
         colorRamp:
-          reverse: false
-          steps: 5
           ramp: RdYlBu
+          steps: 5
+          reverse: false
       fill: {}
       fillHeight: {}
       radius: {}
     shapes:
-      join: id
       file: analysis/network/network.avro
+      join: id
   info:
   - type: text
     backgroundColor: transparent

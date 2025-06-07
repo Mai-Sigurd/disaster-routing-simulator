@@ -17,10 +17,10 @@ layout:
       dataset:
         file: dijkstra-shortest-path-output/analysis/population/mode_share.csv
         aggregate:
-          func: SUM
+          target: share
           groupBy:
           - dist_group
-          target: share
+          func: SUM
     traces:
     - x: $dataset.dist_group
       y: $dataset.share
@@ -170,7 +170,7 @@ layout:
       whiskerwidth: 0.0
       type: scatter
       name: $dataset.road_type
-      colorRamp: Viridis
+      colorRamp: Spectral
     layout:
       xaxis:
         title: Hours after start of simulation
@@ -178,7 +178,7 @@ layout:
         type: '-'
       barmode: overlay
       yaxis:
-        title: Index
+        title: Congestion Index
         color: '#444'
         type: '-'
   map:
@@ -198,13 +198,12 @@ layout:
         columnName: Avg. speed limit
         join: link_id
         colorRamp:
-          reverse: false
+          ramp: Viridis
           steps: 5
-          ramp: RdYlBu
+          reverse: false
       fill: {}
       fillHeight: {}
       radius: {}
     shapes:
-      join: id
       file: dijkstra-shortest-path-output/analysis/network/network.avro
-
+      join: id
