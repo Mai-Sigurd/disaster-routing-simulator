@@ -378,7 +378,7 @@ def _create_evacuation_statistics_table(
     :return: A list of dashboard widget configurations.
     """
     dfs = [
-        pd.read_csv(result.trip_stats_csv_path).rename(columns={"car": result.title})
+        pd.read_csv(result.trip_stats_csv_path).rename(columns={"Value": result.title})
         for result in results
     ]
 
