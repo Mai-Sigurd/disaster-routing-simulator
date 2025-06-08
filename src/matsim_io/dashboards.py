@@ -350,7 +350,7 @@ def _create_simulation_statistics_table(
     """
     dfs = [
         pd.read_csv(result.danger_zone_data_csv_path).rename(
-            columns={"car": result.title}
+            columns={" Value": "Value"}
         )
         for result in results
     ]
